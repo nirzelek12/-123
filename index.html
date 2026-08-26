@@ -58,7 +58,7 @@
         }
 
         .main-container {
-            max-width: 1250px;
+            max-width: 1300px;
             margin: 0 auto;
             background: var(--bg-card);
             padding: 20px;
@@ -96,28 +96,38 @@
 
         .theme-toggle-btn:hover { background: rgba(255, 255, 255, 0.25); }
 
-        .add-player-form {
+        .controls-section {
             display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
             justify-content: center;
-            gap: 8px;
             margin-top: 15px;
+            background: rgba(0,0,0,0.15);
+            padding: 12px;
+            border-radius: 6px;
         }
 
-        .add-player-form input {
-            padding: 6px 12px;
+        .form-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .controls-section input {
+            padding: 6px 10px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             outline: none;
             background-color: var(--input-bg);
             color: var(--text-main);
         }
 
-        .add-player-form button {
+        .controls-section button {
             background-color: #f4d35e;
             color: #0d3b66;
             border: none;
-            padding: 6px 14px;
+            padding: 6px 12px;
             border-radius: 4px;
             font-weight: 800;
             cursor: pointer;
@@ -269,16 +279,25 @@
     <header>
         <button class="theme-toggle-btn" onclick="toggleTheme()">🌙 / ☀️ מצב תצוגה</button>
         <h1>ליגת הניחושים - ריאל מדריד 2026/27</h1>
-        <div class="add-player-form">
-            <input type="text" id="newPlayerName" placeholder="שם שחקן...">
-            <button onclick="addNewPlayer()">הוסף</button>
+        <p class="subtitle">סנכרון בזמן אמת בשרת ענן (Firebase)</p>
+
+        <div class="controls-section">
+            <div class="form-group">
+                <input type="text" id="newPlayerName" placeholder="שם שחקן...">
+                <button onclick="addNewPlayer()">+ הוסף שחקן</button>
+            </div>
+            <div class="form-group" style="border-right: 1px solid rgba(255,255,255,0.2); padding-right: 15px;">
+                <input type="text" id="newMatchName" placeholder="שם המשחק (למשל: ריאל - ליברפול)">
+                <input type="date" id="newMatchDate">
+                <button onclick="addNewMatch()">+ הוסף משחק</button>
+            </div>
         </div>
     </header>
 
     <div class="scoreboard" id="playersBar"></div>
 
     <div class="top-bar">
-        <span>🌐 מחובר ומסונכרן</span>
+        <span>🌐 מחובר ומסונכרן בזמן אמת</span>
         <button class="reset-btn" onclick="resetAllData()">איפוס נתונים</button>
     </div>
 
@@ -328,62 +347,79 @@
     const db = firebase.database();
 
     const DEFAULT_PLAYERS = ["ניר", "ליאור", "אבירם", "שון", "חן", "מאור"];
-    let currentPlayers = [];
-    let currentData = {};
-
-    const matches = [
-        { match: "אספניול - ריאל מדריד", date: "22/08/2026", defaultActual: "1-2" },
-        { match: "ריאל מדריד - ריאל סוסיאדד", date: "26/08/2026" },
-        { match: "ריאל מדריד - מלאגה", date: "30/08/2026" },
-        { match: "ריאל בטיס - ריאל מדריד", date: "04/09/2026" },
-        { match: "ריאל מדריד - ראיו ואייקאנו", date: "13/09/2026" },
-        { match: "אלצ'ה - ריאל מדריד", date: "16/09/2026" },
-        { match: "אתלטיקו מדריד - ריאל מדריד", date: "20/09/2026" },
-        { match: "ריאל מדריד - ויאריאל", date: "11/10/2026" },
-        { match: "ריאל מדריד - סביליה", date: "18/10/2026" },
-        { match: "ברצלונה - ריאל מדריד", date: "25/10/2026", isClasico: true },
-        { match: "ראסינג סנטנדר - ריאל מדריד", date: "01/11/2026" },
-        { match: "ולנסיה - ריאל מדריד", date: "08/11/2026" },
-        { match: "ריאל מדריד - סלטה ויגו", date: "22/11/2026" },
-        { match: "ריאל מדריד - דפורטיבו אלאבס", date: "29/11/2026" },
-        { match: "אתלטיק בילבאו - ריאל מדריד", date: "06/12/2026" },
-        { match: "ריאל מדריד - אוססונה", date: "13/12/2026" },
-        { match: "דפורטיבו לה קורוניה - ריאל מדריד", date: "20/12/2026" },
-        { match: "ריאל מדריד - חטאפה", date: "03/01/2027" },
-        { match: "ריאל מדריד - לבאנטה", date: "10/01/2027" },
-        { match: "מלאגה - ריאל מדריד", date: "17/01/2027" },
-        { match: "ריאל מדריד - ריאל בטיס", date: "24/01/2027" },
-        { match: "ראיו ואייקאנו - ריאל מדריד", date: "31/01/2027" },
-        { match: "ריאל סוסיאדד - ריאל מדריד", date: "07/02/2027" },
-        { match: "ריאל מדריד - אתלטיק בילבאו", date: "14/02/2027" },
-        { match: "סביליה - ריאל מדריד", date: "21/02/2027" },
-        { match: "ריאל מדריד - ולנסיה", date: "28/02/2027" },
-        { match: "ויאריאל - ריאל מדריד", date: "06/03/2027" },
-        { match: "ריאל מדריד - אספניול", date: "13/03/2027" },
-        { match: "סלטה ויגו - ריאל מדריד", date: "20/03/2027" },
-        { match: "ריאל מדריד - אתלטיקו מדריד", date: "03/04/2027" },
-        { match: "אוססונה - ריאל מדריד", date: "10/04/2027" },
-        { match: "חטאפה - ריאל מדריד", date: "17/04/2027" },
-        { match: "ריאל מדריד - אלצ'ה", date: "20/04/2027" },
-        { match: "לבאנטה - ריאל מדריד", date: "01/05/2027" },
-        { match: "ריאל מדריד - ברצלונה", date: "08/05/2027", isClasico: true },
-        { match: "ריאל מדריד - ראסינג סנטנדר", date: "15/05/2027" },
-        { match: "דפורטיבו אלאבס - ריאל מדריד", date: "22/05/2027" },
-        { match: "ריאל מדריד - דפורטיבו לה קורוניה", date: "29/05/2027" }
+    const DEFAULT_MATCHES = [
+        { id: "m1", match: "אספניול - ריאל מדריד", date: "2026-08-22", defaultActual: "1-2" },
+        { id: "m2", match: "ריאל מדריד - ריאל סוסיאדד", date: "2026-08-26" },
+        { id: "m3", match: "ריאל מדריד - מלאגה", date: "2026-08-30" },
+        { id: "m4", match: "ריאל בטיס - ריאל מדריד", date: "2026-09-04" },
+        { id: "m5", match: "ריאל מדריד - ראיו ואייקאנו", date: "2026-09-13" },
+        { id: "m6", match: "אלצ'ה - ריאל מדריד", date: "2026-09-16" },
+        { id: "m7", match: "אתלטיקו מדריד - ריאל מדריד", date: "2026-09-20" },
+        { id: "m8", match: "ריאל מדריד - ויאריאל", date: "2026-10-11" },
+        { id: "m9", match: "ריאל מדריד - סביליה", date: "2026-10-18" },
+        { id: "m10", match: "ברצלונה - ריאל מדריד", date: "2026-10-25", isClasico: true },
+        { id: "m11", match: "ראסינג סנטנדר - ריאל מדריד", date: "2026-11-01" },
+        { id: "m12", match: "ולנסיה - ריאל מדריד", date: "2026-11-08" },
+        { id: "m13", match: "ריאל מדריד - סלטה ויגו", date: "2026-11-22" },
+        { id: "m14", match: "ריאל מדריד - דפורטיבו אלאבס", date: "2026-11-29" },
+        { id: "m15", match: "אתלטיק בילבאו - ריאל מדריד", date: "2026-12-06" },
+        { id: "m16", match: "ריאל מדריד - אוססונה", date: "2026-12-13" },
+        { id: "m17", match: "דפורטיבו לה קורוניה - ריאל מדריד", date: "2026-12-20" },
+        { id: "m18", match: "ריאל מדריד - חטאפה", date: "2027-01-03" },
+        { id: "m19", match: "ריאל מדריד - לבאנטה", date: "2027-01-10" },
+        { id: "m20", match: "מלאגה - ריאל מדריד", date: "2027-01-17" },
+        { id: "m21", match: "ריאל מדריד - ריאל בטיס", date: "2027-01-24" },
+        { id: "m22", match: "ראיו ואייקאנו - ריאל מדריד", date: "2027-01-31" },
+        { id: "m23", match: "ריאל סוסיאדד - ריאל מדריד", date: "2027-02-07" },
+        { id: "m24", match: "ריאל מדריד - אתלטיק בילבאו", date: "2027-02-14" },
+        { id: "m25", match: "סביליה - ריאל מדריד", date: "2027-02-21" },
+        { id: "m26", match: "ריאל מדריד - ולנסיה", date: "2027-02-28" },
+        { id: "m27", match: "ויאריאל - ריאל מדריד", date: "2027-03-06" },
+        { id: "m28", match: "ריאל מדריד - אספניול", date: "2027-03-13" },
+        { id: "m29", match: "סלטה ויגו - ריאל מדריד", date: "2027-03-20" },
+        { id: "m30", match: "ריאל מדריד - אתלטיקו מדריד", date: "2027-04-03" },
+        { id: "m31", match: "אוססונה - ריאל מדריד", date: "2027-04-10" },
+        { id: "m32", match: "חטאפה - ריאל מדריד", date: "2027-04-17" },
+        { id: "m33", match: "ריאל מדריד - אלצ'ה", date: "2027-04-20" },
+        { id: "m34", match: "לבאנטה - ריאל מדריד", date: "2027-05-01" },
+        { id: "m35", match: "ריאל מדריד - ברצלונה", date: "2027-05-08", isClasico: true },
+        { id: "m36", match: "ריאל מדריד - ראסינג סנטנדר", date: "2027-05-15" },
+        { id: "m37", match: "דפורטיבו אלאבס - ריאל מדריד", date: "2027-05-22" },
+        { id: "m38", match: "ריאל מדריד - דפורטיבו לה קורוניה", date: "2027-05-29" }
     ];
 
+    let currentPlayers = [];
+    let currentMatches = [];
+    let currentData = {};
+
+    // האזנה בזמן אמת לענן
     db.ref('league_data').on('value', snapshot => {
         const data = snapshot.val() || {};
         currentPlayers = data.players || DEFAULT_PLAYERS;
+        currentMatches = data.matches || DEFAULT_MATCHES;
         currentData = data.predictions || {};
+
+        // מיון משחקים לפי תאריך בכל עדכון
+        currentMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
+
         renderUI();
     });
 
     function saveToCloud() {
         db.ref('league_data').set({
             players: currentPlayers,
+            matches: currentMatches,
             predictions: currentData
         });
+    }
+
+    function formatDateDisplay(dateStr) {
+        if (!dateStr) return "";
+        const parts = dateStr.split("-");
+        if (parts.length === 3) {
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+        return dateStr;
     }
 
     function addNewPlayer() {
@@ -403,13 +439,40 @@
         }
     }
 
+    function addNewMatch() {
+        const nameInput = document.getElementById("newMatchName");
+        const dateInput = document.getElementById("newMatchDate");
+        const matchName = nameInput.value.trim();
+        const matchDate = dateInput.value;
+
+        if (!matchName || !matchDate) {
+            alert("נא למלא את שם המשחק ואת התאריך!");
+            return;
+        }
+
+        const newId = "m_" + Date.now();
+        const isClasico = matchName.includes("ברצלונה");
+
+        currentMatches.push({
+            id: newId,
+            match: matchName,
+            date: matchDate,
+            isClasico: isClasico
+        });
+
+        nameInput.value = "";
+        dateInput.value = "";
+
+        saveToCloud();
+    }
+
     function onInputSave(key, value) {
         currentData[key] = value;
         db.ref(`league_data/predictions/${key}`).set(value);
     }
 
-    function onWinnerToggle(idx, player) {
-        const key = `winners_${idx}`;
+    function onWinnerToggle(matchId, player) {
+        const key = `winners_${matchId}`;
         let winners = currentData[key] || [];
 
         if (winners.includes(player)) {
@@ -426,8 +489,8 @@
         const scores = {};
         currentPlayers.forEach(p => scores[p] = 0);
 
-        matches.forEach((_, idx) => {
-            const winners = currentData[`winners_${idx}`] || [];
+        currentMatches.forEach(m => {
+            const winners = currentData[`winners_${m.id}`] || [];
             winners.forEach(player => {
                 if (scores[player] !== undefined) scores[player]++;
             });
@@ -440,6 +503,7 @@
     }
 
     function renderUI() {
+        // רשימת שחקנים בראש
         document.getElementById("playersBar").innerHTML = currentPlayers.map(player => `
             <div class="player-card">
                 <button class="remove-btn" onclick="removePlayer('${player}')">×</button>
@@ -448,6 +512,7 @@
             </div>
         `).join("");
 
+        // כותרות טבלה
         document.getElementById("tableHeaderRow").innerHTML = `
             <th style="text-align: right; padding-right: 12px;">משחק</th>
             <th>תאריך</th>
@@ -459,35 +524,36 @@
         const tbody = document.getElementById("tableBody");
         tbody.innerHTML = "";
 
-        matches.forEach((m, idx) => {
+        // רינדור השורות בטבלה
+        currentMatches.forEach((m) => {
             const tr = document.createElement("tr");
             if (m.isClasico) tr.classList.add("clasico");
 
-            const savedActual = currentData[`actual_${idx}`] !== undefined ? currentData[`actual_${idx}`] : (m.defaultActual || "");
-            const savedWinners = currentData[`winners_${idx}`] || [];
+            const savedActual = currentData[`actual_${m.id}`] !== undefined ? currentData[`actual_${m.id}`] : (m.defaultActual || "");
+            const savedWinners = currentData[`winners_${m.id}`] || [];
 
             const winnersHTML = currentPlayers.map(player => {
                 const isChecked = savedWinners.includes(player);
                 return `
-                    <button class="winner-btn ${isChecked ? 'active' : ''}" onclick="onWinnerToggle('${idx}', '${player}')">
+                    <button class="winner-btn ${isChecked ? 'active' : ''}" onclick="onWinnerToggle('${m.id}', '${player}')">
                         ${player}
                     </button>
                 `;
             }).join("");
 
             const predictionsHTML = currentPlayers.map(player => {
-                const savedPred = currentData[`pred_${idx}_${player}`] || "";
+                const savedPred = currentData[`pred_${m.id}_${player}`] || "";
                 return `
                     <td>
-                        <input type="text" class="score-in" value="${savedPred}" placeholder="-" onchange="onInputSave('pred_${idx}_${player}', this.value)">
+                        <input type="text" class="score-in" value="${savedPred}" placeholder="-" onchange="onInputSave('pred_${m.id}_${player}', this.value)">
                     </td>
                 `;
             }).join("");
 
             tr.innerHTML = `
                 <td class="match-name">${m.isClasico ? '🔥 ' : ''}${m.match}</td>
-                <td class="match-date">${m.date}</td>
-                <td><input type="text" class="score-in actual-in" value="${savedActual}" placeholder="0-0" onchange="onInputSave('actual_${idx}', this.value)"></td>
+                <td class="match-date">${formatDateDisplay(m.date)}</td>
+                <td><input type="text" class="score-in actual-in" value="${savedActual}" placeholder="0-0" onchange="onInputSave('actual_${m.id}', this.value)"></td>
                 <td><div class="winners-box">${winnersHTML}</div></td>
                 ${predictionsHTML}
             `;
@@ -498,7 +564,7 @@
     }
 
     function resetAllData() {
-        if (confirm("למחוק את כל הנתונים בענן?")) {
+        if (confirm("למחוק את כל הנתונים והמשחקים בענן?")) {
             db.ref('league_data').remove();
         }
     }
