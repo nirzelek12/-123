@@ -370,7 +370,7 @@
                     const savedPred = currentData[`pred_${idx}_${player}`] || "";
                     return `
                         <td>
-                            <input type="text" class="score-input" value="${savedPred}" placeholder="-" oninput="onInputSave('pred_${idx}_${player}', this.value)">
+                            <input type="text" class="score-input" value="${savedPred}" placeholder="-" onchange="onInputSave('pred_${idx}_${player}', this.value)">
                         </td>
                     `;
                 }).join("");
@@ -378,7 +378,7 @@
                 tr.innerHTML = `
                     <td class="match-cell">${m.isClasico ? '<span class="clasico-badge">אל קלאסיקו</span>' : ''}${m.match}</td>
                     <td class="date-cell">${m.date}</td>
-                    <td><input type="text" class="score-input actual-score" value="${savedActual}" placeholder="0-0" oninput="onInputSave('actual_${idx}', this.value)"></td>
+                    <td><input type="text" class="score-input actual-score" value="${savedActual}" placeholder="0-0" onchange="onInputSave('actual_${idx}', this.value)"></td>
                     <td><div class="winners-grid">${winnersHTML}</div></td>
                     ${predictionsHTML}
                 `;
