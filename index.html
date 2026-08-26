@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ליגת הניחושים - ריאל מדריד 2026/27</title>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
     
@@ -25,9 +25,12 @@
             --tr-even: #f8fafc;
             --tr-hover: #e0f2fe;
             --input-bg: #ffffff;
-            --actual-bg: #e0f2fe;
+            --actual-bg: #0d3b66;
+            --actual-text: #ffffff;
             --clasico-bg: #fff1f2;
             --clasico-text: #e11d48;
+            --sticky-bg: #ffffff;
+            --sticky-even-bg: #f8fafc;
         }
 
         html.dark {
@@ -44,9 +47,12 @@
             --tr-even: #182234;
             --tr-hover: #1e293b;
             --input-bg: #0f172a;
-            --actual-bg: #1e3a8a;
+            --actual-bg: #2563eb;
+            --actual-text: #ffffff;
             --clasico-bg: #31121f;
             --clasico-text: #fda4af;
+            --sticky-bg: #1e293b;
+            --sticky-even-bg: #182234;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Assistant', sans-serif; transition: background-color 0.2s, color 0.2s; }
@@ -54,14 +60,15 @@
         body {
             background-color: var(--bg-body);
             color: var(--text-main);
-            padding: 20px 10px;
+            padding: 10px 5px;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .main-container {
             max-width: 1300px;
             margin: 0 auto;
             background: var(--bg-card);
-            padding: 20px;
+            padding: 12px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             border: 1px solid var(--border-color);
@@ -70,53 +77,51 @@
         header {
             background-color: var(--bg-header);
             color: #ffffff;
-            padding: 22px;
+            padding: 16px 12px;
             border-radius: 8px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             position: relative;
         }
 
-        h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 4px; }
-        p.subtitle { font-size: 0.95rem; opacity: 0.85; }
+        h1 { font-size: 1.4rem; font-weight: 800; margin-bottom: 4px; }
+        p.subtitle { font-size: 0.85rem; opacity: 0.85; }
 
         .theme-toggle-btn {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(255, 255, 255, 0.15);
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.2);
             color: #ffffff;
             border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-weight: 700;
         }
 
-        .theme-toggle-btn:hover { background: rgba(255, 255, 255, 0.25); }
-
         .controls-section {
             display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 15px;
-            background: rgba(0,0,0,0.15);
-            padding: 12px;
-            border-radius: 6px;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 12px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 8px;
         }
 
         .form-group {
             display: flex;
-            align-items: center;
             gap: 6px;
+            width: 100%;
         }
 
         .controls-section input {
-            padding: 6px 10px;
+            flex: 1;
+            padding: 8px;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 0.85rem;
             outline: none;
             background-color: var(--input-bg);
@@ -127,20 +132,22 @@
             background-color: #f4d35e;
             color: #0d3b66;
             border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
+            padding: 8px 12px;
+            border-radius: 6px;
             font-weight: 800;
             cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.85rem;
         }
 
         .scoreboard {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 6px;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             background-color: var(--bg-sub-card);
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
         }
@@ -148,20 +155,21 @@
         .player-card {
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 6px;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            font-size: 0.85rem;
         }
 
         .player-card .score {
             background-color: #2563eb;
             color: #ffffff;
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 4px;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
         }
 
         .remove-btn {
@@ -169,81 +177,107 @@
             border: none;
             color: #ef4444;
             cursor: pointer;
-            font-size: 1rem;
-            margin-right: 4px;
+            font-size: 1.1rem;
+            line-height: 1;
         }
 
+        /* התאמת טבלה לטלפונים */
         .table-wrapper {
             overflow-x: auto;
             border: 1px solid var(--border-color);
             border-radius: 8px;
+            -webkit-overflow-scrolling: touch;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         th {
             background-color: var(--th-bg);
             color: #ffffff;
-            padding: 10px;
+            padding: 8px 4px;
             font-weight: 700;
-            border: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
+            white-space: nowrap;
         }
 
         th.player-th {
             background-color: var(--th-player);
-            min-width: 70px;
+            min-width: 65px;
         }
 
         td {
-            padding: 8px 6px;
-            border: 1px solid var(--border-color);
+            padding: 6px 4px;
+            border-bottom: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
         }
 
-        tr:nth-child(even) { background-color: var(--tr-even); }
-        tr:hover { background-color: var(--tr-hover); }
+        tr:nth-child(even) td { background-color: var(--tr-even); }
+        
+        /* אלמנט דביק (Sticky) לשם המשחק בלבד במסך נייד */
+        th.sticky-col, td.sticky-col {
+            position: sticky;
+            right: 0;
+            z-index: 10;
+            background-color: var(--sticky-bg);
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+        }
 
-        td.match-name { text-align: right; font-weight: 700; white-space: nowrap; padding-right: 12px; }
-        td.match-date { color: var(--text-muted); font-size: 0.8rem; white-space: nowrap; }
+        tr:nth-child(even) td.sticky-col {
+            background-color: var(--sticky-even-bg);
+        }
 
-        tr.clasico { background-color: var(--clasico-bg) !important; }
+        th.sticky-col {
+            background-color: var(--th-bg) !important;
+            z-index: 11;
+        }
+
+        td.match-name { text-align: right; font-weight: 700; white-space: nowrap; padding-right: 8px; padding-left: 8px; }
+        td.match-date { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; }
+
+        tr.clasico td { background-color: var(--clasico-bg) !important; }
         tr.clasico td.match-name { color: var(--clasico-text); }
 
         input.score-in {
-            width: 45px;
+            width: 40px;
+            height: 32px;
             text-align: center;
-            padding: 4px;
+            padding: 2px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
             font-weight: 700;
             direction: ltr;
             background-color: var(--input-bg);
             color: var(--text-main);
+            font-size: 0.9rem;
         }
 
         input.actual-in {
             border-color: #2563eb;
             background-color: var(--actual-bg);
-            color: #ffffff;
+            color: var(--actual-text);
         }
 
         .winners-box {
             display: flex;
-            gap: 4px;
+            gap: 3px;
             justify-content: center;
             flex-wrap: wrap;
+            min-width: 90px;
         }
 
         .winner-btn {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            padding: 2px 6px;
-            font-size: 0.75rem;
+            padding: 3px 6px;
+            font-size: 0.7rem;
             cursor: pointer;
             color: var(--text-muted);
         }
@@ -259,7 +293,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             font-size: 0.85rem;
             color: var(--text-muted);
         }
@@ -271,6 +305,13 @@
             cursor: pointer;
             text-decoration: underline;
         }
+
+        @media (min-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .controls-section { flex-direction: row; justify-content: center; }
+            .form-group { width: auto; }
+            .main-container { padding: 20px; }
+        }
     </style>
 </head>
 <body>
@@ -278,18 +319,18 @@
 <div class="main-container">
     <header>
         <button class="theme-toggle-btn" onclick="toggleTheme()">🌙 / ☀️ מצב תצוגה</button>
-        <h1>ליגת הניחושים - ריאל מדריד 2026/27</h1>
+        <h1>ליגת הניחושים - ריאל מדריד</h1>
         <p class="subtitle">סנכרון בזמן אמת בשרת ענן (Firebase)</p>
 
         <div class="controls-section">
             <div class="form-group">
                 <input type="text" id="newPlayerName" placeholder="שם שחקן...">
-                <button onclick="addNewPlayer()">+ הוסף שחקן</button>
+                <button onclick="addNewPlayer()">+ שחקן</button>
             </div>
-            <div class="form-group" style="border-right: 1px solid rgba(255,255,255,0.2); padding-right: 15px;">
-                <input type="text" id="newMatchName" placeholder="שם המשחק (למשל: ריאל - ליברפול)">
+            <div class="form-group">
+                <input type="text" id="newMatchName" placeholder="משחק (למשל: ריאל - ליברפול)">
                 <input type="date" id="newMatchDate">
-                <button onclick="addNewMatch()">+ הוסף משחק</button>
+                <button onclick="addNewMatch()">+ משחק</button>
             </div>
         </div>
     </header>
@@ -297,8 +338,8 @@
     <div class="scoreboard" id="playersBar"></div>
 
     <div class="top-bar">
-        <span>🌐 מחובר ומסונכרן בזמן אמת</span>
-        <button class="reset-btn" onclick="resetAllData()">איפוס נתונים</button>
+        <span>🌐 מסונכרן בזמן אמת</span>
+        <button class="reset-btn" onclick="resetAllData()">איפוס</button>
     </div>
 
     <div class="table-wrapper">
@@ -392,16 +433,13 @@
     let currentMatches = [];
     let currentData = {};
 
-    // האזנה בזמן אמת לענן
     db.ref('league_data').on('value', snapshot => {
         const data = snapshot.val() || {};
         currentPlayers = data.players || DEFAULT_PLAYERS;
         currentMatches = data.matches || DEFAULT_MATCHES;
         currentData = data.predictions || {};
 
-        // מיון משחקים לפי תאריך בכל עדכון
         currentMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
-
         renderUI();
     });
 
@@ -417,7 +455,7 @@
         if (!dateStr) return "";
         const parts = dateStr.split("-");
         if (parts.length === 3) {
-            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            return `${parts[2]}/${parts[1]}`;
         }
         return dateStr;
     }
@@ -446,7 +484,7 @@
         const matchDate = dateInput.value;
 
         if (!matchName || !matchDate) {
-            alert("נא למלא את שם המשחק ואת התאריך!");
+            alert("נא למלא משחק ותאריך!");
             return;
         }
 
@@ -503,7 +541,6 @@
     }
 
     function renderUI() {
-        // רשימת שחקנים בראש
         document.getElementById("playersBar").innerHTML = currentPlayers.map(player => `
             <div class="player-card">
                 <button class="remove-btn" onclick="removePlayer('${player}')">×</button>
@@ -512,9 +549,8 @@
             </div>
         `).join("");
 
-        // כותרות טבלה
         document.getElementById("tableHeaderRow").innerHTML = `
-            <th style="text-align: right; padding-right: 12px;">משחק</th>
+            <th class="sticky-col" style="text-align: right; padding-right: 8px;">משחק</th>
             <th>תאריך</th>
             <th>תוצאה</th>
             <th>מי צדק?</th>
@@ -524,7 +560,6 @@
         const tbody = document.getElementById("tableBody");
         tbody.innerHTML = "";
 
-        // רינדור השורות בטבלה
         currentMatches.forEach((m) => {
             const tr = document.createElement("tr");
             if (m.isClasico) tr.classList.add("clasico");
@@ -551,7 +586,7 @@
             }).join("");
 
             tr.innerHTML = `
-                <td class="match-name">${m.isClasico ? '🔥 ' : ''}${m.match}</td>
+                <td class="match-name sticky-col">${m.isClasico ? '🔥 ' : ''}${m.match}</td>
                 <td class="match-date">${formatDateDisplay(m.date)}</td>
                 <td><input type="text" class="score-in actual-in" value="${savedActual}" placeholder="0-0" onchange="onInputSave('actual_${m.id}', this.value)"></td>
                 <td><div class="winners-box">${winnersHTML}</div></td>
