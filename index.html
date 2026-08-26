@@ -126,6 +126,13 @@
             outline: none;
             background-color: var(--input-bg);
             color: var(--text-main);
+            text-align: right;
+        }
+
+        /* התאמת שדה התאריך כך שירגיש נכון בעברית */
+        input[type="date"] {
+            direction: ltr;
+            text-align: center;
         }
 
         .controls-section button {
@@ -239,7 +246,7 @@
         }
 
         td.match-name { text-align: right; font-weight: 700; white-space: nowrap; padding-right: 8px; padding-left: 8px; }
-        td.match-date { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; }
+        td.match-date { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; direction: ltr; text-align: center; }
 
         tr.clasico td { background-color: var(--clasico-bg) !important; }
         tr.clasico td.match-name { color: var(--clasico-text); }
@@ -351,7 +358,7 @@
         <div class="controls-section">
             <div class="form-group">
                 <input type="text" id="newPlayerName" placeholder="שם שחקן...">
-                <button onclick="addNewPlayer()">+ שחקן</button>
+                <button onclick="addNewPlayer()">+ הוסף שחקן</button>
             </div>
             <div class="form-group">
                 <input type="text" id="newMatchName" placeholder="משחק (למשל: ריאל - ליברפול)">
@@ -363,7 +370,7 @@
                     <option value="סופר קופה ספרדי">סופר קופה ספרדי</option>
                     <option value="סופר קופה אירופי">סופר קופה אירופי</option>
                 </select>
-                <button onclick="addNewMatch()">+ משחק</button>
+                <button onclick="addNewMatch()">+ הוסף משחק</button>
             </div>
         </div>
     </header>
@@ -372,7 +379,7 @@
 
     <div class="top-bar">
         <span>🌐 מסונכרן בזמן אמת</span>
-        <button class="reset-btn" onclick="resetAllData()">איפוס</button>
+        <button class="reset-btn" onclick="resetAllData()">איפוס נתונים</button>
     </div>
 
     <div class="table-wrapper">
@@ -485,11 +492,12 @@
         });
     }
 
+    // פורמט תאריך ישראלי: DD/MM/YYYY
     function formatDateDisplay(dateStr) {
         if (!dateStr) return "";
         const parts = dateStr.split("-");
         if (parts.length === 3) {
-            return `${parts[2]}/${parts[1]}`;
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
         }
         return dateStr;
     }
@@ -497,9 +505,9 @@
     function getCompBadge(compName) {
         switch(compName) {
             case "ליגת האלופות": return `<span class="comp-badge comp-ucl">צ'מפיונס</span>`;
-            case "גביע המלך": return `<span class="comp-badge comp-copa">גביע</span>`;
-            case "סופר קופה ספרדי": return `<span class="comp-badge comp-supercopa">סופרקופה</span>`;
-            case "סופר קופה אירופי": return `<span class="comp-badge comp-supercup_eu">סופרקופה אירופי</span>`;
+            case "גביע המלך": return `<span class="comp-badge comp-copa">גביע המלך</span>`;
+            case "סופר קופה ספרדי": return `<span class="comp-badge comp-supercopa">סופר קופה</span>`;
+            case "סופר קופה אירופי": return `<span class="comp-badge comp-supercup_eu">סופר קופה אירופי</span>`;
             default: return `<span class="comp-badge comp-la_liga">לה ליגה</span>`;
         }
     }
@@ -508,14 +516,14 @@
         const input = document.getElementById("newPlayerName");
         const name = input.value.trim();
         if (!name) return;
-        if (currentPlayers.includes(name)) { alert("השחקן כבר קיים"); return; }
+        if (currentPlayers.includes(name)) { alert("השחקן כבר קיים ברשימה"); return; }
         currentPlayers.push(name);
         input.value = "";
         saveToCloud();
     }
 
     function removePlayer(name) {
-        if (confirm(`להסיר את ${name}?`)) {
+        if (confirm(`האם להסיר את השחקן ${name}?`)) {
             currentPlayers = currentPlayers.filter(p => p !== name);
             saveToCloud();
         }
@@ -531,7 +539,7 @@
         const comp = compSelect.value;
 
         if (!matchName || !matchDate) {
-            alert("נא למלא משחק ותאריך!");
+            alert("נא למלא את שם המשחק ואת התאריך!");
             return;
         }
 
@@ -610,9 +618,9 @@
 
         document.getElementById("tableHeaderRow").innerHTML = `
             <th class="sticky-col" style="text-align: right; padding-right: 8px;">משחק</th>
-            <th>מפעל</th>
+            <th>מסגרת</th>
             <th>תאריך</th>
-            <th>תוצאה</th>
+            <th>תוצאה אמתית</th>
             <th>מי צדק?</th>
             ${currentPlayers.map(p => `<th class="player-th">${p}</th>`).join("")}
         `;
@@ -667,7 +675,7 @@
     }
 
     function resetAllData() {
-        if (confirm("למחוק את כל הנתונים והמשחקים בענן?")) {
+        if (confirm("האם אתה בטוח שברצונך למחוק את כל הנתונים והמשחקים מהענן?")) {
             db.ref('league_data').remove();
         }
     }
