@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,36 +11,90 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Assistant', sans-serif; }
+        :root {
+            /* Light Mode Variables */
+            --bg-body: #f3f4f6;
+            --bg-card: #ffffff;
+            --bg-header: #0d3b66;
+            --bg-sub-card: #f8fafc;
+            --text-main: #1f2937;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --th-bg: #0d3b66;
+            --th-player: #1e3a8a;
+            --tr-even: #f8fafc;
+            --tr-hover: #e0f2fe;
+            --input-bg: #ffffff;
+            --actual-bg: #e0f2fe;
+            --clasico-bg: #fff1f2;
+            --clasico-text: #e11d48;
+        }
+
+        html.dark {
+            /* Dark Mode Variables */
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-header: #1e3a8a;
+            --bg-sub-card: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --th-bg: #1e3a8a;
+            --th-player: #1e40af;
+            --tr-even: #182234;
+            --tr-hover: #1e293b;
+            --input-bg: #0f172a;
+            --actual-bg: #1e3a8a;
+            --clasico-bg: #31121f;
+            --clasico-text: #fda4af;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Assistant', sans-serif; transition: background-color 0.2s, color 0.2s; }
 
         body {
-            background-color: #f3f4f6; /* רקע אפור רך במקום לבן מוחלט */
-            color: #1f2937;
+            background-color: var(--bg-body);
+            color: var(--text-main);
             padding: 20px 10px;
         }
 
         .main-container {
             max-width: 1250px;
             margin: 0 auto;
-            background: #ffffff;
+            background: var(--bg-card);
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
         }
 
-        /* Header בכחול עמוק */
         header {
-            background-color: #0d3b66;
+            background-color: var(--bg-header);
             color: #ffffff;
             padding: 22px;
             border-radius: 8px;
             text-align: center;
             margin-bottom: 20px;
+            position: relative;
         }
 
         h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 4px; }
         p.subtitle { font-size: 0.95rem; opacity: 0.85; }
+
+        .theme-toggle-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .theme-toggle-btn:hover { background: rgba(255, 255, 255, 0.25); }
 
         .add-player-form {
             display: flex;
@@ -51,10 +105,12 @@
 
         .add-player-form input {
             padding: 6px 12px;
-            border: 1px solid #d1d5db;
+            border: 1px solid var(--border-color);
             border-radius: 4px;
             font-size: 0.9rem;
             outline: none;
+            background-color: var(--input-bg);
+            color: var(--text-main);
         }
 
         .add-player-form button {
@@ -67,33 +123,31 @@
             cursor: pointer;
         }
 
-        /* סרגל ניקוד השחקנים */
         .scoreboard {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             justify-content: center;
             margin-bottom: 20px;
-            background-color: #f8fafc;
+            background-color: var(--bg-sub-card);
             padding: 12px;
             border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
         }
 
         .player-card {
-            background-color: #ffffff;
-            border: 1px solid #cbd5e1;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
             padding: 6px 12px;
             border-radius: 6px;
             font-weight: 700;
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
 
         .player-card .score {
-            background-color: #0d3b66;
+            background-color: #2563eb;
             color: #ffffff;
             padding: 2px 8px;
             border-radius: 4px;
@@ -109,10 +163,9 @@
             margin-right: 4px;
         }
 
-        /* טבלה */
         .table-wrapper {
             overflow-x: auto;
-            border: 1px solid #cbd5e1;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
         }
 
@@ -124,51 +177,50 @@
         }
 
         th {
-            background-color: #0d3b66;
+            background-color: var(--th-bg);
             color: #ffffff;
             padding: 10px;
             font-weight: 700;
-            border: 1px solid #1e40af;
+            border: 1px solid var(--border-color);
         }
 
         th.player-th {
-            background-color: #1e3a8a;
+            background-color: var(--th-player);
             min-width: 70px;
         }
 
         td {
             padding: 8px 6px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
         }
 
-        tr:nth-child(even) { background-color: #f8fafc; }
-        tr:hover { background-color: #e0f2fe; }
+        tr:nth-child(even) { background-color: var(--tr-even); }
+        tr:hover { background-color: var(--tr-hover); }
 
         td.match-name { text-align: right; font-weight: 700; white-space: nowrap; padding-right: 12px; }
-        td.match-date { color: #64748b; font-size: 0.8rem; white-space: nowrap; }
+        td.match-date { color: var(--text-muted); font-size: 0.8rem; white-space: nowrap; }
 
-        tr.clasico { background-color: #fff1f2 !important; }
-        tr.clasico td.match-name { color: #e11d48; }
+        tr.clasico { background-color: var(--clasico-bg) !important; }
+        tr.clasico td.match-name { color: var(--clasico-text); }
 
-        /* שדות קלט למספרים */
         input.score-in {
             width: 45px;
             text-align: center;
             padding: 4px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid var(--border-color);
             border-radius: 4px;
             font-weight: 700;
             direction: ltr;
-            background-color: #ffffff;
+            background-color: var(--input-bg);
+            color: var(--text-main);
         }
 
         input.actual-in {
-            border-color: #0d3b66;
-            background-color: #e0f2fe;
-            color: #0d3b66;
+            border-color: #2563eb;
+            background-color: var(--actual-bg);
+            color: #ffffff;
         }
 
-        /* צ'קבוקסים של מי צדק */
         .winners-box {
             display: flex;
             gap: 4px;
@@ -177,19 +229,19 @@
         }
 
         .winner-btn {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             border-radius: 4px;
             padding: 2px 6px;
             font-size: 0.75rem;
             cursor: pointer;
-            color: #475569;
+            color: var(--text-muted);
         }
 
         .winner-btn.active {
-            background-color: #0d3b66;
+            background-color: #2563eb;
             color: #ffffff;
-            border-color: #0d3b66;
+            border-color: #2563eb;
             font-weight: 700;
         }
 
@@ -199,13 +251,13 @@
             align-items: center;
             margin-bottom: 12px;
             font-size: 0.85rem;
-            color: #64748b;
+            color: var(--text-muted);
         }
 
         .reset-btn {
             background: none;
             border: none;
-            color: #dc2626;
+            color: #ef4444;
             cursor: pointer;
             text-decoration: underline;
         }
@@ -215,6 +267,7 @@
 
 <div class="main-container">
     <header>
+        <button class="theme-toggle-btn" onclick="toggleTheme()">🌙 / ☀️ מצב תצוגה</button>
         <h1>ליגת הניחושים - ריאל מדריד 2026/27</h1>
         <p class="subtitle">סנכרון בזמן אמת בשרת ענן (Firebase)</p>
         <div class="add-player-form">
@@ -239,6 +292,28 @@
 </div>
 
 <script>
+    // === DARK MODE SYSTEM ===
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }
+
+    function toggleTheme() {
+        const html = document.documentElement;
+        if (html.classList.contains('dark')) {
+            html.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        } else {
+            html.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        }
+    }
+    initTheme();
+
     // === FIREBASE CONFIGURATION ===
     const firebaseConfig = {
         apiKey: "AIzaSyCNkYBoD6fBQ-uxmn8tj78yS96a9ipc-5w",
