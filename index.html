@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ליגת הניחושים - ריאל מדריד 2026/27</title>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&family=Teko:wght@600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --rm-dark-bg: #0a0e17;
@@ -26,12 +31,7 @@
             --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.5);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Assistant', sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Assistant', sans-serif; }
 
         body {
             background-color: var(--rm-dark-bg);
@@ -59,374 +59,104 @@
         header::before {
             content: "HALA MADRID";
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 7rem;
-            font-weight: 800;
-            opacity: 0.03;
-            letter-spacing: 6px;
-            pointer-events: none;
-            white-space: nowrap;
+            font-size: 7rem; font-weight: 800;
+            opacity: 0.03; letter-spacing: 6px;
+            pointer-events: none; white-space: nowrap;
         }
 
         .header-title {
-            font-size: 2.4rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-            color: var(--rm-white);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            font-size: 2.4rem; font-weight: 800; margin-bottom: 8px;
+            color: var(--rm-white); display: flex; align-items: center; justify-content: center; gap: 12px;
         }
+        .header-title span { color: var(--rm-gold); text-shadow: 0 0 15px var(--rm-gold-glow); }
+        .header-subtitle { font-size: 1.1rem; color: var(--text-muted); font-weight: 400; }
 
-        .header-title span {
-            color: var(--rm-gold);
-            text-shadow: 0 0 15px var(--rm-gold-glow);
-        }
-
-        .header-subtitle {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        .add-player-box {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 15px;
-        }
-
+        .add-player-box { display: flex; justify-content: center; gap: 8px; margin-top: 15px; }
         .add-player-input {
-            padding: 8px 14px;
-            border-radius: 8px;
-            border: 1px solid var(--rm-border);
-            background: rgba(10, 14, 23, 0.7);
-            color: var(--rm-white);
-            font-size: 0.95rem;
-            outline: none;
+            padding: 8px 14px; border-radius: 8px; border: 1px solid var(--rm-border);
+            background: rgba(10, 14, 23, 0.7); color: var(--rm-white); font-size: 0.95rem; outline: none;
         }
-
-        .add-player-input:focus {
-            border-color: var(--rm-gold);
-        }
-
+        .add-player-input:focus { border-color: var(--rm-gold); }
         .btn-add-player {
-            background: var(--rm-gold);
-            color: var(--rm-navy);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
+            background: var(--rm-gold); color: var(--rm-navy); border: none;
+            padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s;
         }
-
-        .btn-add-player:hover {
-            background: var(--rm-gold-hover);
-        }
+        .btn-add-player:hover { background: var(--rm-gold-hover); }
 
         .players-bar {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 14px;
-            margin: -22px auto 30px;
-            max-width: 1100px;
-            padding: 0 15px;
-            position: relative;
-            z-index: 10;
+            display: flex; justify-content: center; flex-wrap: wrap; gap: 14px;
+            margin: -22px auto 30px; max-width: 1100px; padding: 0 15px; position: relative; z-index: 10;
         }
-
         .player-badge {
-            background: rgba(28, 42, 68, 0.85);
-            backdrop-filter: blur(8px);
-            padding: 10px 16px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 1rem;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--rm-gold);
-            color: var(--rm-white);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(28, 42, 68, 0.85); backdrop-filter: blur(8px);
+            padding: 10px 16px; border-radius: 30px; font-weight: 700; font-size: 1rem;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--rm-gold); color: var(--rm-white);
+            display: flex; align-items: center; gap: 8px; transition: all 0.25s;
         }
-
-        .player-badge:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 20px var(--rm-gold-glow);
-            border-color: var(--rm-gold-hover);
-        }
-
+        .player-badge:hover { transform: translateY(-4px); box-shadow: 0 6px 20px var(--rm-gold-glow); }
         .player-badge .pts {
             background: linear-gradient(135deg, var(--rm-gold) 0%, #c99a19 100%);
-            color: var(--rm-dark-bg);
-            padding: 2px 10px;
-            border-radius: 14px;
-            font-size: 0.95rem;
-            font-weight: 800;
-            font-family: 'Teko', sans-serif;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            color: var(--rm-dark-bg); padding: 2px 10px; border-radius: 14px;
+            font-size: 0.95rem; font-weight: 800; font-family: 'Teko', sans-serif;
         }
-
         .remove-player-btn {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            border-radius: 50%;
-            width: 22px;
-            height: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: bold;
-            line-height: 1;
-            transition: all 0.2s;
-            margin-left: 2px;
+            background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);
+            border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 0.9rem; font-weight: bold; line-height: 1; margin-left: 2px;
         }
+        .remove-player-btn:hover { background: #ef4444; color: #ffffff; }
 
-        .remove-player-btn:hover {
-            background: #ef4444;
-            color: #ffffff;
-            transform: scale(1.1);
-        }
-
-        .container {
-            max-width: 1350px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
+        .container { max-width: 1350px; margin: 0 auto; padding: 0 20px; }
         .actions-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            background: var(--rm-card-bg);
-            backdrop-filter: blur(10px);
-            padding: 16px 24px;
-            border-radius: 14px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--rm-border);
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
+            background: var(--rm-card-bg); backdrop-filter: blur(10px); padding: 16px 24px;
+            border-radius: 14px; box-shadow: var(--shadow-sm); border: 1px solid var(--rm-border);
         }
-
-        .info-note {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
+        .info-note { font-size: 0.95rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
         .status-badge {
-            background: rgba(16, 185, 129, 0.15) !important;
-            color: var(--success-green) !important;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.3s;
+            background: rgba(16, 185, 129, 0.15); color: var(--success-green);
+            border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 14px; border-radius: 20px;
+            font-size: 0.85rem; font-weight: 700; transition: all 0.3s;
         }
-
         .btn-clear {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            padding: 8px 18px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
+            background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 8px 18px; font-weight: 700; font-size: 0.85rem; border-radius: 8px; cursor: pointer;
         }
+        .btn-clear:hover { background: #ef4444; color: var(--rm-white); }
 
-        .btn-clear:hover {
-            background: #ef4444;
-            color: var(--rm-white);
-            box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
-        }
-
-        .table-card {
-            background: var(--rm-card-bg);
-            backdrop-filter: blur(12px);
-            border-radius: 18px;
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
-            border: 1px solid var(--rm-border);
-        }
-
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: center;
-            font-size: 0.95rem;
-        }
-
-        thead th {
-            background-color: var(--rm-navy);
-            color: var(--rm-gold);
-            padding: 18px 12px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            border-bottom: 2px solid var(--rm-gold);
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-        }
-
-        thead th.player-header {
-            background-color: var(--rm-dark-blue);
-            color: var(--rm-white);
-            min-width: 85px;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: background-color 0.2s ease;
-        }
-
-        tbody tr:nth-child(even) {
-            background-color: rgba(255, 255, 255, 0.015);
-        }
-
-        tbody tr:hover {
-            background-color: rgba(229, 184, 73, 0.05);
-        }
-
-        td.match-cell {
-            text-align: right;
-            padding: 16px 20px;
-            font-weight: 700;
-            color: var(--rm-white);
-            white-space: nowrap;
-        }
-
-        td.date-cell {
-            color: var(--text-muted);
-            font-size: 0.88rem;
-            white-space: nowrap;
-            padding: 16px 10px;
-        }
-
-        tr.clasico-row {
-            background-color: var(--clasico-bg) !important;
-            border-bottom: 1px solid var(--clasico-border);
-        }
-
-        tr.clasico-row td.match-cell {
-            color: #fca5a5;
-        }
-
-        .clasico-badge {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            color: var(--rm-white);
-            font-size: 0.75rem;
-            padding: 3px 8px;
-            border-radius: 6px;
-            margin-right: 8px;
-            font-weight: 700;
-            display: inline-block;
-            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.4);
-        }
+        .table-card { background: var(--rm-card-bg); backdrop-filter: blur(12px); border-radius: 18px; box-shadow: var(--shadow-md); overflow: hidden; border: 1px solid var(--rm-border); }
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.95rem; }
+        thead th { background-color: var(--rm-navy); color: var(--rm-gold); padding: 18px 12px; font-weight: 700; border-bottom: 2px solid var(--rm-gold); }
+        thead th.player-header { background-color: var(--rm-dark-blue); color: var(--rm-white); min-width: 85px; }
+        tbody tr { border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        tbody tr:nth-child(even) { background-color: rgba(255, 255, 255, 0.015); }
+        tbody tr:hover { background-color: rgba(229, 184, 73, 0.05); }
+        td.match-cell { text-align: right; padding: 16px 20px; font-weight: 700; color: var(--rm-white); white-space: nowrap; }
+        td.date-cell { color: var(--text-muted); font-size: 0.88rem; white-space: nowrap; padding: 16px 10px; }
+        tr.clasico-row { background-color: var(--clasico-bg) !important; border-bottom: 1px solid var(--clasico-border); }
+        tr.clasico-row td.match-cell { color: #fca5a5; }
+        .clasico-badge { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: var(--rm-white); font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; margin-right: 8px; font-weight: 700; display: inline-block; }
 
         input.score-input {
-            width: 58px;
-            text-align: center;
-            padding: 8px 4px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--rm-white);
-            background: rgba(10, 14, 23, 0.6);
-            transition: all 0.2s;
-            direction: ltr;
+            width: 58px; text-align: center; padding: 8px 4px; border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px; font-weight: 700; font-size: 1rem; color: var(--rm-white);
+            background: rgba(10, 14, 23, 0.6); direction: ltr;
         }
+        input.score-input:focus { outline: none; border-color: var(--rm-gold); box-shadow: 0 0 12px var(--rm-gold-glow); }
+        input.actual-score { border-color: var(--rm-gold); background: rgba(229, 184, 73, 0.1); color: var(--rm-gold); }
 
-        input.score-input:focus {
-            outline: none;
-            border-color: var(--rm-gold);
-            box-shadow: 0 0 12px var(--rm-gold-glow);
-            background: rgba(10, 14, 23, 0.9);
-        }
-
-        input.actual-score {
-            border-color: var(--rm-gold);
-            background: rgba(229, 184, 73, 0.1);
-            color: var(--rm-gold);
-        }
-
-        .winners-grid {
-            display: flex;
-            gap: 6px;
-            justify-content: center;
-            flex-wrap: wrap;
-            padding: 4px;
-            max-width: 320px;
-            margin: 0 auto;
-        }
-
+        .winners-grid { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; padding: 4px; max-width: 320px; margin: 0 auto; }
         .winner-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            cursor: pointer;
-            user-select: none;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-muted);
-            transition: all 0.2s ease;
+            display: inline-flex; align-items: center; gap: 4px; background: rgba(255, 255, 255, 0.05);
+            padding: 5px 10px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-muted);
         }
-
-        .winner-chip:hover {
-            background: rgba(255, 255, 255, 0.12);
-            color: var(--rm-white);
-        }
-
-        .winner-chip input {
-            display: none;
-        }
-
-        .winner-chip.active {
-            background: linear-gradient(135deg, var(--rm-gold) 0%, #c99a19 100%);
-            color: var(--rm-dark-bg);
-            border-color: var(--rm-gold);
-            font-weight: 800;
-            box-shadow: 0 2px 8px var(--rm-gold-glow);
-        }
-
-        .winner-chip.active::before {
-            content: "✓";
-            font-weight: 900;
-            color: var(--rm-dark-bg);
-        }
-
-        @media (max-width: 768px) {
-            .header-title { font-size: 1.6rem; }
-            .actions-bar { flex-direction: column; gap: 14px; text-align: center; }
-            td.match-cell { font-size: 0.88rem; padding: 12px; }
-            .winners-grid { max-width: 230px; }
-        }
+        .winner-chip input { display: none; }
+        .winner-chip.active { background: linear-gradient(135deg, var(--rm-gold) 0%, #c99a19 100%); color: var(--rm-dark-bg); font-weight: 800; }
+        .winner-chip.active::before { content: "✓"; font-weight: 900; color: var(--rm-dark-bg); }
     </style>
 </head>
 <body>
@@ -435,87 +165,55 @@
         <div class="header-title">
             🏆 <span>ליגת הניחושים</span> - ריאל מדריד 2026/27
         </div>
-        <div class="header-subtitle">טבלת מעקב תוצאות וניחושים - שמירה אוטומטית בזמן אמת</div>
+        <div class="header-subtitle">טבלת ניחושים משותפת בזמן אמת (Firebase Cloud)</div>
         <div class="add-player-box">
             <input type="text" id="newPlayerName" class="add-player-input" placeholder="שם שחקן חדש...">
             <button class="btn-add-player" onclick="addNewPlayer()">+ הוסף שחקן</button>
         </div>
     </header>
 
-    <div class="players-bar" id="playersBar">
-        <!-- Dynamic Player Badges -->
-    </div>
+    <div class="players-bar" id="playersBar"></div>
 
     <div class="container">
         <div class="actions-bar">
             <div class="info-note">
-                ⚡ <b>שמירה אוטומטית פעילה:</b> כל תוצאה, ניחור, הוספה או הסרת שחקן נשמרים ברקע בלייב!
+                🌐 <b>סנכרון ענן פעיל:</b> כל שינוי שתעשה יתעדכן מיד אצל כל החברים!
             </div>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <div class="status-badge" id="saveStatus">✓ נשמר</div>
+                <div class="status-badge" id="saveStatus">☁️ מחובר לשרת</div>
                 <button class="btn-clear" onclick="resetAllData()">🗑️ איפוס נתונים</button>
             </div>
         </div>
 
         <div class="table-card">
             <div class="table-responsive">
-                <table id="predictionTable">
-                    <thead>
-                        <tr id="tableHeaderRow">
-                            <!-- Dynamic Table Header -->
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <!-- Data rows dynamically rendered -->
-                    </tbody>
+                <table>
+                    <thead><tr id="tableHeaderRow"></tr></thead>
+                    <tbody id="tableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <script>
+        // === FIREBASE CONFIGURATION ===
+        const firebaseConfig = {
+            apiKey: "AIzaSyCNkYBoD6fBQ-uxmn8tj78yS96a9ipc-5w",
+            authDomain: "hablnacos.firebaseapp.com",
+            databaseURL: "https://hablnacos-default-rtdb.firebaseio.com",
+            projectId: "hablnacos",
+            storageBucket: "hablnacos.appspot.com",
+            messagingSenderId: "1098555243394",
+            appId: "1:1098555243394:web:e00bf2adcf538bd1b97087"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         const DEFAULT_PLAYERS = ["ניר", "ליאור", "אבירם", "שון", "חן", "מאור"];
-        const PLAYERS_KEY = "rm_predictions_players_list";
-        const STORAGE_KEY = "rm_predictions_league_data";
-
-        function getPlayers() {
-            const saved = localStorage.getItem(PLAYERS_KEY);
-            return saved ? JSON.parse(saved) : [...DEFAULT_PLAYERS];
-        }
-
-        function savePlayersList(players) {
-            localStorage.setItem(PLAYERS_KEY, JSON.stringify(players));
-        }
-
-        function addNewPlayer() {
-            const input = document.getElementById("newPlayerName");
-            const name = input.value.trim();
-            if (!name) return;
-
-            let players = getPlayers();
-            if (players.includes(name)) {
-                alert("שחקן בשם זה כבר קיים!");
-                return;
-            }
-
-            players.push(name);
-            savePlayersList(players);
-            input.value = "";
-            
-            initUI();
-            showSavedIndicator();
-        }
-
-        function removePlayer(name) {
-            if (confirm(`להסיר את ${name} מהתחרות?`)) {
-                let players = getPlayers();
-                players = players.filter(p => p !== name);
-                savePlayersList(players);
-
-                initUI();
-                showSavedIndicator();
-            }
-        }
+        let currentPlayers = [];
+        let currentData = {};
 
         const matches = [
             { match: "אספניול - ריאל מדריד", date: "22/08/2026", defaultActual: "1-2" },
@@ -558,122 +256,130 @@
             { match: "ריאל מדריד - דפורטיבו לה קורוניה", date: "29/05/2027" }
         ];
 
-        function getSavedData() {
-            const data = localStorage.getItem(STORAGE_KEY);
-            return data ? JSON.parse(data) : {};
+        // === LISTEN TO LIVE FIREBASE UPDATES ===
+        db.ref('league_data').on('value', snapshot => {
+            const data = snapshot.val() || {};
+            currentPlayers = data.players || DEFAULT_PLAYERS;
+            currentData = data.predictions || {};
+
+            renderUI();
+        });
+
+        function saveToCloud() {
+            db.ref('league_data').set({
+                players: currentPlayers,
+                predictions: currentData
+            });
         }
 
-        function saveData(data) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            showSavedIndicator();
-            updateScores();
+        function addNewPlayer() {
+            const input = document.getElementById("newPlayerName");
+            const name = input.value.trim();
+            if (!name) return;
+            if (currentPlayers.includes(name)) { alert("שחקן קיים!"); return; }
+
+            currentPlayers.push(name);
+            input.value = "";
+            saveToCloud();
         }
 
-        function showSavedIndicator() {
-            const status = document.getElementById("saveStatus");
-            status.style.opacity = "1";
-            status.innerHTML = "✓ נשמר";
-            status.style.background = "#d1fae5";
-            status.style.color = "#065f46";
-            
-            setTimeout(() => {
-                status.style.opacity = "0.7";
-            }, 1000);
+        function removePlayer(name) {
+            if (confirm(`להסיר את ${name}?`)) {
+                currentPlayers = currentPlayers.filter(p => p !== name);
+                saveToCloud();
+            }
+        }
+
+        function onInputSave(key, value) {
+            currentData[key] = value;
+            db.ref(`league_data/predictions/${key}`).set(value);
+        }
+
+        function onWinnerToggle(idx, player, isChecked) {
+            const key = `winners_${idx}`;
+            let winners = currentData[key] || [];
+
+            if (isChecked) {
+                if (!winners.includes(player)) winners.push(player);
+            } else {
+                winners = winners.filter(p => p !== player);
+            }
+
+            currentData[key] = winners;
+            db.ref(`league_data/predictions/${key}`).set(winners);
         }
 
         function updateScores() {
-            const players = getPlayers();
-            const data = getSavedData();
             const scores = {};
-            players.forEach(p => scores[p] = 0);
+            currentPlayers.forEach(p => scores[p] = 0);
 
             matches.forEach((_, idx) => {
-                const winners = data[`winners_${idx}`] || [];
+                const winners = currentData[`winners_${idx}`] || [];
                 winners.forEach(player => {
-                    if (scores[player] !== undefined) {
-                        scores[player]++;
-                    }
+                    if (scores[player] !== undefined) scores[player]++;
                 });
             });
 
-            players.forEach(player => {
+            currentPlayers.forEach(player => {
                 const el = document.getElementById(`score_${player}`);
                 if (el) el.innerText = `${scores[player]} נק'`;
             });
         }
 
-        function renderPlayersBar() {
-            const players = getPlayers();
-            const bar = document.getElementById("playersBar");
-            bar.innerHTML = players.map((player, index) => `
+        function renderUI() {
+            // Render Badges
+            document.getElementById("playersBar").innerHTML = currentPlayers.map((player, index) => `
                 <div class="player-badge">
-                    <button class="remove-player-btn" onclick="removePlayer('${player}')" title="הסר שחקן">×</button>
+                    <button class="remove-player-btn" onclick="removePlayer('${player}')">×</button>
                     ${index === 0 ? '👑' : '⭐'} ${player}
                     <span class="pts" id="score_${player}">0 נק'</span>
                 </div>
             `).join("");
-        }
 
-        function renderTableHeader() {
-            const players = getPlayers();
-            const headerRow = document.getElementById("tableHeaderRow");
-            const playerHeaders = players.map(p => `<th class="player-header">${p}</th>`).join("");
-            
-            headerRow.innerHTML = `
+            // Render Header
+            document.getElementById("tableHeaderRow").innerHTML = `
                 <th style="text-align: right; padding-right: 20px;">משחק</th>
                 <th>תאריך</th>
                 <th>תוצאה בפועל</th>
-                <th style="min-width: 260px;">מי צדק? (בחירה מרובה)</th>
-                ${playerHeaders}
+                <th style="min-width: 260px;">מי צדק?</th>
+                ${currentPlayers.map(p => `<th class="player-header">${p}</th>`).join("")}
             `;
-        }
 
-        function renderTable() {
-            const players = getPlayers();
+            // Render Table Rows
             const tbody = document.getElementById("tableBody");
-            const savedData = getSavedData();
             tbody.innerHTML = "";
 
             matches.forEach((m, idx) => {
                 const tr = document.createElement("tr");
                 if (m.isClasico) tr.classList.add("clasico-row");
 
-                const savedActual = savedData[`actual_${idx}`] !== undefined ? savedData[`actual_${idx}`] : (m.defaultActual || "");
-                const savedWinners = savedData[`winners_${idx}`] || [];
+                const savedActual = currentData[`actual_${idx}`] !== undefined ? currentData[`actual_${idx}`] : (m.defaultActual || "");
+                const savedWinners = currentData[`winners_${idx}`] || [];
 
-                const winnersHTML = players.map(player => {
+                const winnersHTML = currentPlayers.map(player => {
                     const isChecked = savedWinners.includes(player);
                     return `
-                        <label class="winner-chip ${isChecked ? 'active' : ''}" id="chip_${idx}_${player}">
+                        <label class="winner-chip ${isChecked ? 'active' : ''}">
                             <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="onWinnerToggle('${idx}', '${player}', this.checked)">
                             ${player}
                         </label>
                     `;
                 }).join("");
 
-                const predictionsHTML = players.map(player => {
-                    const savedPred = savedData[`pred_${idx}_${player}`] || "";
+                const predictionsHTML = currentPlayers.map(player => {
+                    const savedPred = currentData[`pred_${idx}_${player}`] || "";
                     return `
                         <td>
-                            <input type="text" class="score-input" placeholder="-" value="${savedPred}" id="pred_${idx}_${player}" oninput="onInputSave('pred_${idx}_${player}', this.value)">
+                            <input type="text" class="score-input" value="${savedPred}" placeholder="-" oninput="onInputSave('pred_${idx}_${player}', this.value)">
                         </td>
                     `;
                 }).join("");
 
                 tr.innerHTML = `
-                    <td class="match-cell">
-                        ${m.isClasico ? '<span class="clasico-badge">אל קלאסיקו</span>' : ''}
-                        ${m.match}
-                    </td>
+                    <td class="match-cell">${m.isClasico ? '<span class="clasico-badge">אל קלאסיקו</span>' : ''}${m.match}</td>
                     <td class="date-cell">${m.date}</td>
-                    <td>
-                        <input type="text" class="score-input actual-score" value="${savedActual}" placeholder="0-0" id="actual_${idx}" oninput="onInputSave('actual_${idx}', this.value)">
-                    </td>
-                    <td>
-                        <div class="winners-grid">
-                            ${winnersHTML}
-                        </div>
-                    </td>
+                    <td><input type="text" class="score-input actual-score" value="${savedActual}" placeholder="0-0" oninput="onInputSave('actual_${idx}', this.value)"></td>
+                    <td><div class="winners-grid">${winnersHTML}</div></td>
                     ${predictionsHTML}
                 `;
                 tbody.appendChild(tr);
@@ -682,50 +388,11 @@
             updateScores();
         }
 
-        function onInputSave(key, value) {
-            const data = getSavedData();
-            data[key] = value;
-            saveData(data);
-        }
-
-        function onWinnerToggle(idx, player, isChecked) {
-            const data = getSavedData();
-            const key = `winners_${idx}`;
-            let winners = data[key] || [];
-
-            if (isChecked) {
-                if (!winners.includes(player)) winners.push(player);
-            } else {
-                winners = winners.filter(p => p !== player);
-            }
-
-            data[key] = winners;
-
-            const label = document.getElementById(`chip_${idx}_${player}`);
-            if (label) {
-                if (isChecked) label.classList.add("active");
-                else label.classList.remove("active");
-            }
-
-            saveData(data);
-        }
-
         function resetAllData() {
-            if (confirm("האם אתה בטוח שברצונך לאפס את כל הנתונים, הניקוד והשחקנים?")) {
-                localStorage.removeItem(STORAGE_KEY);
-                localStorage.removeItem(PLAYERS_KEY);
-                initUI();
+            if (confirm("איפוס מוחלט של כל הנתונים בענן?")) {
+                db.ref('league_data').remove();
             }
         }
-
-        function initUI() {
-            renderPlayersBar();
-            renderTableHeader();
-            renderTable();
-        }
-
-        // Initialize table on page load
-        initUI();
     </script>
 </body>
 </html>
