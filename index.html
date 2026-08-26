@@ -11,460 +11,412 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <style>
-        :root {
-            --rm-blue: #00529f;
-            --rm-dark-blue: #001c58;
-            --rm-light-blue: #ebf5ff;
-            --rm-bg: #f8fafc;
-            --rm-card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --clasico-red: #dc2626;
-            --clasico-bg: #fef2f2;
-        }
-
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Assistant', sans-serif; }
 
         body {
-            background-color: var(--rm-bg);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding-bottom: 60px;
+            background-color: #ffffff;
+            color: #111827;
+            padding: 20px 10px;
         }
 
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header בכחול לבן נקי */
         header {
-            background-color: var(--rm-blue);
+            background-color: #00529f;
             color: #ffffff;
-            padding: 30px 20px 25px;
+            padding: 20px;
+            border-radius: 8px;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
 
-        .header-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
+        h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 4px; }
+        p.subtitle { font-size: 0.95rem; opacity: 0.9; }
 
-        .header-subtitle {
-            font-size: 1rem;
-            opacity: 0.9;
-            font-weight: 400;
-        }
-
-        .add-player-box {
+        .add-player-form {
             display: flex;
             justify-content: center;
             gap: 8px;
-            margin-top: 18px;
+            margin-top: 15px;
         }
 
-        .add-player-input {
-            padding: 8px 14px;
-            border-radius: 6px;
-            border: 1px solid #ffffff;
-            font-size: 0.95rem;
+        .add-player-form input {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 0.9rem;
             outline: none;
         }
 
-        .btn-add-player {
-            background-color: var(--rm-dark-blue);
+        .add-player-form button {
+            background-color: #002f6c;
             color: #ffffff;
             border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 6px 14px;
+            border-radius: 4px;
             font-weight: 700;
             cursor: pointer;
-            transition: background 0.2s;
         }
 
-        .btn-add-player:hover {
-            background-color: #000c28;
-        }
-
-        .players-bar {
+        /* סרגל ניקוד השחקנים */
+        .scoreboard {
             display: flex;
-            justify-content: center;
             flex-wrap: wrap;
             gap: 10px;
-            margin: 20px auto;
-            max-width: 1200px;
-            padding: 0 15px;
+            justify-content: center;
+            margin-bottom: 20px;
         }
 
-        .player-badge {
-            background-color: #ffffff;
-            padding: 8px 16px;
-            border-radius: 20px;
+        .player-card {
+            background-color: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            padding: 6px 12px;
+            border-radius: 6px;
             font-weight: 700;
-            font-size: 0.95rem;
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        .player-badge .pts {
-            background-color: var(--rm-light-blue);
-            color: var(--rm-blue);
+        .player-card .score {
+            background-color: #00529f;
+            color: #ffffff;
             padding: 2px 8px;
-            border-radius: 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 4px;
+        }
+
+        /* טבלה */
+        .table-wrapper {
+            overflow-x: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
             font-size: 0.9rem;
         }
 
-        .remove-player-btn {
-            background: none;
-            color: #94a3b8;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1rem;
-            line-height: 1;
-            padding: 0 2px;
-        }
-
-        .remove-player-btn:hover {
-            color: var(--clasico-red);
-        }
-
-        .container { max-width: 1300px; margin: 0 auto; padding: 0 15px; }
-
-        .actions-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            background: #ffffff;
-            padding: 12px 18px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .info-note { font-size: 0.9rem; color: var(--text-muted); }
-
-        .btn-clear {
-            background: #ffffff;
-            color: var(--clasico-red);
-            border: 1px solid #fca5a5;
-            padding: 6px 12px;
-            font-weight: 700;
-            font-size: 0.85rem;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .btn-clear:hover { background: var(--clasico-bg); }
-
-        .table-card { 
-            background: #ffffff; 
-            border-radius: 8px; 
-            border: 1px solid var(--border-color); 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            overflow: hidden; 
-        }
-
-        .table-responsive { width: 100%; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.95rem; }
-
-        thead th { 
-            background-color: var(--rm-blue); 
-            color: #ffffff; 
-            padding: 12px 10px; 
-            font-weight: 700; 
-        }
-
-        thead th.player-header { background-color: var(--rm-dark-blue); min-width: 80px; }
-        tbody tr { border-bottom: 1px solid var(--border-color); }
-        tbody tr:nth-child(even) { background-color: #f8fafc; }
-        tbody tr:hover { background-color: var(--rm-light-blue); }
-
-        td.match-cell { text-align: right; padding: 12px 15px; font-weight: 700; color: var(--text-main); white-space: nowrap; }
-        td.date-cell { color: var(--text-muted); font-size: 0.85rem; white-space: nowrap; padding: 12px 8px; }
-
-        tr.clasico-row { background-color: var(--clasico-bg) !important; }
-        tr.clasico-row td.match-cell { color: var(--clasico-red); }
-
-        .clasico-badge { 
-            background: var(--clasico-red); 
+        th {
+            background-color: #00529f;
             color: #ffffff;
-            font-size: 0.75rem;
-            padding: 2px 6px;
-            border-radius: 4px; 
-            margin-right: 6px;
+            padding: 10px;
             font-weight: 700;
+            border: 1px solid #004080;
         }
 
-        input.score-input {
-            width: 50px;
+        th.player-th {
+            background-color: #003366;
+            min-width: 70px;
+        }
+
+        td {
+            padding: 8px 6px;
+            border: 1px solid #e5e7eb;
+        }
+
+        tr:nth-child(even) { background-color: #f9fafb; }
+        tr:hover { background-color: #f0f7ff; }
+
+        td.match-name { text-align: right; font-weight: 700; white-space: nowrap; padding-right: 12px; }
+        td.match-date { color: #6b7280; font-size: 0.8rem; white-space: nowrap; }
+
+        tr.clasico { background-color: #fef2f2 !important; }
+        tr.clasico td.match-name { color: #dc2626; }
+
+        /* שדות קלט למספרים */
+        input.score-in {
+            width: 45px;
             text-align: center;
-            padding: 5px;
-            border: 1px solid var(--border-color);
+            padding: 4px;
+            border: 1px solid #d1d5db;
             border-radius: 4px;
             font-weight: 700;
-            font-size: 0.95rem;
-            color: var(--text-main);
             direction: ltr;
         }
 
-        input.score-input:focus {
-            outline: none;
-            border-color: var(--rm-blue);
+        input.actual-in {
+            border-color: #00529f;
+            background-color: #eef6ff;
+            color: #00529f;
         }
 
-        input.actual-score {
-            border-color: var(--rm-blue);
-            background-color: var(--rm-light-blue);
-            color: var(--rm-blue);
+        /* צ'קבוקסים של מי צדק */
+        .winners-box {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
-        .winners-grid { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; padding: 2px; }
-
-        .winner-chip {
-            display: inline-flex;
-            align-items: center;
+        .winner-btn {
             background: #ffffff;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.75rem;
             cursor: pointer;
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
+            color: #4b5563;
         }
 
-        .winner-chip input { display: none; }
-
-        .winner-chip.active { 
-            background: var(--rm-blue); 
+        .winner-btn.active {
+            background-color: #00529f;
             color: #ffffff;
-            border-color: var(--rm-blue);
+            border-color: #00529f;
+            font-weight: 700;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .reset-btn {
+            background: none;
+            border: none;
+            color: #dc2626;
+            cursor: pointer;
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
+<div class="main-container">
     <header>
-        <div class="header-title">ליגת הניחושים - ריאל מדריד 2026/27</div>
-        <div class="header-subtitle">טבלת ניחושים משותפת בזמן אמת (Firebase)</div>
-        <div class="add-player-box">
-            <input type="text" id="newPlayerName" class="add-player-input" placeholder="שם שחקן חדש...">
-            <button class="btn-add-player" onclick="addNewPlayer()">+ הוסף שחקן</button>
+        <h1>ליגת הניחושים - ריאל מדריד 2026/27</h1>
+        <p class="subtitle">סנכרון בזמן אמת בשרת ענן (Firebase)</p>
+        <div class="add-player-form">
+            <input type="text" id="newPlayerName" placeholder="שם שחקן...">
+            <button onclick="addNewPlayer()">הוסף</button>
         </div>
     </header>
 
-    <div class="players-bar" id="playersBar"></div>
+    <div class="scoreboard" id="playersBar"></div>
 
-    <div class="container">
-        <div class="actions-bar">
-            <div class="info-note">🌐 <b>סנכרון פעיל:</b> השינויים מתעדכנים בלייב אצל כולם.</div>
-            <button class="btn-clear" onclick="resetAllData()">🗑️ איפוס נתונים</button>
-        </div>
-
-        <div class="table-card">
-            <div class="table-responsive">
-                <table>
-                    <thead><tr id="tableHeaderRow"></tr></thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
-        </div>
+    <div class="top-bar">
+        <span>🌐 מחובר ומסונכרן</span>
+        <button class="reset-btn" onclick="resetAllData()">איפוס נתונים</button>
     </div>
 
-    <script>
-        // === FIREBASE CONFIGURATION ===
-        const firebaseConfig = {
-            apiKey: "AIzaSyCNkYBoD6fBQ-uxmn8tj78yS96a9ipc-5w",
-            authDomain: "hablnacos.firebaseapp.com",
-            databaseURL: "https://hablnacos-default-rtdb.firebaseio.com",
-            projectId: "hablnacos",
-            storageBucket: "hablnacos.appspot.com",
-            messagingSenderId: "1098555243394",
-            appId: "1:1098555243394:web:e00bf2adcf538bd1b97087"
-        };
+    <div class="table-wrapper">
+        <table>
+            <thead><tr id="tableHeaderRow"></tr></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+<script>
+    // === FIREBASE CONFIGURATION ===
+    const firebaseConfig = {
+        apiKey: "AIzaSyCNkYBoD6fBQ-uxmn8tj78yS96a9ipc-5w",
+        authDomain: "hablnacos.firebaseapp.com",
+        databaseURL: "https://hablnacos-default-rtdb.firebaseio.com",
+        projectId: "hablnacos",
+        storageBucket: "hablnacos.appspot.com",
+        messagingSenderId: "1098555243394",
+        appId: "1:1098555243394:web:e00bf2adcf538bd1b97087"
+    };
 
-        const DEFAULT_PLAYERS = ["ניר", "ליאור", "אבירם", "שון", "חן", "מאור"];
-        let currentPlayers = [];
-        let currentData = {};
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-        const matches = [
-            { match: "אספניול - ריאל מדריד", date: "22/08/2026", defaultActual: "1-2" },
-            { match: "ריאל מדריד - ריאל סוסיאדד", date: "26/08/2026" },
-            { match: "ריאל מדריד - מלאגה", date: "30/08/2026" },
-            { match: "ריאל בטיס - ריאל מדריד", date: "04/09/2026" },
-            { match: "ריאל מדריד - ראיו ואייקאנו", date: "13/09/2026" },
-            { match: "אלצ'ה - ריאל מדריד", date: "16/09/2026" },
-            { match: "אתלטיקו מדריד - ריאל מדריד", date: "20/09/2026" },
-            { match: "ריאל מדריד - ויאריאל", date: "11/10/2026" },
-            { match: "ריאל מדריד - סביליה", date: "18/10/2026" },
-            { match: "ברצלונה - ריאל מדריד", date: "25/10/2026", isClasico: true },
-            { match: "ראסינג סנטנדר - ריאל מדריד", date: "01/11/2026" },
-            { match: "ולנסיה - ריאל מדריד", date: "08/11/2026" },
-            { match: "ריאל מדריד - סלטה ויגו", date: "22/11/2026" },
-            { match: "ריאל מדריד - דפורטיבו אלאבס", date: "29/11/2026" },
-            { match: "אתלטיק בילבאו - ריאל מדריד", date: "06/12/2026" },
-            { match: "ריאל מדריד - אוססונה", date: "13/12/2026" },
-            { match: "דפורטיבו לה קורוניה - ריאל מדריד", date: "20/12/2026" },
-            { match: "ריאל מדריד - חטאפה", date: "03/01/2027" },
-            { match: "ריאל מדריד - לבאנטה", date: "10/01/2027" },
-            { match: "מלאגה - ריאל מדריד", date: "17/01/2027" },
-            { match: "ריאל מדריד - ריאל בטיס", date: "24/01/2027" },
-            { match: "ראיו ואייקאנו - ריאל מדריד", date: "31/01/2027" },
-            { match: "ריאל סוסיאדד - ריאל מדריד", date: "07/02/2027" },
-            { match: "ריאל מדריד - אתלטיק בילבאו", date: "14/02/2027" },
-            { match: "סביליה - ריאל מדריד", date: "21/02/2027" },
-            { match: "ריאל מדריד - ולנסיה", date: "28/02/2027" },
-            { match: "ויאריאל - ריאל מדריד", date: "06/03/2027" },
-            { match: "ריאל מדריד - אספניול", date: "13/03/2027" },
-            { match: "סלטה ויגו - ריאל מדריד", date: "20/03/2027" },
-            { match: "ריאל מדריד - אתלטיקו מדריד", date: "03/04/2027" },
-            { match: "אוססונה - ריאל מדריד", date: "10/04/2027" },
-            { match: "חטאפה - ריאל מדריד", date: "17/04/2027" },
-            { match: "ריאל מדריד - אלצ'ה", date: "20/04/2027" },
-            { match: "לבאנטה - ריאל מדריד", date: "01/05/2027" },
-            { match: "ריאל מדריד - ברצלונה", date: "08/05/2027", isClasico: true },
-            { match: "ריאל מדריד - ראסינג סנטנדר", date: "15/05/2027" },
-            { match: "דפורטיבו אלאבס - ריאל מדריד", date: "22/05/2027" },
-            { match: "ריאל מדריד - דפורטיבו לה קורוניה", date: "29/05/2027" }
-        ];
+    const DEFAULT_PLAYERS = ["ניר", "ליאור", "אבירם", "שון", "חן", "מאור"];
+    let currentPlayers = [];
+    let currentData = {};
 
-        db.ref('league_data').on('value', snapshot => {
-            const data = snapshot.val() || {};
-            currentPlayers = data.players || DEFAULT_PLAYERS;
-            currentData = data.predictions || {};
+    const matches = [
+        { match: "אספניול - ריאל מדריד", date: "22/08/2026", defaultActual: "1-2" },
+        { match: "ריאל מדריד - ריאל סוסיאדד", date: "26/08/2026" },
+        { match: "ריאל מדריד - מלאגה", date: "30/08/2026" },
+        { match: "ריאל בטיס - ריאל מדריד", date: "04/09/2026" },
+        { match: "ריאל מדריד - ראיו ואייקאנו", date: "13/09/2026" },
+        { match: "אלצ'ה - ריאל מדריד", date: "16/09/2026" },
+        { match: "אתלטיקו מדריד - ריאל מדריד", date: "20/09/2026" },
+        { match: "ריאל מדריד - ויאריאל", date: "11/10/2026" },
+        { match: "ריאל מדריד - סביליה", date: "18/10/2026" },
+        { match: "ברצלונה - ריאל מדריד", date: "25/10/2026", isClasico: true },
+        { match: "ראסינג סנטנדר - ריאל מדריד", date: "01/11/2026" },
+        { match: "ולנסיה - ריאל מדריד", date: "08/11/2026" },
+        { match: "ריאל מדריד - סלטה ויגו", date: "22/11/2026" },
+        { match: "ריאל מדריד - דפורטיבו אלאבס", date: "29/11/2026" },
+        { match: "אתלטיק בילבאו - ריאל מדריד", date: "06/12/2026" },
+        { match: "ריאל מדריד - אוססונה", date: "13/12/2026" },
+        { match: "דפורטיבו לה קורוניה - ריאל מדריד", date: "20/12/2026" },
+        { match: "ריאל מדריד - חטאפה", date: "03/01/2027" },
+        { match: "ריאל מדריד - לבאנטה", date: "10/01/2027" },
+        { match: "מלאגה - ריאל מדריד", date: "17/01/2027" },
+        { match: "ריאל מדריד - ריאל בטיס", date: "24/01/2027" },
+        { match: "ראיו ואייקאנו - ריאל מדריד", date: "31/01/2027" },
+        { match: "ריאל סוסיאדד - ריאל מדריד", date: "07/02/2027" },
+        { match: "ריאל מדריד - אתלטיק בילבאו", date: "14/02/2027" },
+        { match: "סביליה - ריאל מדריד", date: "21/02/2027" },
+        { match: "ריאל מדריד - ולנסיה", date: "28/02/2027" },
+        { match: "ויאריאל - ריאל מדריד", date: "06/03/2027" },
+        { match: "ריאל מדריד - אספניול", date: "13/03/2027" },
+        { match: "סלטה ויגו - ריאל מדריד", date: "20/03/2027" },
+        { match: "ריאל מדריד - אתלטיקו מדריד", date: "03/04/2027" },
+        { match: "אוססונה - ריאל מדריד", date: "10/04/2027" },
+        { match: "חטאפה - ריאל מדריד", date: "17/04/2027" },
+        { match: "ריאל מדריד - אלצ'ה", date: "20/04/2027" },
+        { match: "לבאנטה - ריאל מדריד", date: "01/05/2027" },
+        { match: "ריאל מדריד - ברצלונה", date: "08/05/2027", isClasico: true },
+        { match: "ריאל מדריד - ראסינג סנטנדר", date: "15/05/2027" },
+        { match: "דפורטיבו אלאבס - ריאל מדריד", date: "22/05/2027" },
+        { match: "ריאל מדריד - דפורטיבו לה קורוניה", date: "29/05/2027" }
+    ];
 
-            renderUI();
+    db.ref('league_data').on('value', snapshot => {
+        const data = snapshot.val() || {};
+        currentPlayers = data.players || DEFAULT_PLAYERS;
+        currentData = data.predictions || {};
+        renderUI();
+    });
+
+    function saveToCloud() {
+        db.ref('league_data').set({
+            players: currentPlayers,
+            predictions: currentData
         });
+    }
 
-        function saveToCloud() {
-            db.ref('league_data').set({
-                players: currentPlayers,
-                predictions: currentData
-            });
-        }
+    function addNewPlayer() {
+        const input = document.getElementById("newPlayerName");
+        const name = input.value.trim();
+        if (!name) return;
+        if (currentPlayers.includes(name)) { alert("השחקן כבר קיים"); return; }
+        currentPlayers.push(name);
+        input.value = "";
+        saveToCloud();
+    }
 
-        function addNewPlayer() {
-            const input = document.getElementById("newPlayerName");
-            const name = input.value.trim();
-            if (!name) return;
-            if (currentPlayers.includes(name)) { alert("שחקן קיים!"); return; }
-
-            currentPlayers.push(name);
-            input.value = "";
+    function removePlayer(name) {
+        if (confirm(`להסיר את ${name}?`)) {
+            currentPlayers = currentPlayers.filter(p => p !== name);
             saveToCloud();
         }
+    }
 
-        function removePlayer(name) {
-            if (confirm(`להסיר את ${name}?`)) {
-                currentPlayers = currentPlayers.filter(p => p !== name);
-                saveToCloud();
-            }
+    function onInputSave(key, value) {
+        currentData[key] = value;
+        db.ref(`league_data/predictions/${key}`).set(value);
+    }
+
+    function onWinnerToggle(idx, player) {
+        const key = `winners_${idx}`;
+        let winners = currentData[key] || [];
+
+        if (winners.includes(player)) {
+            winners = winners.filter(p => p !== player);
+        } else {
+            winners.push(player);
         }
 
-        function onInputSave(key, value) {
-            currentData[key] = value;
-            db.ref(`league_data/predictions/${key}`).set(value);
-        }
+        currentData[key] = winners;
+        db.ref(`league_data/predictions/${key}`).set(winners);
+    }
 
-        function onWinnerToggle(idx, player, isChecked) {
-            const key = `winners_${idx}`;
-            let winners = currentData[key] || [];
+    function updateScores() {
+        const scores = {};
+        currentPlayers.forEach(p => scores[p] = 0);
 
-            if (isChecked) {
-                if (!winners.includes(player)) winners.push(player);
-            } else {
-                winners = winners.filter(p => p !== player);
-            }
-
-            currentData[key] = winners;
-            db.ref(`league_data/predictions/${key}`).set(winners);
-        }
-
-        function updateScores() {
-            const scores = {};
-            currentPlayers.forEach(p => scores[p] = 0);
-
-            matches.forEach((_, idx) => {
-                const winners = currentData[`winners_${idx}`] || [];
-                winners.forEach(player => {
-                    if (scores[player] !== undefined) scores[player]++;
-                });
+        matches.forEach((_, idx) => {
+            const winners = currentData[`winners_${idx}`] || [];
+            winners.forEach(player => {
+                if (scores[player] !== undefined) scores[player]++;
             });
+        });
 
-            currentPlayers.forEach(player => {
-                const el = document.getElementById(`score_${player}`);
-                if (el) el.innerText = `${scores[player]} נק'`;
-            });
-        }
+        currentPlayers.forEach(player => {
+            const el = document.getElementById(`score_${player}`);
+            if (el) el.innerText = `${scores[player]} נק'`;
+        });
+    }
 
-        function renderUI() {
-            document.getElementById("playersBar").innerHTML = currentPlayers.map(player => `
-                <div class="player-badge">
-                    <button class="remove-player-btn" onclick="removePlayer('${player}')">×</button>
-                    ${player}
-                    <span class="pts" id="score_${player}">0 נק'</span>
-                </div>
-            `).join("");
+    function renderUI() {
+        document.getElementById("playersBar").innerHTML = currentPlayers.map(player => `
+            <div class="player-card">
+                <button class="remove-btn" onclick="removePlayer('${player}')">×</button>
+                <span>${player}</span>
+                <span class="score" id="score_${player}">0 נק'</span>
+            </div>
+        `).join("");
 
-            document.getElementById("tableHeaderRow").innerHTML = `
-                <th style="text-align: right; padding-right: 15px;">משחק</th>
-                <th>תאריך</th>
-                <th>תוצאה</th>
-                <th style="min-width: 200px;">מי צדק?</th>
-                ${currentPlayers.map(p => `<th class="player-header">${p}</th>`).join("")}
-            `;
+        document.getElementById("tableHeaderRow").innerHTML = `
+            <th style="text-align: right; padding-right: 12px;">משחק</th>
+            <th>תאריך</th>
+            <th>תוצאה</th>
+            <th>מי צדק?</th>
+            ${currentPlayers.map(p => `<th class="player-th">${p}</th>`).join("")}
+        `;
 
-            const tbody = document.getElementById("tableBody");
-            tbody.innerHTML = "";
+        const tbody = document.getElementById("tableBody");
+        tbody.innerHTML = "";
 
-            matches.forEach((m, idx) => {
-                const tr = document.createElement("tr");
-                if (m.isClasico) tr.classList.add("clasico-row");
+        matches.forEach((m, idx) => {
+            const tr = document.createElement("tr");
+            if (m.isClasico) tr.classList.add("clasico");
 
-                const savedActual = currentData[`actual_${idx}`] !== undefined ? currentData[`actual_${idx}`] : (m.defaultActual || "");
-                const savedWinners = currentData[`winners_${idx}`] || [];
+            const savedActual = currentData[`actual_${idx}`] !== undefined ? currentData[`actual_${idx}`] : (m.defaultActual || "");
+            const savedWinners = currentData[`winners_${idx}`] || [];
 
-                const winnersHTML = currentPlayers.map(player => {
-                    const isChecked = savedWinners.includes(player);
-                    return `
-                        <label class="winner-chip ${isChecked ? 'active' : ''}">
-                            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="onWinnerToggle('${idx}', '${player}', this.checked)">
-                            ${player}
-                        </label>
-                    `;
-                }).join("");
-
-                const predictionsHTML = currentPlayers.map(player => {
-                    const savedPred = currentData[`pred_${idx}_${player}`] || "";
-                    return `
-                        <td>
-                            <input type="text" class="score-input" value="${savedPred}" placeholder="-" onchange="onInputSave('pred_${idx}_${player}', this.value)">
-                        </td>
-                    `;
-                }).join("");
-
-                tr.innerHTML = `
-                    <td class="match-cell">${m.isClasico ? '<span class="clasico-badge">קלאסיקו</span>' : ''}${m.match}</td>
-                    <td class="date-cell">${m.date}</td>
-                    <td><input type="text" class="score-input actual-score" value="${savedActual}" placeholder="0-0" onchange="onInputSave('actual_${idx}', this.value)"></td>
-                    <td><div class="winners-grid">${winnersHTML}</div></td>
-                    ${predictionsHTML}
+            const winnersHTML = currentPlayers.map(player => {
+                const isChecked = savedWinners.includes(player);
+                return `
+                    <button class="winner-btn ${isChecked ? 'active' : ''}" onclick="onWinnerToggle('${idx}', '${player}')">
+                        ${player}
+                    </button>
                 `;
-                tbody.appendChild(tr);
-            });
+            }).join("");
 
-            updateScores();
-        }
+            const predictionsHTML = currentPlayers.map(player => {
+                const savedPred = currentData[`pred_${idx}_${player}`] || "";
+                return `
+                    <td>
+                        <input type="text" class="score-in" value="${savedPred}" placeholder="-" onchange="onInputSave('pred_${idx}_${player}', this.value)">
+                    </td>
+                `;
+            }).join("");
 
-        function resetAllData() {
-            if (confirm("להאפס את כל הנתונים בענן?")) {
-                db.ref('league_data').remove();
-            }
+            tr.innerHTML = `
+                <td class="match-name">${m.isClasico ? '🔥 ' : ''}${m.match}</td>
+                <td class="match-date">${m.date}</td>
+                <td><input type="text" class="score-in actual-in" value="${savedActual}" placeholder="0-0" onchange="onInputSave('actual_${idx}', this.value)"></td>
+                <td><div class="winners-box">${winnersHTML}</div></td>
+                ${predictionsHTML}
+            `;
+            tbody.appendChild(tr);
+        });
+
+        updateScores();
+    }
+
+    function resetAllData() {
+        if (confirm("למחוק את כל הנתונים בענן?")) {
+            db.ref('league_data').remove();
         }
-    </script>
+    }
+</script>
 </body>
 </html>
