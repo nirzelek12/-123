@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ליגת הניחושים - ריאל מדריד 2026/27</title>
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&family=Teko:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Firebase Libraries -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -12,124 +12,75 @@
 
     <style>
         :root {
-            --rm-dark-bg: #0b132b;
-            --rm-card-bg: #1c2541;
-            --rm-navy: #001c58;
             --rm-blue: #00529f;
-            --rm-light-blue: #3a86ff;
-            --rm-white: #ffffff;
-            --rm-border: rgba(255, 255, 255, 0.12);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --clasico-red: #ef4444;
-            --clasico-bg: rgba(239, 68, 68, 0.15);
-            --clasico-border: rgba(239, 68, 68, 0.4);
-            --success-green: #10b981;
-            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+            --rm-dark-blue: #001c58;
+            --rm-light-blue: #ebf5ff;
+            --rm-bg: #f8fafc;
+            --rm-card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --clasico-red: #dc2626;
+            --clasico-bg: #fef2f2;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Assistant', sans-serif; }
 
         body {
-            background-color: var(--rm-dark-bg);
-            background-image: 
-                radial-gradient(circle at 50% -10%, #1c2541 0%, transparent 60%),
-                radial-gradient(circle at 85% 30%, rgba(58, 134, 255, 0.05) 0%, transparent 40%);
-            background-attachment: fixed;
+            background-color: var(--rm-bg);
             color: var(--text-main);
             min-height: 100vh;
             padding-bottom: 60px;
         }
 
         header {
-            background: linear-gradient(180deg, var(--rm-navy) 0%, #0b132b 100%);
-            color: var(--rm-white);
-            padding: 40px 20px 30px;
+            background-color: var(--rm-blue);
+            color: #ffffff;
+            padding: 30px 20px 25px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            border-bottom: 3px solid var(--rm-blue);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* סמל ריאל מדריד ברקע ה-Header */
-        header::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 280px;
-            height: 280px;
-            background-image: url('https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: contain;
-            opacity: 0.06;
-            pointer-events: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .header-title {
-            font-size: 2.3rem;
+            font-size: 2.2rem;
             font-weight: 800;
             margin-bottom: 6px;
-            color: var(--rm-white);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            position: relative;
-            z-index: 2;
         }
-        
+
         .header-subtitle {
             font-size: 1rem;
-            color: #94a3b8;
-            font-weight: 500;
-            position: relative;
-            z-index: 2;
+            opacity: 0.9;
+            font-weight: 400;
         }
 
         .add-player-box {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-            position: relative;
-            z-index: 2;
+            gap: 8px;
+            margin-top: 18px;
         }
-        
+
         .add-player-input {
-            padding: 10px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--rm-border);
-            background: rgba(11, 19, 43, 0.8);
-            color: var(--rm-white);
+            padding: 8px 14px;
+            border-radius: 6px;
+            border: 1px solid #ffffff;
             font-size: 0.95rem;
             outline: none;
-            transition: all 0.2s ease;
         }
-        
-        .add-player-input:focus {
-            border-color: var(--rm-light-blue);
-            box-shadow: 0 0 8px rgba(58, 134, 255, 0.3);
-        }
-        
+
         .btn-add-player {
-            background: var(--rm-blue);
-            color: var(--rm-white);
+            background-color: var(--rm-dark-blue);
+            color: #ffffff;
             border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background 0.2s;
         }
-        
+
         .btn-add-player:hover {
-            background: var(--rm-light-blue);
-            transform: translateY(-1px);
+            background-color: #000c28;
         }
 
         .players-bar {
@@ -137,206 +88,166 @@
             justify-content: center;
             flex-wrap: wrap;
             gap: 10px;
-            margin: -20px auto 30px;
+            margin: 20px auto;
             max-width: 1200px;
             padding: 0 15px;
-            position: relative;
-            z-index: 10;
-        }
-        
-        .player-badge {
-            background: #1c2541;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--rm-border);
-            color: var(--rm-white);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s ease;
-        }
-        
-        .player-badge:hover {
-            border-color: var(--rm-light-blue);
-            transform: translateY(-2px);
-        }
-        
-        .player-badge .pts {
-            background: var(--rm-blue);
-            color: var(--rm-white);
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 1.05rem;
-            font-weight: 700;
-            font-family: 'Teko', sans-serif;
-        }
-        
-        .remove-player-btn {
-            background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
-            border: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-        
-        .remove-player-btn:hover {
-            background: var(--clasico-red);
-            color: var(--rm-white);
         }
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
-        
+        .player-badge {
+            background-color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .player-badge .pts {
+            background-color: var(--rm-light-blue);
+            color: var(--rm-blue);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .remove-player-btn {
+            background: none;
+            color: #94a3b8;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            line-height: 1;
+            padding: 0 2px;
+        }
+
+        .remove-player-btn:hover {
+            color: var(--clasico-red);
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 15px; }
+
         .actions-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            background: var(--rm-card-bg);
-            padding: 14px 20px;
-            border-radius: 12px;
-            border: 1px solid var(--rm-border);
-        }
-        
-        .info-note { font-size: 0.9rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
-        
-        .status-badge {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success-green);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
-        
-        .btn-clear {
-            background: rgba(239, 68, 68, 0.1);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            padding: 6px 14px;
-            font-weight: 700;
-            font-size: 0.85rem;
+            margin-bottom: 15px;
+            background: #ffffff;
+            padding: 12px 18px;
             border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
+            border: 1px solid var(--border-color);
         }
-        
-        .btn-clear:hover { background: var(--clasico-red); color: var(--rm-white); }
+
+        .info-note { font-size: 0.9rem; color: var(--text-muted); }
+
+        .btn-clear {
+            background: #ffffff;
+            color: var(--clasico-red);
+            border: 1px solid #fca5a5;
+            padding: 6px 12px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-clear:hover { background: var(--clasico-bg); }
 
         .table-card { 
-            background: var(--rm-card-bg); 
-            border-radius: 14px; 
-            box-shadow: var(--shadow-md); 
+            background: #ffffff; 
+            border-radius: 8px; 
+            border: 1px solid var(--border-color); 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             overflow: hidden; 
-            border: 1px solid var(--rm-border); 
         }
-        
+
         .table-responsive { width: 100%; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.95rem; }
-        
+
         thead th { 
-            background-color: var(--rm-navy); 
-            color: var(--rm-white); 
-            padding: 16px 12px; 
+            background-color: var(--rm-blue); 
+            color: #ffffff; 
+            padding: 12px 10px; 
             font-weight: 700; 
-            border-bottom: 2px solid var(--rm-blue); 
         }
-        
-        thead th.player-header { background-color: #151d35; min-width: 85px; }
-        tbody tr { border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: background 0.2s; }
-        tbody tr:hover { background-color: rgba(58, 134, 255, 0.05); }
-        
-        td.match-cell { text-align: right; padding: 16px 18px; font-weight: 700; color: var(--rm-white); white-space: nowrap; }
-        td.date-cell { color: var(--text-muted); font-size: 0.85rem; white-space: nowrap; padding: 16px 10px; }
-        
-        tr.clasico-row { background-color: var(--clasico-bg) !important; border-bottom: 1px solid var(--clasico-border); }
-        tr.clasico-row td.match-cell { color: #fca5a5; }
-        
+
+        thead th.player-header { background-color: var(--rm-dark-blue); min-width: 80px; }
+        tbody tr { border-bottom: 1px solid var(--border-color); }
+        tbody tr:nth-child(even) { background-color: #f8fafc; }
+        tbody tr:hover { background-color: var(--rm-light-blue); }
+
+        td.match-cell { text-align: right; padding: 12px 15px; font-weight: 700; color: var(--text-main); white-space: nowrap; }
+        td.date-cell { color: var(--text-muted); font-size: 0.85rem; white-space: nowrap; padding: 12px 8px; }
+
+        tr.clasico-row { background-color: var(--clasico-bg) !important; }
+        tr.clasico-row td.match-cell { color: var(--clasico-red); }
+
         .clasico-badge { 
             background: var(--clasico-red); 
-            color: var(--rm-white);
-            font-size: 0.7rem;
-            padding: 2px 8px;
+            color: #ffffff;
+            font-size: 0.75rem;
+            padding: 2px 6px;
             border-radius: 4px; 
-            margin-right: 8px;
+            margin-right: 6px;
             font-weight: 700;
-            display: inline-block;
         }
 
         input.score-input {
-            width: 55px;
+            width: 50px;
             text-align: center;
-            padding: 6px 4px;
-            border: 1px solid var(--rm-border);
-            border-radius: 6px;
+            padding: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
             font-weight: 700;
-            font-size: 1.05rem;
-            color: var(--rm-white);
-            background: rgba(11, 19, 43, 0.6);
+            font-size: 0.95rem;
+            color: var(--text-main);
             direction: ltr;
-            font-family: 'Teko', sans-serif;
-            transition: all 0.2s;
-        }
-        
-        input.score-input:focus {
-            outline: none;
-            border-color: var(--rm-light-blue);
-            background: rgba(11, 19, 43, 0.9);
-        }
-        
-        input.actual-score {
-            border-color: var(--rm-blue);
-            background: rgba(0, 82, 159, 0.2);
-            color: var(--rm-white);
         }
 
-        .winners-grid { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; padding: 4px; max-width: 320px; margin: 0 auto; }
-        
+        input.score-input:focus {
+            outline: none;
+            border-color: var(--rm-blue);
+        }
+
+        input.actual-score {
+            border-color: var(--rm-blue);
+            background-color: var(--rm-light-blue);
+            color: var(--rm-blue);
+        }
+
+        .winners-grid { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; padding: 2px; }
+
         .winner-chip {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 4px 10px;
-            border-radius: 16px;
+            background: #ffffff;
+            padding: 3px 8px;
+            border-radius: 12px;
             font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
-            border: 1px solid var(--rm-border);
+            border: 1px solid var(--border-color);
             color: var(--text-muted);
-            transition: all 0.2s ease;
         }
-        
-        .winner-chip:hover { border-color: var(--rm-light-blue); color: var(--rm-white); }
+
         .winner-chip input { display: none; }
-        
+
         .winner-chip.active { 
             background: var(--rm-blue); 
-            color: var(--rm-white);
-            font-weight: 700;
-            border-color: var(--rm-light-blue);
+            color: #ffffff;
+            border-color: var(--rm-blue);
         }
-        .winner-chip.active::before { content: "✓"; font-weight: 900; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="header-title">
-            ⚽ <span>ליגת הניחושים</span> - ריאל מדריד 2026/27
-        </div>
-
+        <div class="header-title">ליגת הניחושים - ריאל מדריד 2026/27</div>
+        <div class="header-subtitle">טבלת ניחושים משותפת בזמן אמת (Firebase)</div>
         <div class="add-player-box">
             <input type="text" id="newPlayerName" class="add-player-input" placeholder="שם שחקן חדש...">
             <button class="btn-add-player" onclick="addNewPlayer()">+ הוסף שחקן</button>
@@ -347,13 +258,8 @@
 
     <div class="container">
         <div class="actions-bar">
-            <div class="info-note">
-                🌐 <b>סנכרון ענן פעיל:</b>יאללה תנו בראש
-            </div>
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <div class="status-badge" id="saveStatus">☁️ מחובר לשרת</div>
-                <button class="btn-clear" onclick="resetAllData()">🗑️ איפוס נתונים</button>
-            </div>
+            <div class="info-note">🌐 <b>סנכרון פעיל:</b> השינויים מתעדכנים בלייב אצל כולם.</div>
+            <button class="btn-clear" onclick="resetAllData()">🗑️ איפוס נתונים</button>
         </div>
 
         <div class="table-card">
@@ -496,19 +402,19 @@
         }
 
         function renderUI() {
-            document.getElementById("playersBar").innerHTML = currentPlayers.map((player, index) => `
+            document.getElementById("playersBar").innerHTML = currentPlayers.map(player => `
                 <div class="player-badge">
                     <button class="remove-player-btn" onclick="removePlayer('${player}')">×</button>
-                    ${index === 0 ? '👑' : '⭐'} ${player}
+                    ${player}
                     <span class="pts" id="score_${player}">0 נק'</span>
                 </div>
             `).join("");
 
             document.getElementById("tableHeaderRow").innerHTML = `
-                <th style="text-align: right; padding-right: 20px;">משחק</th>
+                <th style="text-align: right; padding-right: 15px;">משחק</th>
                 <th>תאריך</th>
-                <th>תוצאה בפועל</th>
-                <th style="min-width: 260px;">מי צדק?</th>
+                <th>תוצאה</th>
+                <th style="min-width: 200px;">מי צדק?</th>
                 ${currentPlayers.map(p => `<th class="player-header">${p}</th>`).join("")}
             `;
 
@@ -542,7 +448,7 @@
                 }).join("");
 
                 tr.innerHTML = `
-                    <td class="match-cell">${m.isClasico ? '<span class="clasico-badge">אל קלאסיקו</span>' : ''}${m.match}</td>
+                    <td class="match-cell">${m.isClasico ? '<span class="clasico-badge">קלאסיקו</span>' : ''}${m.match}</td>
                     <td class="date-cell">${m.date}</td>
                     <td><input type="text" class="score-input actual-score" value="${savedActual}" placeholder="0-0" onchange="onInputSave('actual_${idx}', this.value)"></td>
                     <td><div class="winners-grid">${winnersHTML}</div></td>
@@ -555,7 +461,7 @@
         }
 
         function resetAllData() {
-            if (confirm("איפוס מוחלט של כל הנתונים בענן?")) {
+            if (confirm("להאפס את כל הנתונים בענן?")) {
                 db.ref('league_data').remove();
             }
         }
