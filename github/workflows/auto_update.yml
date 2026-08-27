@@ -1,0 +1,26 @@
+name: Update Real Madrid Schedule
+
+on:
+  schedule:
+    # ירוץ אוטומטית פעם ביום בשעה 06:00 בבוקר
+    - cron: '0 6 * * *'
+  workflow_dispatch: # מאפשר גם לחיצה ידנית באתר גיטהאב מתי שתרצה
+
+jobs:
+  update-schedule:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install requests firebase-admin
+
+      - name: Run script
+        run: python update_matches.py
