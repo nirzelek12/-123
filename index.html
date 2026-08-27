@@ -467,7 +467,7 @@
     <div class="scoreboard" id="playersBar"></div>
 
     <div class="top-bar">
-        <span>⚡ מערכת מעודכנת לענן</span>
+        <span>⚡ מערכת מעודכנת לענן (מתעדכן אוטומטית מה-API)</span>
         <button class="reset-btn" onclick="resetAllData()">איפוס נתונים כללי</button>
     </div>
 
@@ -517,18 +517,17 @@
     const db = firebase.database();
 
     const DEFAULT_PLAYERS = ["ניר", "ליאור", "אבירם", "שון", "חן", "מאור"];
-    const DEFAULT_MATCHES = [
-        { id: "m1", match: "אספניול - ריאל מדריד", date: "2026-08-22", time: "22:00", comp: "ליגה", defaultActual: "1-2" }
-    ];
+    const DEFAULT_MATCHES = [];
 
     let activePlayersList = [];
     let currentMatches = [];
     let currentData = {};
     let hasScrolledToNext = false;
 
+    // פונקציית נעילה מבוססת על השעה האמיתית של המשחק מה-API
     function isPredictionLocked(dateStr, timeStr) {
-        if (!dateStr) return false;
-        const matchTime = new Date(`${dateStr}T${timeStr || '22:00'}`).getTime();
+        if (!dateStr || !timeStr) return false;
+        const matchTime = new Date(`${dateStr}T${timeStr}`).getTime();
         const now = new Date().getTime();
         const diff = matchTime - now; 
         return diff <= -900000; // ננעל 15 דקות אחרי שריקת הפתיחה
@@ -540,7 +539,13 @@
         currentMatches = data.matches || DEFAULT_MATCHES;
         currentData = data.predictions || {};
 
-        currentMatches.sort((a, b) => new Date(`${a.date}T${a.time || '22:00'}`) - new Date(`${b.date}T${b.time || '22:00'}`));
+        // מיון המשחקים לפי תאריך ושעה אמיתיים שמגיעים מה-API
+        currentMatches.sort((a, b) => {
+            const timeA = a.time ? a.time : "00:00";
+            const timeB = b.time ? b.time : "00:00";
+            return new Date(`${a.date}T${timeA}`) - new Date(`${b.date}T${timeB}`);
+        });
+
         renderUI();
 
         if (!hasScrolledToNext) {
@@ -585,9 +590,11 @@
         return timeStr ? `${dateFormatted} | ${timeStr}` : dateFormatted;
     }
 
+    // חישוב סטטוס וזמן אמת המבוסס אך ורק על השעה הספציפית שקיימת באובייקט המשחק
     function getMatchStatus(dateStr, timeStr) {
-        if (!dateStr) return { text: "", isLive: false, isEnded: false };
-        const matchTime = new Date(`${dateStr}T${timeStr || '22:00'}`).getTime();
+        if (!dateStr || !timeStr) return { text: "שעה טרם נקבעה", isLive: false, isEnded: false };
+        
+        const matchTime = new Date(`${dateStr}T${timeStr}`).getTime();
         const now = new Date().getTime();
         const diff = matchTime - now;
 
@@ -662,7 +669,7 @@
 
         const matchName = nameInput.value.trim();
         const matchDate = dateInput.value;
-        const matchTime = timeInput.value || "22:00";
+        const matchTime = timeInput.value || "21:00";
         const comp = compSelect.value;
 
         if (!matchName || !matchDate) {
@@ -683,11 +690,11 @@
             isUserCreated: true
         });
 
-        currentMatches.sort((a, b) => new Date(`${a.date}T${a.time || '22:00'}`) - new Date(`${b.date}T${b.time || '22:00'}`));
+        currentMatches.sort((a, b) => new Date(`${a.date}T${a.time || '00:00'}`) - new Date(`${b.date}T${b.time || '00:00'}`));
 
         nameInput.value = "";
         dateInput.value = "";
-        timeInput.value = "22:00";
+        timeInput.value = "21:00";
 
         saveToCloud();
     }
