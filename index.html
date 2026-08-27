@@ -450,7 +450,7 @@
                 <div class="form-group">
                     <input type="text" id="newMatchName" placeholder="משחק (למשל: ריאל - ליברפול)">
                     <input type="date" id="newMatchDate">
-                    <input type="time" id="newMatchTime" value="22:00">
+                    <input type="time" id="newMatchTime" value="21:00">
                     <select id="newMatchComp">
                         <option value="ליגה">לה ליגה</option>
                         <option value="ליגת האלופות">ליגת האלופות</option>
@@ -524,10 +524,11 @@
     let currentData = {};
     let hasScrolledToNext = false;
 
-    // פונקציית נעילה מבוססת על השעה האמיתית של המשחק מה-API
+    // פונקציית נעילה – מתבססת על השעה שמגיעה מה-API או ברירת מחדל בטוחה
     function isPredictionLocked(dateStr, timeStr) {
-        if (!dateStr || !timeStr) return false;
-        const matchTime = new Date(`${dateStr}T${timeStr}`).getTime();
+        const effectiveTime = timeStr || "21:00";
+        if (!dateStr) return false;
+        const matchTime = new Date(`${dateStr}T${effectiveTime}`).getTime();
         const now = new Date().getTime();
         const diff = matchTime - now; 
         return diff <= -900000; // ננעל 15 דקות אחרי שריקת הפתיחה
@@ -539,10 +540,10 @@
         currentMatches = data.matches || DEFAULT_MATCHES;
         currentData = data.predictions || {};
 
-        // מיון המשחקים לפי תאריך ושעה אמיתיים שמגיעים מה-API
+        // מיון המשחקים לפי תאריך ושעה (עם גיבוי ל-21:00 אם השדה מאיזושהי סיבה ריק ב-API)
         currentMatches.sort((a, b) => {
-            const timeA = a.time ? a.time : "00:00";
-            const timeB = b.time ? b.time : "00:00";
+            const timeA = a.time ? a.time : "21:00";
+            const timeB = b.time ? b.time : "21:00";
             return new Date(`${a.date}T${timeA}`) - new Date(`${b.date}T${timeB}`);
         });
 
@@ -587,14 +588,16 @@
         if (!dateStr) return "";
         const parts = dateStr.split("-");
         const dateFormatted = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : dateStr;
-        return timeStr ? `${dateFormatted} | ${timeStr}` : dateFormatted;
+        const effectiveTime = timeStr || "21:00"; // הצגת שעה אוטומטית גם אם הנתון מה-API התעכב לרגע
+        return `${dateFormatted} | ${effectiveTime}`;
     }
 
-    // חישוב סטטוס וזמן אמת המבוסס אך ורק על השעה הספציפית שקיימת באובייקט המשחק
+    // חישוב סטטוס וזמן אמת - משתמש בשעה מה-API, או ב-21:00 כברירת מחדל זמנית למניעת שגיאות
     function getMatchStatus(dateStr, timeStr) {
-        if (!dateStr || !timeStr) return { text: "שעה טרם נקבעה", isLive: false, isEnded: false };
+        if (!dateStr) return { text: "שעה טרם נקבעה", isLive: false, isEnded: false };
         
-        const matchTime = new Date(`${dateStr}T${timeStr}`).getTime();
+        const effectiveTime = timeStr || "21:00";
+        const matchTime = new Date(`${dateStr}T${effectiveTime}`).getTime();
         const now = new Date().getTime();
         const diff = matchTime - now;
 
@@ -690,7 +693,7 @@
             isUserCreated: true
         });
 
-        currentMatches.sort((a, b) => new Date(`${a.date}T${a.time || '00:00'}`) - new Date(`${b.date}T${b.time || '00:00'}`));
+        currentMatches.sort((a, b) => new Date(`${a.date}T${a.time || '21:00'}`) - new Date(`${b.date}T${b.time || '21:00'}`));
 
         nameInput.value = "";
         dateInput.value = "";
