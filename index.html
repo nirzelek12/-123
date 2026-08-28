@@ -5,965 +5,228 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ניחושי הבלאנקוס לשנת 26/27</title>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Heebo:wght@400;600;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Firebase Libraries -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
     <style>
         :root {
-            --bg-body: #eef1f6;
-            --bg-card: #ffffff;
+            --bg-body: #eef1f6; --bg-card: #ffffff;
             --bg-header: linear-gradient(160deg, #0a2a5e 0%, #041225 100%);
-            --bg-sub-card: #f7f9fc;
-            --text-main: #0b1220;
-            --text-muted: #626e85;
-            --border-color: #d7dce6;
-            --th-bg: #041225;
-            --th-player: #0a2a5e;
-            --tr-even: #f7f9fc;
-            --input-bg: #ffffff;
-            --actual-bg: #e3f0ff;
-            --actual-text: #0a2a5e;
-            --clasico-bg: #fdf1f2;
-            --clasico-text: #b8123b;
-            --gold-deep: #b3891a;
-            --gold-accent: #c9932e;
-            --gold-bright: #f0cb6b;
-            --crest-navy: #0a2a5e;
-            --font-body: 'Assistant', sans-serif;
+            --bg-sub-card: #f7f9fc; --text-main: #0b1220; --text-muted: #626e85;
+            --border-color: #d7dce6; --th-bg: #041225; --th-player: #0a2a5e;
+            --tr-even: #f7f9fc; --input-bg: #ffffff; --actual-bg: #e3f0ff;
+            --actual-text: #0a2a5e; --clasico-bg: #fdf1f2; --clasico-text: #b8123b;
+            --gold-deep: #b3891a; --gold-accent: #c9932e; --gold-bright: #f0cb6b;
+            --crest-navy: #0a2a5e; --font-body: 'Assistant', sans-serif;
             --font-display: 'Heebo', 'Assistant', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
             --glow-gold: 0 0 24px rgba(201, 147, 46, 0.35);
             --shadow-card: 0 20px 50px -12px rgba(4, 18, 37, 0.18), 0 8px 16px -8px rgba(0,0,0,0.08);
             --shadow-soft: 0 4px 20px -6px rgba(4, 18, 37, 0.12);
         }
-
         html.dark {
-            --bg-body: #04060c;
-            --bg-card: #0a1020;
-            --bg-header: linear-gradient(160deg, #0d2a5c 0%, #030812 100%);
-            --bg-sub-card: #0d1428;
-            --text-main: #eef2fa;
-            --text-muted: #7e8aa6;
-            --border-color: #1a2540;
-            --th-bg: #050a18;
-            --th-player: #0d2a5c;
-            --tr-even: #0a1020;
-            --input-bg: #050810;
-            --actual-bg: #0e2148;
-            --actual-text: #dce9ff;
-            --clasico-bg: #1c0a12;
-            --clasico-text: #ff8fa8;
-            --gold-deep: #a9821c;
-            --gold-accent: #e0a93f;
-            --gold-bright: #f5da8e;
-            --crest-navy: #0d2a5c;
+            --bg-body: #0a0814; --bg-card: #131022;
+            --bg-header: linear-gradient(160deg, #181235 0%, #070510 100%);
+            --bg-sub-card: #1b1630; --text-main: #eef2fa; --text-muted: #8c82a6;
+            --border-color: #2c244a; --th-bg: #0b0817; --th-player: #181235;
+            --tr-even: #131022; --input-bg: #0a0814; --actual-bg: #1c1538;
+            --actual-text: #dce9ff; --clasico-bg: #2c101d; --clasico-text: #ff8fa8;
+            --gold-deep: #a9821c; --gold-accent: #e0a93f; --gold-bright: #f5da8e;
+            --crest-navy: #181235;
             --glow-gold: 0 0 30px rgba(224, 169, 63, 0.4), 0 0 60px rgba(224, 169, 63, 0.15);
             --shadow-card: 0 24px 60px -12px rgba(0,0,0,0.7), 0 8px 20px -8px rgba(0,0,0,0.5);
             --shadow-soft: 0 8px 30px -8px rgba(0,0,0,0.5);
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-body); transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease; }
+        
+        body { background-color: var(--bg-body); color: var(--text-main); padding: 14px 6px; -webkit-tap-highlight-color: transparent; min-height: 100vh; position: relative; overflow-x: hidden; }
+        body::before { 
+            content: ""; 
+            position: fixed; 
+            inset: 0; 
+            background-image: 
+                repeating-linear-gradient(-45deg, rgba(110, 85, 175, 0.15) 0px, rgba(110, 85, 175, 0.15) 40px, transparent 40px, transparent 80px),
+                linear-gradient(135deg, #7c68bc 0%, #4a3880 50%, #291c52 100%);
+            background-blend-mode: overlay;
+            opacity: 0.85;
+            pointer-events: none; 
+            z-index: 0; 
+        }
+        html.dark body::before { 
+            background-image: 
+                repeating-linear-gradient(-45deg, rgba(135, 110, 205, 0.12) 0px, rgba(135, 110, 205, 0.12) 50px, transparent 50px, transparent 100px),
+                linear-gradient(135deg, #2b1f54 0%, #171033 50%, #080514 100%);
+            opacity: 0.95;
+        }
+        body::after { content: ""; position: fixed; inset: 0; background-image: linear-gradient(var(--border-color) 1px, transparent 1px), linear-gradient(90deg, var(--border-color) 1px, transparent 1px); background-size: 40px 40px; background-position: center; opacity: 0.04; pointer-events: none; z-index: 0; }
+        
+        .main-container { width: 100%; max-width: 98vw; margin: 0 auto; background: var(--bg-card); padding: 18px; border-radius: 20px; box-shadow: var(--shadow-card); border: 1px solid var(--border-color); position: relative; z-index: 1; backdrop-filter: blur(20px); }
+        header { background: linear-gradient(160deg, rgba(24, 18, 53, 0.94) 0%, rgba(7, 5, 16, 0.98) 100%), url('https://images.unsplash.com/photo-1540747913346-25e1f3f3e3c5?w=1200&q=80') center/cover; color: #ffffff; padding: 40px 22px 30px; border-radius: 20px; text-align: center; margin-bottom: 22px; position: relative; box-shadow: 0 24px 60px rgba(4, 18, 37, 0.6), 0 0 40px rgba(110, 85, 175, 0.25), inset 0 1px 0 rgba(255,255,255,0.1); border: 1px solid rgba(224, 169, 63, 0.35); overflow: hidden; }
+        header::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle at 50% 0%, rgba(224, 169, 63, 0.28), transparent 55%), radial-gradient(circle at 50% 100%, rgba(110, 85, 175, 0.5), transparent 60%); pointer-events: none; }
+        header::after { content: ""; position: absolute; top: -50%; left: -60%; width: 60%; height: 200%; background: linear-gradient(100deg, transparent, rgba(245, 218, 142, 0.08), transparent); transform: skewX(-18deg); animation: sweep 8s ease-in-out infinite; pointer-events: none; }
+        @keyframes sweep { 0%, 100% { left: -60%; } 50% { left: 120%; } }
+        .header-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .blancos-banner { max-width: 360px; width: 80%; max-height: 130px; object-fit: contain; margin-bottom: 14px; filter: drop-shadow(0 8px 22px rgba(0,0,0,0.55)) drop-shadow(0 0 30px rgba(110, 85, 175, 0.5)); animation: crestFloat 5s ease-in-out infinite; }
+        
+        .match-add-card { background: linear-gradient(145deg, rgba(20, 15, 38, 0.9), rgba(10, 8, 20, 0.95)); border: 1px solid rgba(224, 169, 63, 0.3); border-radius: 16px; padding: 20px; margin-top: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        .match-add-card .form-row-labeled { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; align-items: flex-end; width: 100%; }
+        .match-add-card .field { display: flex; flex-direction: column; gap: 6px; }
+        .match-add-card .field label { font-size: 0.82rem; font-weight: 800; color: var(--gold-bright); letter-spacing: 0.5px; text-shadow: 0 0 10px rgba(245, 218, 142, 0.25); }
+        .match-add-card .field input, .match-add-card .field select { width: 100%; padding: 12px 14px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; font-size: 0.95rem; outline: none; background-color: rgba(0, 0, 0, 0.4); color: #ffffff; text-align: right; transition: 0.25s; }
+        .match-add-card .field input:focus, .match-add-card .field select:focus { border-color: var(--gold-accent); box-shadow: 0 0 0 3px rgba(224, 169, 63, 0.25), var(--glow-gold); background-color: rgba(0, 0, 0, 0.6); }
+        .match-add-card .field input::placeholder { color: rgba(255, 255, 255, 0.4); }
+        .match-add-card .action-submit-btn { grid-column: 1 / -1; width: 100%; padding: 13px; background: linear-gradient(135deg, var(--gold-accent), var(--gold-deep)); color: #0f172a; border: none; border-radius: 12px; font-weight: 900; font-size: 1rem; cursor: pointer; box-shadow: 0 6px 20px rgba(201, 147, 46, 0.4); transition: 0.25s; margin-top: 6px; }
+        .match-add-card .action-submit-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 10px 25px rgba(201, 147, 46, 0.6), var(--glow-gold); }
 
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            padding: 14px 6px;
-            -webkit-tap-highlight-color: transparent;
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* Ambient stadium glow background */
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background:
-                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(13, 42, 92, 0.35), transparent 60%),
-                radial-gradient(ellipse 60% 40% at 85% 100%, rgba(201, 147, 46, 0.08), transparent 55%),
-                radial-gradient(ellipse 50% 40% at 15% 80%, rgba(13, 42, 92, 0.18), transparent 55%);
-            pointer-events: none;
-            z-index: 0;
-        }
-        html.dark body::before {
-            background:
-                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(13, 42, 92, 0.55), transparent 60%),
-                radial-gradient(ellipse 60% 40% at 85% 100%, rgba(224, 169, 63, 0.06), transparent 55%),
-                radial-gradient(ellipse 50% 40% at 15% 80%, rgba(13, 42, 92, 0.25), transparent 55%);
-        }
-        html:not(.dark) body { background-image: none; }
-
-        /* Subtle grid texture */
-        body::after {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background-image:
-                linear-gradient(var(--border-color) 1px, transparent 1px),
-                linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
-            background-size: 40px 40px;
-            background-position: center;
-            opacity: 0.04;
-            pointer-events: none;
-            z-index: 0;
-        }
-        html:not(.dark) body::after { opacity: 0.5; }
-
-        .main-container {
-            width: 100%;
-            max-width: 98vw;
-            margin: 0 auto;
-            background: var(--bg-card);
-            padding: 18px;
-            border-radius: 20px;
-            box-shadow: var(--shadow-card);
-            border: 1px solid var(--border-color);
-            position: relative;
-            z-index: 1;
-            backdrop-filter: blur(20px);
-        }
-
-        /* ===== HEADER ===== */
-        header {
-            background:
-                linear-gradient(160deg, rgba(13, 42, 92, 0.92) 0%, rgba(4, 18, 37, 0.96) 100%),
-                url('https://images.unsplash.com/photo-1540747913346-25e1f3f3e3c5?w=1200&q=80') center/cover;
-            color: #ffffff;
-            padding: 40px 22px 30px;
-            border-radius: 20px;
-            text-align: center;
-            margin-bottom: 22px;
-            position: relative;
-            box-shadow: 0 24px 60px rgba(4, 18, 37, 0.6), inset 0 1px 0 rgba(255,255,255,0.1);
-            border: 1px solid rgba(224, 169, 63, 0.3);
-            overflow: hidden;
-        }
-
-        header::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image:
-                radial-gradient(circle at 50% 0%, rgba(224, 169, 63, 0.28), transparent 55%),
-                radial-gradient(circle at 50% 100%, rgba(13, 42, 92, 0.5), transparent 60%),
-                linear-gradient(180deg, rgba(4,18,37,0.3) 0%, transparent 30%, transparent 70%, rgba(4,18,37,0.4) 100%);
-            pointer-events: none;
-        }
-
-        /* Animated light sweep */
-        header::after {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -60%;
-            width: 60%;
-            height: 200%;
-            background: linear-gradient(100deg, transparent, rgba(245, 218, 142, 0.08), transparent);
-            transform: skewX(-18deg);
-            animation: sweep 8s ease-in-out infinite;
-            pointer-events: none;
-        }
-        @keyframes sweep {
-            0%, 100% { left: -60%; }
-            50% { left: 120%; }
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .crest-mark {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 6px 14px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(224, 169, 63, 0.5));
-            animation: crestFloat 4s ease-in-out infinite;
-        }
-        @keyframes crestFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-4px); }
-        }
-        .motto-line {
-            font-family: var(--font-display);
-            font-size: 0.68rem;
-            color: rgba(245, 218, 142, 0.7);
-            font-weight: 600;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-top: 2px;
-            margin-bottom: 14px;
-            font-style: italic;
-        }
-
-        h1 {
-            font-family: var(--font-display);
-            font-size: 1.85rem;
-            font-weight: 900;
-            margin-bottom: 2px;
-            letter-spacing: -0.3px;
-            text-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 30px rgba(224, 169, 63, 0.2);
-            background: linear-gradient(180deg, #ffffff 0%, #e8eefc 60%, #c9d6f0 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        p.subtitle {
-            font-family: var(--font-display);
-            font-size: 0.78rem;
-            color: var(--gold-bright);
-            font-weight: 700;
-            margin-bottom: 16px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            text-shadow: 0 0 16px rgba(245, 218, 142, 0.4);
-        }
-
-        /* ===== Next match: matchday ticket ===== */
-        .next-match-widget {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 16px 22px;
-            margin: 14px auto 0 auto;
-            width: 100%;
-            max-width: 650px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
-            color: var(--text-main);
-            position: relative;
-        }
-        .next-match-widget::before,
-        .next-match-widget::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            width: 18px;
-            height: 18px;
-            background: var(--bg-header);
-            border-radius: 50%;
-            transform: translateY(-50%);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
-        }
-        .next-match-widget::before { right: -10px; }
-        .next-match-widget::after { left: -10px; }
-
-        .nm-header-label {
-            font-family: var(--font-display);
-            font-size: 0.72rem;
-            color: var(--gold-accent);
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1.8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .nm-teams-name {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-family: var(--font-display);
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: var(--text-main);
-            letter-spacing: -0.2px;
-        }
-
-        .nm-details-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            border-top: 1px dashed var(--border-color);
-            padding-top: 10px;
-            font-weight: 700;
-        }
-
-        .nm-timer-val {
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: var(--text-main);
-            direction: ltr;
-            font-family: var(--font-mono);
-            background: linear-gradient(135deg, var(--bg-sub-card), var(--bg-card));
-            border: 1px solid var(--border-color);
-            padding: 4px 12px;
-            border-radius: 8px;
-            letter-spacing: 1px;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-        }
-
-        .nm-action-btn {
-            background: linear-gradient(135deg, var(--crest-navy), #061a3d);
-            color: var(--gold-bright);
-            border: 1px solid rgba(224, 169, 63, 0.4);
-            padding: 9px 16px;
-            border-radius: 10px;
-            font-weight: 800;
-            cursor: pointer;
-            font-size: 0.85rem;
-            box-shadow: 0 4px 12px rgba(13, 42, 92, 0.4), inset 0 1px 0 rgba(255,255,255,0.1);
-            transition: 0.25s;
-        }
-        .nm-action-btn:hover {
-            filter: brightness(1.15);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(13, 42, 92, 0.5), var(--glow-gold);
-        }
-
-        /* ===== Live match: stadium LED scoreboard (signature element) ===== */
-        .live-match-widget {
-            width: 100%;
-            max-width: 650px;
-            margin: 14px auto 0 auto;
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .live-match-card {
-            background:
-                radial-gradient(ellipse at 50% 0%, rgba(255,157,31,0.06), transparent 70%),
-                #0a0b0d;
-            border: 1px solid #2a2620;
-            border-radius: 14px;
-            padding: 16px 20px 14px;
-            box-shadow:
-                0 0 0 4px #171512,
-                0 0 0 5px rgba(255, 157, 31, 0.15),
-                0 14px 40px rgba(0,0,0,0.6),
-                inset 0 0 30px rgba(0,0,0,0.7);
-            color: #ff9d1f;
-            position: relative;
-            animation: liveGlow 3s ease-in-out infinite;
-        }
-        @keyframes liveGlow {
-            0%, 100% { box-shadow: 0 0 0 4px #171512, 0 0 0 5px rgba(255, 157, 31, 0.15), 0 14px 40px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.7); }
-            50% { box-shadow: 0 0 0 4px #171512, 0 0 0 5px rgba(255, 157, 31, 0.35), 0 14px 50px rgba(255,157,31,0.15), inset 0 0 30px rgba(0,0,0,0.7); }
-        }
-
-        .lm-top-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 12px;
-            font-family: var(--font-mono);
-        }
-
-        .lm-live-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #ff2d3a;
-            box-shadow: 0 0 8px 3px rgba(255, 45, 58, 0.9);
-            animation: pulse 1.2s infinite;
-        }
-
-        .lm-live-label {
-            font-size: 0.72rem;
-            font-weight: 800;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: #ff5b64;
-        }
-
-        .lm-comp-name {
-            font-size: 0.7rem;
-            color: #6b6357;
-            font-weight: 700;
-            font-family: var(--font-body);
-        }
-
-        .lm-scoreline {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-        }
-
-        .lm-team-name {
-            font-family: var(--font-display);
-            font-size: 1rem;
-            font-weight: 800;
-            flex: 1;
-            text-align: center;
-            color: #ffd479;
-            letter-spacing: 0.5px;
-            text-shadow: 0 0 12px rgba(255, 212, 121, 0.3);
-        }
-
-        .lm-score-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #000000;
-            border: 1px solid #3a3225;
-            padding: 8px 20px;
-            border-radius: 8px;
-            font-size: 1.8rem;
-            font-weight: 800;
-            direction: ltr;
-            font-family: var(--font-mono);
-            min-width: 100px;
-            justify-content: center;
-            color: #ff9d1f;
-            text-shadow: 0 0 10px rgba(255, 157, 31, 0.7), 0 0 20px rgba(255, 157, 31, 0.3);
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
-        }
-        .lm-score-box.score-flash {
-            animation: scoreFlash 1.2s ease-out;
-        }
-        @keyframes scoreFlash {
-            0% { background: #000; transform: scale(1); }
-            20% { background: #ff9d1f; color: #000; transform: scale(1.15); box-shadow: 0 0 30px rgba(255,157,31,0.9); }
-            100% { background: #000; color: #ff9d1f; transform: scale(1); }
-        }
-        .lm-goal-banner {
-            position: absolute;
-            top: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #ff9d1f, #ffce6b);
-            color: #0a0b0d;
-            font-family: var(--font-display);
-            font-weight: 900;
-            font-size: 0.7rem;
-            padding: 3px 14px;
-            border-radius: 20px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            box-shadow: 0 4px 12px rgba(255,157,31,0.6);
-            animation: goalPop 2s ease-out;
-            opacity: 0;
-            pointer-events: none;
-        }
-        @keyframes goalPop {
-            0% { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.5); }
-            15% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.1); }
-            30% { transform: translateX(-50%) translateY(0) scale(1); }
-            80% { opacity: 1; }
-            100% { opacity: 0; transform: translateX(-50%) translateY(-6px) scale(1); }
-        }
-
-        .lm-minute-badge {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-        }
-
-        .lm-minute-val {
-            background: #000000;
-            color: #ffce6b;
-            font-family: var(--font-mono);
-            font-weight: 800;
-            font-size: 0.92rem;
-            padding: 4px 14px;
-            border-radius: 20px;
-            border: 1px solid #3a3225;
-            direction: ltr;
-            min-width: 50px;
-            text-align: center;
-            text-shadow: 0 0 8px rgba(255, 206, 107, 0.8);
-        }
-
-        .lm-bottom-row {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 12px;
-        }
-
-        .lm-goto-btn {
-            background: rgba(255,157,31,0.12);
-            color: #ffce6b;
-            border: 1px solid rgba(255,157,31,0.4);
-            padding: 7px 16px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            cursor: pointer;
-            font-family: var(--font-body);
-            transition: 0.25s;
-        }
-        .lm-goto-btn:hover {
-            background: rgba(255,157,31,0.22);
-            box-shadow: 0 0 16px rgba(255,157,31,0.3);
-        }
-
-        .theme-toggle-btn {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            background: rgba(255, 255, 255, 0.12);
-            color: #ffffff;
-            border: 1px solid rgba(224, 169, 63, 0.4);
-            padding: 7px 14px;
-            border-radius: 22px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 700;
-            backdrop-filter: blur(10px);
-            z-index: 3;
-            transition: 0.25s;
-        }
-        .theme-toggle-btn:hover {
-            background: rgba(255, 255, 255, 0.22);
-            box-shadow: var(--glow-gold);
-            transform: translateY(-1px);
-        }
-
-        .controls-section {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            margin-top: 20px;
-            width: 100%;
-        }
-
-        .control-card {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 16px;
-            border-radius: 14px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(224, 169, 63, 0.2);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            text-align: right;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
-        }
-
-        .section-label {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--gold-bright);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            text-shadow: 0 0 12px rgba(245, 218, 142, 0.3);
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .controls-section input, .controls-section select {
-            width: 100%;
-            padding: 11px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 10px;
-            font-size: 0.95rem;
-            outline: none;
-            background-color: rgba(0, 0, 0, 0.35);
-            color: #ffffff;
-            text-align: right;
-            transition: 0.25s;
-        }
-
+        @keyframes crestFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+        .motto-line { font-family: var(--font-display); font-size: 0.68rem; color: rgba(245, 218, 142, 0.7); font-weight: 600; letter-spacing: 4px; text-transform: uppercase; margin-top: 2px; margin-bottom: 14px; font-style: italic; }
+        h1 { font-family: var(--font-display); font-size: 1.85rem; font-weight: 900; margin-bottom: 2px; letter-spacing: -0.3px; text-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 30px rgba(224, 169, 63, 0.2); background: linear-gradient(180deg, #ffffff 0%, #e8eefc 60%, #c9d6f0 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        p.subtitle { font-family: var(--font-display); font-size: 0.78rem; color: var(--gold-bright); font-weight: 700; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 0 16px rgba(245, 218, 142, 0.4); }
+        .next-match-widget { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px 22px; margin: 14px auto 0 auto; width: 100%; max-width: 650px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 12px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06); color: var(--text-main); position: relative; }
+        .next-match-widget::before, .next-match-widget::after { content: ""; position: absolute; top: 50%; width: 18px; height: 18px; background: var(--bg-header); border-radius: 50%; transform: translateY(-50%); box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
+        .next-match-widget::before { right: -10px; } .next-match-widget::after { left: -10px; }
+        .nm-header-label { font-family: var(--font-display); font-size: 0.72rem; color: var(--gold-accent); font-weight: 800; text-transform: uppercase; letter-spacing: 1.8px; display: flex; align-items: center; gap: 6px; }
+        .nm-teams-name { display: flex; align-items: center; justify-content: center; gap: 10px; font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.2px; }
+        .nm-details-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted); border-top: 1px dashed var(--border-color); padding-top: 10px; font-weight: 700; }
+        .nm-timer-val { font-size: 1.15rem; font-weight: 800; color: var(--text-main); direction: ltr; font-family: var(--font-mono); background: linear-gradient(135deg, var(--bg-sub-card), var(--bg-card)); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 8px; letter-spacing: 1px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+        .nm-action-btn { background: linear-gradient(135deg, var(--crest-navy), #0a0814); color: var(--gold-bright); border: 1px solid rgba(224, 169, 63, 0.4); padding: 9px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 0.85rem; box-shadow: 0 4px 12px rgba(110, 85, 175, 0.3), inset 0 1px 0 rgba(255,255,255,0.1); transition: 0.25s; }
+        .nm-action-btn:hover { filter: brightness(1.15); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(110, 85, 175, 0.5), var(--glow-gold); }
+        .live-match-widget { width: 100%; max-width: 650px; margin: 14px auto 0 auto; display: none; flex-direction: column; gap: 10px; }
+        .live-match-card { background: radial-gradient(ellipse at 50% 0%, rgba(255,157,31,0.06), transparent 70%), #0a0b0d; border: 1px solid #2a2620; border-radius: 14px; padding: 16px 20px 14px; box-shadow: 0 0 0 4px #171512, 0 0 0 5px rgba(255, 157, 31, 0.15), 0 14px 40px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.7); color: #ff9d1f; position: relative; animation: liveGlow 3s ease-in-out infinite; }
+        @keyframes liveGlow { 0%, 100% { box-shadow: 0 0 0 4px #171512, 0 0 0 5px rgba(255, 157, 31, 0.15), 0 14px 40px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.7); } 50% { box-shadow: 0 0 0 4px #171512, 0 0 0 5px rgba(255, 157, 31, 0.35), 0 14px 50px rgba(255,157,31,0.15), inset 0 0 30px rgba(0,0,0,0.7); } }
+        .lm-top-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; font-family: var(--font-mono); }
+        .lm-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff2d3a; box-shadow: 0 0 8px 3px rgba(255, 45, 58, 0.9); animation: pulse 1.2s infinite; }
+        .lm-live-label { font-size: 0.72rem; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: #ff5b64; }
+        .lm-comp-name { font-size: 0.7rem; color: #6b6357; font-weight: 700; font-family: var(--font-body); }
+        .lm-scoreline { display: flex; align-items: center; justify-content: center; gap: 16px; }
+        .lm-team-name { font-family: var(--font-display); font-size: 1rem; font-weight: 800; flex: 1; text-align: center; color: #ffd479; letter-spacing: 0.5px; text-shadow: 0 0 12px rgba(255, 212, 121, 0.3); }
+        .lm-score-box { display: flex; align-items: center; gap: 10px; background: #000000; border: 1px solid #3a3225; padding: 8px 20px; border-radius: 8px; font-size: 1.8rem; font-weight: 800; direction: ltr; font-family: var(--font-mono); min-width: 100px; justify-content: center; color: #ff9d1f; text-shadow: 0 0 10px rgba(255, 157, 31, 0.7), 0 0 20px rgba(255, 157, 31, 0.3); box-shadow: inset 0 0 15px rgba(0,0,0,0.8); }
+        .lm-score-box.score-flash { animation: scoreFlash 1.2s ease-out; }
+        @keyframes scoreFlash { 0% { background: #000; transform: scale(1); } 20% { background: #ff9d1f; color: #000; transform: scale(1.15); box-shadow: 0 0 30px rgba(255,157,31,0.9); } 100% { background: #000; color: #ff9d1f; transform: scale(1); } }
+        .lm-goal-banner { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #ff9d1f, #ffce6b); color: #0a0b0d; font-family: var(--font-display); font-weight: 900; font-size: 0.7rem; padding: 3px 14px; border-radius: 20px; letter-spacing: 2px; text-transform: uppercase; box-shadow: 0 4px 12px rgba(255,157,31,0.6); animation: goalPop 2s ease-out; opacity: 0; pointer-events: none; }
+        @keyframes goalPop { 0% { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.5); } 15% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.1); } 30% { transform: translateX(-50%) translateY(0) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-6px) scale(1); } }
+        .lm-minute-badge { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .lm-minute-val { background: #000000; color: #ffce6b; font-family: var(--font-mono); font-weight: 800; font-size: 0.92rem; padding: 4px 14px; border-radius: 20px; border: 1px solid #3a3225; direction: ltr; min-width: 50px; text-align: center; text-shadow: 0 0 8px rgba(255, 206, 107, 0.8); }
+        .lm-bottom-row { display: flex; justify-content: center; align-items: center; margin-top: 12px; }
+        .lm-goto-btn { background: rgba(255,157,31,0.12); color: #ffce6b; border: 1px solid rgba(255,157,31,0.4); padding: 7px 16px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; cursor: pointer; font-family: var(--font-body); transition: 0.25s; }
+        .lm-goto-btn:hover { background: rgba(255,157,31,0.22); box-shadow: 0 0 16px rgba(255,157,31,0.3); }
+        .lm-error-banner { background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(220,38,38,0.12)); border: 1px solid rgba(239,68,68,0.5); color: #ffb4b4; padding: 6px 12px; border-radius: 8px; font-size: 0.72rem; font-weight: 700; text-align: center; margin-bottom: 6px; animation: pulse 2s infinite; }
+        .lm-source-line { font-size: 0.66rem; color: #8a7d63; font-weight: 600; text-align: center; margin-top: 6px; font-family: var(--font-mono); direction: ltr; letter-spacing: 0.3px; }
+        .theme-toggle-btn { position: absolute; top: 16px; left: 16px; background: rgba(255, 255, 255, 0.12); color: #ffffff; border: 1px solid rgba(224, 169, 63, 0.4); padding: 7px 14px; border-radius: 22px; cursor: pointer; font-size: 0.8rem; font-weight: 700; backdrop-filter: blur(10px); z-index: 3; transition: 0.25s; }
+        .theme-toggle-btn:hover { background: rgba(255, 255, 255, 0.22); box-shadow: var(--glow-gold); transform: translateY(-1px); }
+        .controls-section { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; width: 100%; }
+        .control-card { background: rgba(0, 0, 0, 0.3); padding: 16px; border-radius: 14px; backdrop-filter: blur(10px); border: 1px solid rgba(224, 169, 63, 0.2); display: flex; flex-direction: column; gap: 10px; text-align: right; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
+        .section-label { font-size: 0.85rem; font-weight: 700; color: var(--gold-bright); display: flex; align-items: center; gap: 6px; text-shadow: 0 0 12px rgba(245, 218, 142, 0.3); }
+        .form-group { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+        .controls-section input, .controls-section select { width: 100%; padding: 11px 16px; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 10px; font-size: 0.95rem; outline: none; background-color: rgba(0, 0, 0, 0.35); color: #ffffff; text-align: right; transition: 0.25s; }
         .controls-section input::placeholder { color: rgba(255, 255, 255, 0.55); }
-        .controls-section input:focus, .controls-section select:focus {
-            border-color: var(--gold-accent);
-            box-shadow: 0 0 0 3px rgba(224, 169, 63, 0.25), var(--glow-gold);
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
+        .controls-section input:focus, .controls-section select:focus { border-color: var(--gold-accent); box-shadow: 0 0 0 3px rgba(224, 169, 63, 0.25), var(--glow-gold); background-color: rgba(0, 0, 0, 0.5); }
         input[type="date"], input.time-text-in { direction: ltr; text-align: center; }
-        .controls-section select option { background-color: #0b2545; color: #ffffff; }
-
-        .controls-section button.action-submit-btn {
-            background: linear-gradient(135deg, var(--gold-accent), var(--gold-deep));
-            color: #0f172a;
-            border: none;
-            padding: 11px 18px;
-            border-radius: 10px;
-            font-weight: 800;
-            cursor: pointer;
-            width: 100%;
-            font-size: 0.95rem;
-            box-shadow: 0 6px 16px rgba(201, 147, 46, 0.4), inset 0 1px 0 rgba(255,255,255,0.3);
-            transition: 0.25s;
-        }
-        .controls-section button.action-submit-btn:hover {
-            filter: brightness(1.1);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 24px rgba(201, 147, 46, 0.5), var(--glow-gold);
-        }
-
-        /* ===== Scoreboard (player chips) ===== */
-        .scoreboard {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 18px;
-            background: linear-gradient(135deg, var(--bg-sub-card), var(--bg-card));
-            padding: 16px;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-soft);
-        }
-
-        .player-card {
-            background: linear-gradient(135deg, var(--bg-card), var(--bg-sub-card));
-            border: 1px solid var(--border-color);
-            padding: 8px 14px;
-            border-radius: 12px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.88rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.05);
-            transition: 0.25s;
-        }
-        .player-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.05);
-            border-color: var(--gold-accent);
-        }
-
-        .player-card .score {
-            background: linear-gradient(135deg, #0d2a5c, #061a3d);
-            color: #ffffff;
-            padding: 3px 10px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            border-bottom: 2px solid var(--gold-accent);
-            box-shadow: 0 2px 8px rgba(13, 42, 92, 0.4), inset 0 1px 0 rgba(255,255,255,0.1);
-            font-family: var(--font-mono);
-        }
-
+        .controls-section select option { background-color: #181235; color: #ffffff; }
+        .controls-section button.action-submit-btn { background: linear-gradient(135deg, var(--gold-accent), var(--gold-deep)); color: #0f172a; border: none; padding: 11px 18px; border-radius: 10px; font-weight: 800; cursor: pointer; width: 100%; font-size: 0.95rem; box-shadow: 0 6px 16px rgba(201, 147, 46, 0.4), inset 0 1px 0 rgba(255,255,255,0.3); transition: 0.25s; }
+        .controls-section button.action-submit-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(201, 147, 46, 0.5), var(--glow-gold); }
+        .scoreboard { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 18px; background: linear-gradient(135deg, var(--bg-sub-card), var(--bg-card)); padding: 16px; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow-soft); }
+        .player-card { background: linear-gradient(135deg, var(--bg-card), var(--bg-sub-card)); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 12px; font-weight: 700; display: flex; align-items: center; gap: 10px; font-size: 0.88rem; box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.05); transition: 0.25s; }
+        .player-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.05); border-color: var(--gold-accent); }
+        .player-card .score { background: linear-gradient(135deg, var(--crest-navy), #0a0814); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; border-bottom: 2px solid var(--gold-accent); box-shadow: 0 2px 8px rgba(110, 85, 175, 0.4), inset 0 1px 0 rgba(255,255,255,0.1); font-family: var(--font-mono); }
         .remove-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1.1rem; line-height: 1; opacity: 0.6; transition: 0.2s; }
         .remove-btn:hover { opacity: 1; transform: scale(1.2); }
-
-        .countdown-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: rgba(0, 82, 159, 0.1);
-            color: #00529f;
-            border: 1px solid rgba(0, 82, 159, 0.25);
-            padding: 3px 10px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            direction: ltr;
-            white-space: nowrap;
-            font-family: var(--font-mono);
-        }
-        html.dark .countdown-badge {
-            background: rgba(56, 189, 248, 0.12);
-            color: #38bdf8;
-            border-color: rgba(56, 189, 248, 0.3);
-        }
-        .countdown-badge.live {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: #ffffff;
-            border-color: #dc2626;
-            animation: pulse 1.5s infinite;
-            box-shadow: 0 0 16px rgba(239, 68, 68, 0.5);
-        }
+        .countdown-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(110, 85, 175, 0.1); color: #7c68bc; border: 1px solid rgba(110, 85, 175, 0.25); padding: 3px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; direction: ltr; white-space: nowrap; font-family: var(--font-mono); }
+        html.dark .countdown-badge { background: rgba(179, 156, 245, 0.12); color: #b39cf5; border-color: rgba(179, 156, 245, 0.3); }
+        .countdown-badge.live { background: linear-gradient(135deg, #ef4444, #dc2626); color: #ffffff; border-color: #dc2626; animation: pulse 1.5s infinite; box-shadow: 0 0 16px rgba(239, 68, 68, 0.5); }
         .countdown-badge.ended { background: rgba(100, 116, 139, 0.15); color: var(--text-muted); border-color: var(--border-color); }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.55; } 100% { opacity: 1; } }
-
-        /* ===== Mobile cards ===== */
+        .api-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 7px; font-size: 0.68rem; font-weight: 800; white-space: nowrap; border: 1px solid var(--border-color); background: var(--bg-sub-card); color: var(--text-muted); letter-spacing: 0.2px; }
+        .api-pill.api-live { background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border-color: #15803d; box-shadow: 0 0 10px rgba(22,163,74,0.45); animation: pulse 1.6s infinite; }
+        .api-pill.api-waiting { background: rgba(100,116,139,0.14); color: var(--text-muted); }
+        .api-pill.api-down { background: linear-gradient(135deg, #ef4444, #dc2626); color: #ffffff; border-color: #dc2626; box-shadow: 0 0 10px rgba(239,68,68,0.4); }
+        .api-pill.api-searching { background: rgba(245,158,11,0.16); color: #b45309; border-color: rgba(245,158,11,0.45); }
+        html.dark .api-pill.api-searching { color: #fbbf24; }
+        .api-pill.api-manual { background: rgba(110,85,175,0.14); color: var(--crest-navy); }
+        html.dark .api-pill.api-manual { color: #d0c2f8; }
+        .match-api-status { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+        .actual-source { font-size: 0.66rem; color: var(--text-muted); font-weight: 600; margin-top: 4px; display: flex; align-items: center; gap: 4px; direction: ltr; font-family: var(--font-mono); }
         .mobile-cards-container { display: flex; flex-direction: column; gap: 14px; }
-
-        .match-mobile-card {
-            background: linear-gradient(160deg, var(--bg-sub-card), var(--bg-card));
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: var(--shadow-soft);
-            scroll-margin-top: 20px;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
-        }
-        .match-mobile-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--gold-accent), transparent);
-            opacity: 0.6;
-        }
-        .match-mobile-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-            border-color: rgba(224, 169, 63, 0.4);
-        }
-
-        .match-mobile-card.clasico-card {
-            background: linear-gradient(160deg, var(--clasico-bg), var(--bg-card));
-            border-color: rgba(253, 164, 175, 0.5);
-        }
-        .match-mobile-card.clasico-card::before {
-            background: linear-gradient(90deg, transparent, #ff2d3a, transparent);
-        }
-
-        .match-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-
+        .match-mobile-card { background: linear-gradient(160deg, var(--bg-sub-card), var(--bg-card)); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; box-shadow: var(--shadow-soft); scroll-margin-top: 20px; position: relative; overflow: hidden; transition: 0.3s; }
+        .match-mobile-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--gold-accent), transparent); opacity: 0.6; }
+        .match-mobile-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); border-color: rgba(224, 169, 63, 0.4); }
+        .match-mobile-card.clasico-card { background: linear-gradient(160deg, var(--clasico-bg), var(--bg-card)); border-color: rgba(253, 164, 175, 0.5); }
+        .match-mobile-card.clasico-card::before { background: linear-gradient(90deg, transparent, #ff2d3a, transparent); }
+        .match-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
         .match-card-title { font-weight: 800; font-size: 1.05rem; display: flex; align-items: center; gap: 6px; letter-spacing: -0.2px; }
         .match-mobile-card.clasico-card .match-card-title { color: var(--clasico-text); text-shadow: 0 0 12px rgba(255,45,58,0.2); }
-
         .match-card-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.82rem; color: var(--text-muted); flex-wrap: wrap; gap: 6px; }
-
-        .match-card-actual {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-card);
-            padding: 10px 12px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border-color);
-            gap: 8px;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-        }
-
+        .match-card-actual { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 10px 12px; border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--border-color); gap: 8px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); }
         .match-card-predictions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
-
-        .pred-box-mini {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            padding: 8px 10px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: 0.25s;
-        }
-        .pred-box-mini:focus-within {
-            border-color: var(--gold-accent);
-            box-shadow: 0 0 0 2px rgba(224, 169, 63, 0.2);
-        }
-
+        .pred-box-mini { background: var(--bg-card); border: 1px solid var(--border-color); padding: 8px 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; transition: 0.25s; }
+        .pred-box-mini:focus-within { border-color: var(--gold-accent); box-shadow: 0 0 0 2px rgba(224, 169, 63, 0.2); }
         .pred-box-mini span { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); }
-
-        /* ===== Desktop table ===== */
-        .table-wrapper {
-            display: none;
-            width: 100%;
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            box-shadow: var(--shadow-soft);
-            overflow-x: visible;
-            background: var(--bg-card);
-        }
-
+        .table-wrapper { display: none; width: 100%; border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--shadow-soft); overflow-x: visible; background: var(--bg-card); }
         table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; text-align: center; font-size: 0.9rem; }
-
-        th {
-            background-color: var(--th-bg);
-            color: #ffffff;
-            padding: 14px 6px;
-            font-weight: 700;
-            border-bottom: 2px solid var(--gold-accent);
-            border-left: 1px solid var(--border-color);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            position: sticky;
-            top: 0;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
-
-        th.player-th {
-            background-color: var(--th-player);
-            background-image: linear-gradient(180deg, var(--th-player), var(--th-bg));
-        }
+        th { background-color: var(--th-bg); color: #ffffff; padding: 14px 6px; font-weight: 700; border-bottom: 2px solid var(--gold-accent); border-left: 1px solid var(--border-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: sticky; top: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        th.player-th { background-color: var(--th-player); background-image: linear-gradient(180deg, var(--th-player), var(--th-bg)); }
         td { padding: 12px 6px; border-bottom: 1px solid var(--border-color); border-left: 1px solid var(--border-color); overflow: hidden; text-overflow: ellipsis; transition: background-color 0.2s; }
         tr:nth-child(even) td { background-color: var(--tr-even); }
         tr:hover td { background-color: rgba(224, 169, 63, 0.06); }
-        
         td.match-name { text-align: right; font-weight: 700; padding-right: 12px; padding-left: 12px; }
         td.match-date-cell { color: var(--text-muted); font-size: 0.8rem; text-align: center; font-family: var(--font-mono); }
-
+        td.countdown-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; overflow: visible; padding: 24px 8px; }
+        td.countdown-cell .countdown-badge { width: 100%; justify-content: center; box-sizing: border-box; padding: 10px 10px; font-size: 0.82rem; }
+        td.countdown-cell .api-pill { padding: 7px 12px; font-size: 0.74rem; }
         tr.clasico td { background-color: var(--clasico-bg) !important; }
         tr.clasico td.match-name { color: var(--clasico-text); font-weight: 800; }
-
-        .comp-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 8px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            white-space: nowrap;
-            letter-spacing: 0.3px;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
-        }
+        .comp-badge { display: inline-block; padding: 4px 8px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; white-space: nowrap; letter-spacing: 0.3px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.1); }
         .comp-la_liga { background-color: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
-        .comp-ucl { background: linear-gradient(135deg, #002b5c, #00529f); color: #ffffff; border: 1px solid #0073e6; box-shadow: 0 2px 6px rgba(0,82,159,0.3); }
+        .comp-ucl { background: linear-gradient(135deg, #181235, #3a2e6e); color: #ffffff; border: 1px solid #7c68bc; box-shadow: 0 2px 6px rgba(110,85,175,0.3); }
         .comp-copa { background: linear-gradient(135deg, #b91c1c, #7f1d1d); color: #ffffff; box-shadow: 0 2px 6px rgba(185,28,28,0.3); }
         .comp-supercopa { background: linear-gradient(135deg, #b45309, #92400e); color: #ffffff; box-shadow: 0 2px 6px rgba(180,83,9,0.3); }
         .comp-supercup_eu { background: linear-gradient(135deg, #0369a1, #075985); color: #ffffff; box-shadow: 0 2px 6px rgba(3,105,161,0.3); }
-
         html.dark .comp-la_liga { background-color: #1e293b; color: #cbd5e1; border-color: #334155; }
-
-        input.score-in {
-            width: 44px;
-            height: 36px;
-            text-align: center;
-            padding: 2px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-weight: 700;
-            direction: ltr;
-            background-color: var(--input-bg);
-            color: var(--text-main);
-            font-size: 0.9rem;
-            margin: 0 auto;
-            display: block;
-            transition: 0.25s;
-        }
+        input.score-in { width: 44px; height: 36px; text-align: center; padding: 2px; border: 1px solid var(--border-color); border-radius: 8px; font-weight: 700; direction: ltr; background-color: var(--input-bg); color: var(--text-main); font-size: 0.9rem; margin: 0 auto; display: block; transition: 0.25s; }
         input.score-in:focus { border-color: var(--gold-accent); outline: none; box-shadow: 0 0 0 3px rgba(224, 169, 63, 0.2); }
         input.score-in:disabled { background-color: rgba(100, 116, 139, 0.15); color: var(--text-muted); cursor: not-allowed; opacity: 0.7; }
-
-        input.actual-in {
-            border-color: rgba(125, 211, 252, 0.5);
-            background: linear-gradient(135deg, var(--actual-bg), var(--input-bg));
-            color: var(--actual-text);
-            font-weight: 800;
-            width: 58px;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-        }
-        input.time-text-in {
-            border-color: var(--border-color);
-            background-color: var(--input-bg);
-            color: var(--text-main);
-            font-weight: 700;
-            width: 68px;
-            font-size: 0.85rem;
-            height: 36px;
-            text-align: center;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            font-family: var(--font-mono);
-        }
+        input.actual-in { border-color: rgba(125, 211, 252, 0.5); background: linear-gradient(135deg, var(--actual-bg), var(--input-bg)); color: var(--actual-text); font-weight: 800; width: 58px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+        input.time-text-in { border-color: var(--border-color); background-color: var(--input-bg); color: var(--text-main); font-weight: 700; width: 68px; font-size: 0.85rem; height: 36px; text-align: center; border-radius: 8px; border: 1px solid var(--border-color); font-family: var(--font-mono); }
         input.time-text-in:focus { border-color: var(--gold-accent); outline: none; box-shadow: 0 0 0 3px rgba(224, 169, 63, 0.2); }
-
         .winners-box { display: grid; grid-template-columns: repeat(3, minmax(35px, 1fr)); gap: 4px; justify-content: center; }
-
-        .winner-btn {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 7px;
-            padding: 5px 3px;
-            font-size: 0.72rem;
-            cursor: pointer;
-            color: var(--text-muted);
-            font-weight: 600;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            transition: 0.25s;
-        }
+        .winner-btn { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 7px; padding: 5px 3px; font-size: 0.72rem; cursor: pointer; color: var(--text-muted); font-weight: 600; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: 0.25s; }
         .winner-btn:hover { border-color: var(--gold-accent); color: var(--text-main); transform: translateY(-1px); }
-        .winner-btn.active {
-            background: linear-gradient(135deg, #0d2a5c, #061a3d);
-            color: var(--gold-bright);
-            border-color: var(--gold-accent);
-            font-weight: 800;
-            box-shadow: 0 4px 12px rgba(13, 42, 92, 0.4), inset 0 1px 0 rgba(255,255,255,0.1), var(--glow-gold);
-        }
+        .winner-btn.active { background: linear-gradient(135deg, var(--crest-navy), #0a0814); color: var(--gold-bright); border-color: var(--gold-accent); font-weight: 800; box-shadow: 0 4px 12px rgba(110, 85, 175, 0.4), inset 0 1px 0 rgba(255,255,255,0.1), var(--glow-gold); }
         .winner-btn:disabled { cursor: not-allowed; opacity: 0.5; filter: grayscale(0.5); }
-
         .delete-match-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.95rem; margin-left: 4px; opacity: 0.6; transition: 0.2s; }
         .delete-match-btn:hover { opacity: 1; transform: scale(1.15); }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            padding: 0 6px;
-            font-weight: 600;
-        }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 0.8rem; color: var(--text-muted); padding: 0 6px; font-weight: 600; }
         .reset-btn { background: none; border: none; color: #ef4444; cursor: pointer; text-decoration: underline; font-weight: 600; transition: 0.2s; }
         .reset-btn:hover { color: #dc2626; text-shadow: 0 0 8px rgba(239,68,68,0.4); }
-
         @media (min-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            body { padding: 20px 10px; }
-            .main-container { padding: 28px; }
-            .controls-section { display: grid; grid-template-columns: 300px 1fr; gap: 18px; align-items: stretch; }
+            h1 { font-size: 2.5rem; } body { padding: 20px 10px; } .main-container { padding: 28px; }
+            .controls-section { display: grid; grid-template-columns: 280px 1fr; gap: 18px; align-items: stretch; }
             .control-card { justify-content: space-between; }
-            .control-card:nth-child(2) .form-group { display: grid; grid-template-columns: 1fr 130px 85px 150px auto; gap: 10px; }
-            .control-card:nth-child(1) .form-group { display: flex; flex-direction: row; gap: 8px; }
+            .match-add-card .form-row-labeled { display: grid; grid-template-columns: 1.5fr 1fr 100px 1.2fr; gap: 12px; }
+            .match-add-card .action-submit-btn { grid-column: 1 / -1; }
             .controls-section button.action-submit-btn { width: auto; white-space: nowrap; }
-            .mobile-cards-container { display: none; }
-            .table-wrapper { display: block; }
+            .mobile-cards-container { display: none; } .table-wrapper { display: block; }
         }
     </style>
 </head>
 <body>
-
 <div class="main-container">
     <header>
         <button class="theme-toggle-btn" onclick="toggleTheme()">🌙 / ☀️ מצב תצוגה</button>
         <div class="header-content">
-            <svg class="crest-mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="47" fill="#0d2a5c" stroke="#e0a93f" stroke-width="2.5"/>
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#e0a93f" stroke-width="0.8" opacity="0.5"/>
-                <path d="M28 38 L34 24 L42 32 L50 20 L58 32 L66 24 L72 38 L68 44 L32 44 Z" fill="#e0a93f" stroke="#f5da8e" stroke-width="0.5"/>
-                <circle cx="34" cy="24" r="2.5" fill="#f5da8e"/>
-                <circle cx="50" cy="20" r="2.5" fill="#f5da8e"/>
-                <circle cx="66" cy="24" r="2.5" fill="#f5da8e"/>
-                <text x="50" y="64" text-anchor="middle" fill="#f5da8e" font-size="17" font-weight="900" font-family="serif" letter-spacing="1">RM</text>
-                <path d="M32 72 Q50 82 68 72" stroke="#e0a93f" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                <circle cx="50" cy="86" r="1.8" fill="#e0a93f"/>
-            </svg>
+            <img class="blancos-banner" src="https://media.base44.com/images/public/6a91620bb63bd7c1b5a2d9e8/0a36110dd_717f280bed475230e0023ddf508c79d1_tplv-tiktokx-cropcenter_1080_1080-removebg-preview.png" alt="הבלאנקוס">
             <h1>ניחושי הבלאנקוס לשנת 26/27</h1>
             <p class="subtitle">עונת 2026/27 • Hala Madrid y nada más</p>
-            <div class="motto-line">¡Hala Madrid! • Blanca Legión • 15★</div>
-
             <div class="next-match-widget" id="headerNextMatchWidget">
                 <div class="nm-header-label">⏳ המשחק הבא</div>
-                <div class="nm-teams-name" id="hnmTeamsContainer">
-                    <span>טוען משחק הבא...</span>
-                </div>
+                <div class="nm-teams-name" id="hnmTeamsContainer"><span>טוען משחק הבא...</span></div>
                 <div class="nm-details-row">
                     <span id="hnmInfo">--/-- | --:--</span>
                     <span class="nm-timer-val" id="hnmTimer">--:--:--</span>
                     <button class="nm-action-btn" onclick="scrollToHeaderTargetMatch()">🎯 מעבר לניחוש</button>
                 </div>
             </div>
-
             <div class="live-match-widget" id="liveMatchWidget"></div>
         </div>
-
         <div class="controls-section">
             <div class="control-card">
                 <span class="section-label">👤 הוספת מנחש</span>
@@ -972,35 +235,42 @@
                     <button class="action-submit-btn" onclick="addNewPlayer()">+ הוסף</button>
                 </div>
             </div>
-
-            <div class="control-card">
-                <span class="section-label">⚽ הוספת משחק ללוח</span>
-                <div class="form-group">
-                    <input type="text" id="newMatchName" placeholder="משחק (למשל: ריאל - ליברפול)">
-                    <input type="date" id="newMatchDate">
-                    <input type="text" id="newMatchTime" value="22:00" placeholder="22:00">
-                    <select id="newMatchComp">
-                        <option value="ליגה">לה ליגה</option>
-                        <option value="ליגת האלופות">ליגת האלופות</option>
-                        <option value="גביע המלך">גביע המלך</option>
-                        <option value="סופר קופה ספרדי">סופר קופה ספרדי</option>
-                        <option value="סופר קופה אירופי">סופר קופה אירופי</option>
-                    </select>
-                    <button class="action-submit-btn" onclick="addNewMatch()">+ הוסף משחק</button>
+            <div class="control-card match-add-card">
+                <span class="section-label">⚽ הוספת משחק חדש ללוח</span>
+                <div class="form-row-labeled">
+                    <div class="field">
+                        <label for="newMatchName">משחק (קבוצות)</label>
+                        <input type="text" id="newMatchName" placeholder="ריאל מדריד - ליברפול">
+                    </div>
+                    <div class="field field-date">
+                        <label for="newMatchDate">תאריך</label>
+                        <input type="date" id="newMatchDate">
+                    </div>
+                    <div class="field field-time">
+                        <label for="newMatchTime">שעה (24h)</label>
+                        <input type="text" id="newMatchTime" value="22:00" placeholder="22:00">
+                    </div>
+                    <div class="field field-comp">
+                        <label for="newMatchComp">מסגרת</label>
+                        <select id="newMatchComp">
+                            <option value="ליגה">לה ליגה</option>
+                            <option value="ליגת האלופות">ליגת האלופות</option>
+                            <option value="גביע המלך">גביע המלך</option>
+                            <option value="סופר קופה ספרדי">סופר קופה ספרדי</option>
+                            <option value="סופר קופה אירופי">סופר קופה אירופי</option>
+                        </select>
+                    </div>
                 </div>
+                <button class="action-submit-btn" onclick="addNewMatch()">+ הוסף משחק ללוח</button>
             </div>
         </div>
     </header>
-
     <div class="scoreboard" id="playersBar"></div>
-
     <div class="top-bar">
         <span>⚡ ניהול שעות מלא (פורמט 24 שעות) וספירה לאחור אוטומטית</span>
         <button class="reset-btn" onclick="resetAllData()">איפוס נתונים כללי</button>
     </div>
-
     <div class="mobile-cards-container" id="mobileCardsContainer"></div>
-
     <div class="table-wrapper">
         <table>
             <thead><tr id="tableHeaderRow"></tr></thead>
@@ -1008,219 +278,343 @@
         </table>
     </div>
 </div>
-
 <script>
     function initTheme() {
         const savedTheme = localStorage.getItem('theme') || 'dark';
-        if (savedTheme === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        if (savedTheme === 'dark') document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
     }
-
     function toggleTheme() {
         const html = document.documentElement;
-        if (html.classList.contains('dark')) {
-            html.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        } else {
-            html.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        }
+        if (html.classList.contains('dark')) { html.classList.remove('dark'); localStorage.setItem('theme', 'light'); }
+        else { html.classList.add('dark'); localStorage.setItem('theme', 'dark'); }
     }
     initTheme();
-
     const firebaseConfig = {
         apiKey: "AIzaSyCNkYBoD6fBQ-uxmn8tj78yS96a9ipc-5w",
         authDomain: "hablnacos.firebaseapp.com",
         databaseURL: "https://hablnacos-default-rtdb.firebaseio.com",
-        projectId: "hablnacos",
-        storageBucket: "hablnacos.appspot.com",
-        messagingSenderId: "1098555243394",
-        appId: "1:1098555243394:web:e00bf2adcf538bd1b97087"
+        projectId: "hablnacos", storageBucket: "hablnacos.appspot.com",
+        messagingSenderId: "1098555243394", appId: "1:1098555243394:web:e00bf2adcf538bd1b97087"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
     const DEFAULT_PLAYERS = ["ניר", "ליאור", "אבירם", "שון", "חן", "מאור"];
-    const DEFAULT_MATCHES = [];
-
-    let activePlayersList = [];
-    let currentMatches = [];
-    let currentData = {};
-    let hasScrolledToNext = false;
-    let targetNextMatchId = "";
-    let previousLiveScores = {};
+    const DEFAULT_MATCHES = [
+        { id: "m1", match: "ריאל מדריד - אוססונה", date: "2026-09-13", time: "22:00", comp: "ליגה", isClasico: false },
+        { id: "m2", match: "ברצלונה - ריאל מדריד", date: "2026-10-25", time: "22:00", comp: "ליגה", isClasico: true }
+    ];
+    let activePlayersList = [], currentMatches = [], currentData = {};
+    let hasScrolledToNext = false, targetNextMatchId = "", previousLiveScores = {};
 
     function isPredictionLocked(match) {
+        if (currentData[`unlocked_${match.id}`]) return false;
         const timeStr = currentData[`time_${match.id}`] !== undefined ? currentData[`time_${match.id}`] : (match.time || "22:00");
         if (!match.date || !timeStr) return false;
         const matchTime = new Date(`${match.date}T${timeStr}`).getTime();
-        const now = new Date().getTime();
-        const diff = matchTime - now; 
-        return diff <= -900000; 
+        return (matchTime - new Date().getTime()) <= -900000;
     }
-
+    function toggleManualLock(matchId) {
+        const key = `unlocked_${matchId}`;
+        currentData[key] = !currentData[key];
+        db.ref(`league_data/predictions/${key}`).set(currentData[key]);
+        renderUI();
+    }
+    function normalizeScoreStr(val) {
+        if (val === undefined || val === null) return "";
+        const m = String(val).replace(/[\u2013\u2014:\u05be]/g, "-").match(/(\d+)\s*-\s*(\d+)/);
+        return m ? `${m[1]}-${m[2]}` : "";
+    }
+    function computeAutoWinners(match) {
+        const actualRaw = currentData[`actual_${match.id}`] !== undefined ? currentData[`actual_${match.id}`] : (match.defaultActual || "");
+        const actual = normalizeScoreStr(actualRaw);
+        if (!actual) return null;
+        return activePlayersList.filter(p => normalizeScoreStr(currentData[`pred_${match.id}_${p}`]) === actual);
+    }
+    function sameList(a, b) { return [...(a||[])].sort().join("|") === [...(b||[])].sort().join("|"); }
+    function syncAutoWinners() {
+        currentMatches.forEach(m => {
+            if (!m || currentData[`manualWinners_${m.id}`]) return;
+            const auto = computeAutoWinners(m);
+            if (auto === null) return;
+            if (!sameList(currentData[`winners_${m.id}`] || [], auto)) {
+                currentData[`winners_${m.id}`] = auto;
+                db.ref(`league_data/predictions/winners_${m.id}`).set(auto);
+            }
+        });
+    }
+    function resetWinnersToAuto(matchId) {
+        currentData[`manualWinners_${matchId}`] = false;
+        db.ref(`league_data/predictions/manualWinners_${matchId}`).set(false);
+        syncAutoWinners(); renderUI();
+    }
+    const TEAM_ALIASES = {
+        "real madrid": ["ריאל", "ריאל מדריד"], "barcelona": ["ברצלונה", "ברצה"],
+        "atletico madrid": ["אתלטיקו", "אתלטיקו מדריד"], "athletic bilbao": ["בילבאו", "אתלטיק בילבאו"],
+        "real sociedad": ["סוסיאדד", "ריאל סוסיאדד"], "real betis": ["בטיס", "ריאל בטיס"],
+        "sevilla": ["סביליה"], "valencia": ["ולנסיה"], "villarreal": ["ויאריאל"],
+        "getafe": ["חטאפה"], "osasuna": ["אוססונה"], "girona": ["חירונה"],
+        "rayo vallecano": ["ראיו", "ראיו ויאקנו"], "celta vigo": ["סלטה", "סלטה ויגו"],
+        "mallorca": ["מיורקה"], "alaves": ["אלאבס"], "espanyol": ["אספניול"],
+        "levante": ["לבנטה"], "elche": ["אלצ'ה"], "real oviedo": ["אוביידו", "ריאל אוביידו"],
+        "liverpool": ["ליברפול"], "arsenal": ["ארסנל"],
+        "manchester city": ["מנצ'סטר סיטי", "מן סיטי"], "manchester united": ["מנצ'סטר יונייטד"],
+        "chelsea": ["צ'לסי"], "tottenham": ["טוטנהאם"],
+        "bayern munich": ["בייארן", "באיירן", "בייארן מינכן"], "borussia dortmund": ["דורטמונד"],
+        "juventus": ["יובנטוס"], "inter": ["אינטר"], "ac milan": ["מילאן"], "napoli": ["נאפולי"],
+        "paris sg": ["פריז", "פ.ס.ז'", "פ.ס.ז", "פריז סן ז'רמן"],
+        "benfica": ["בנפיקה"], "porto": ["פורטו"], "ajax": ["איאקס"]
+    };
+    function normTeam(str) {
+        return String(str || "").toLowerCase().replace(/\b(fc|cf|sc|ud|cd|club|de|the)\b/g, " ").replace(/[^a-z\u0590-\u05ff ]/g, " ").replace(/\s+/g, " ").trim();
+    }
+    function canonicalTeam(name) {
+        const n = normTeam(name);
+        if (!n) return "";
+        for (const [canon, aliases] of Object.entries(TEAM_ALIASES)) {
+            if (n === canon || canon.includes(n) || n.includes(canon)) return canon;
+            for (const a of aliases) { const na = normTeam(a); if (n === na || n.includes(na) || na.includes(n)) return canon; }
+        }
+        return n;
+    }
+    let liveApiEvents = [];
+    let autoScoreEnabled = localStorage.getItem("autoScore") !== "off";
+    let lastAutoFetchLabel = "";
+    const LIVE_REFRESH_MS = 10000, IDLE_REFRESH_MS = 300000, MAX_BACKOFF_MS = 60000;
+    let liveFetchTimer = null, consecutiveFailures = 0, lastFetchOk = true, lastFetchTime = null;
+    let prevLiveMatchIds = new Set();
+    
+    function ensureNotifyPermission() {
+        if (!("Notification" in window)) return;
+        if (Notification.permission === "default") Notification.requestPermission().then(p => {});
+    }
+    document.addEventListener("click", function once() { ensureNotifyPermission(); document.removeEventListener("click", once); });
+    function notifyScoreChange(match, newScore) {
+        if (!("Notification" in window) || Notification.permission !== "granted") return;
+        try {
+            const n = new Notification("⚽ שינוי תוצאה בשידור חי!", {
+                body: `${match.match}  —  ${newScore}`,
+                tag: "live_" + match.id,
+                icon: "https://images.unsplash.com/photo-1540747913346-25e1f3f3e3c5?w=128&q=80"
+            });
+            n.onclick = () => { window.focus(); n.close(); };
+        } catch (e) { console.warn("notify failed", e); }
+    }
+    function hasLiveMatch() { return currentMatches.some(m => m && m.date && getMatchStatus(m).isLive); }
+    function currentRefreshDelay() {
+        if (consecutiveFailures > 0) return Math.min(MAX_BACKOFF_MS, 2000 * Math.pow(2, consecutiveFailures - 1));
+        return hasLiveMatch() ? LIVE_REFRESH_MS : IDLE_REFRESH_MS;
+    }
+    function scheduleNextFetch() {
+        if (liveFetchTimer) clearTimeout(liveFetchTimer);
+        liveFetchTimer = setTimeout(async () => { await fetchLiveScores(); scheduleNextFetch(); }, currentRefreshDelay());
+    }
+    function toggleAutoScore() {
+        autoScoreEnabled = !autoScoreEnabled;
+        localStorage.setItem("autoScore", autoScoreEnabled ? "on" : "off");
+        if (autoScoreEnabled) { consecutiveFailures = 0; fetchLiveScores(); }
+        scheduleNextFetch(); updateLiveMatchWidget(); renderStatusIndicators(); renderUI();
+    }
+    function findApiEvent(match) {
+        if (!liveApiEvents.length) return null;
+        const parts = String(match.match || "").split("-").map(t => canonicalTeam(t));
+        if (parts.length < 2 || !parts[0] || !parts[1]) return null;
+        return liveApiEvents.find(ev => {
+            const h = canonicalTeam(ev.strHomeTeam), a = canonicalTeam(ev.strAwayTeam);
+            return (h === parts[0] && a === parts[1]) || (h === parts[1] && a === parts[0]);
+        }) || null;
+    }
+    function apiScoreForMatch(match) {
+        const ev = findApiEvent(match);
+        if (!ev) return null;
+        const parts = String(match.match || "").split("-").map(t => canonicalTeam(t));
+        const home = parseInt(ev.intHomeScore || "0", 10) || 0;
+        const away = parseInt(ev.intAwayScore || "0", 10) || 0;
+        const flipped = canonicalTeam(ev.strHomeTeam) !== parts[0];
+        const score = flipped ? `${away}-${home}` : `${home}-${away}`;
+        let minute = "";
+        if (ev.strStatus === "HT") minute = "מחצית";
+        else if (ev.strStatus === "FT") minute = "סיום";
+        else if (ev.strProgress) minute = `${ev.strProgress}'`;
+        return { score, minute, status: ev.strStatus || "" };
+    }
+    async function fetchLiveScores() {
+        if (!autoScoreEnabled) return;
+        try {
+            const res = await fetch("https://www.thesportsdb.com/api/v1/json/123/livescore.php?s=Soccer", { cache: "no-store" });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            const json = await res.json();
+            liveApiEvents = (json && json.livescore) || [];
+            consecutiveFailures = 0; lastFetchOk = true; lastFetchTime = new Date();
+            lastAutoFetchLabel = lastFetchTime.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+            applyAutoScores(); updateLiveMatchWidget(); renderStatusIndicators();
+        } catch (e) {
+            consecutiveFailures++; lastFetchOk = false;
+            console.warn("live score fetch failed (" + consecutiveFailures + ")", e);
+            updateLiveMatchWidget(); renderStatusIndicators();
+        }
+    }
+    function checkLiveTransition() {
+        const currentLiveIds = new Set(currentMatches.filter(m => m && m.date && getMatchStatus(m).isLive).map(m => m.id));
+        let newLive = false;
+        currentLiveIds.forEach(id => { if (!prevLiveMatchIds.has(id)) newLive = true; });
+        prevLiveMatchIds = currentLiveIds;
+        if (newLive && autoScoreEnabled) {
+            if (liveFetchTimer) { clearTimeout(liveFetchTimer); liveFetchTimer = null; }
+            consecutiveFailures = 0;
+            fetchLiveScores().then(() => scheduleNextFetch());
+        }
+    }
+    function applyAutoScores() {
+        if (!autoScoreEnabled) return;
+        let changed = false;
+        currentMatches.forEach(m => {
+            if (!m || !m.date) return;
+            if (!getMatchStatus(m).isLive) return;
+            const info = apiScoreForMatch(m);
+            if (!info) return;
+            if (currentData[`actual_${m.id}`] !== info.score) {
+                currentData[`actual_${m.id}`] = info.score;
+                db.ref(`league_data/predictions/actual_${m.id}`).set(info.score);
+                notifyScoreChange(m, info.score);
+                changed = true;
+            }
+        });
+        if (changed) { syncAutoWinners(); renderUI(); }
+    }
+    fetchLiveScores();
+    scheduleNextFetch();
     db.ref('league_data').on('value', snapshot => {
         const data = snapshot.val() || {};
         activePlayersList = data.activePlayers || DEFAULT_PLAYERS;
         currentMatches = data.matches || DEFAULT_MATCHES;
         currentData = data.predictions || {};
-
         currentMatches.sort((a, b) => {
             const timeA = currentData[`time_${a.id}`] !== undefined ? currentData[`time_${a.id}`] : (a.time || "22:00");
             const timeB = currentData[`time_${b.id}`] !== undefined ? currentData[`time_${b.id}`] : (b.time || "22:00");
             return new Date(`${a.date}T${timeA}`) - new Date(`${b.date}T${timeB}`);
         });
-
-        renderUI();
-        updateHeaderCountdownWidget();
-        updateLiveMatchWidget();
-
-        if (!hasScrolledToNext) {
-            setTimeout(() => {
-                scrollToNextMatch();
-            }, 400);
-            hasScrolledToNext = true;
-        }
+        renderUI(); updateHeaderCountdownWidget(); updateLiveMatchWidget(); renderStatusIndicators();
+        if (!hasScrolledToNext) { setTimeout(scrollToNextMatch, 400); hasScrolledToNext = true; }
     });
-
-    setInterval(() => {
-        updateCountdowns();
-        updateHeaderCountdownWidget();
-        updateLiveMatchWidget();
-    }, 1000);
-
+    setInterval(() => { updateCountdowns(); updateHeaderCountdownWidget(); updateLiveMatchWidget(); checkLiveTransition(); }, 1000);
     function getLiveMinuteDisplay(match) {
         const timeStr = currentData[`time_${match.id}`] !== undefined ? currentData[`time_${match.id}`] : (match.time || "22:00");
         const matchTime = new Date(`${match.date}T${timeStr}`).getTime();
-        const now = new Date().getTime();
-        const elapsedMin = (now - matchTime) / 60000;
-
-        if (elapsedMin <= 45) {
-            return `${Math.max(1, Math.ceil(elapsedMin))}'`;
-        } else if (elapsedMin <= 60) {
-            return `מחצית`;
-        } else if (elapsedMin <= 105) {
-            return `${Math.ceil(elapsedMin - 15)}'`;
-        } else if (elapsedMin <= 120) {
-            return `90+${Math.ceil(elapsedMin - 105)}'`;
-        } else {
-            return `סיום`;
-        }
+        const elapsedMin = (new Date().getTime() - matchTime) / 60000;
+        if (elapsedMin <= 45) return `${Math.max(1, Math.ceil(elapsedMin))}'`;
+        if (elapsedMin <= 60) return `מחצית`;
+        if (elapsedMin <= 105) return `${Math.ceil(elapsedMin - 15)}'`;
+        if (elapsedMin <= 120) return `90+${Math.ceil(elapsedMin - 105)}'`;
+        return `סיום`;
     }
-
+    function getMatchApiStatus(match) {
+        const st = getMatchStatus(match);
+        if (!st.isLive) return { key: "waiting", label: "ממתין למשחק", cls: "api-waiting" };
+        if (!autoScoreEnabled) return { key: "manual", label: "עדכון ידני", cls: "api-manual" };
+        if (!lastFetchOk) return { key: "down", label: "API לא זמין", cls: "api-down" };
+        if (apiScoreForMatch(match)) return { key: "live", label: "LIVE פעיל", cls: "api-live" };
+        return { key: "searching", label: "מחפש שידור…", cls: "api-searching" };
+    }
+    function getMatchSourceNote(match) {
+        const info = apiScoreForMatch(match);
+        if (!info && lastFetchOk) return "";
+        const t = lastFetchTime ? lastFetchTime.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" }) : "";
+        const status = lastFetchOk ? "TheSportsDB" : "TheSportsDB (לא זמין)";
+        return `<span class="actual-source">📡 ${status}${t ? " • עודכן " + t : ""}</span>`;
+    }
+    function renderStatusIndicators() {
+        currentMatches.forEach(m => {
+            const s = getMatchApiStatus(m), note = getMatchSourceNote(m);
+            const mobPill = document.getElementById(`api_status_mobile_${m.id}`);
+            const tabPill = document.getElementById(`api_status_table_${m.id}`);
+            if (mobPill) { mobPill.className = `api-pill ${s.cls}`; mobPill.innerText = s.label; }
+            if (tabPill) { tabPill.className = `api-pill ${s.cls}`; tabPill.innerText = s.label; }
+            const mobNote = document.getElementById(`src_mobile_${m.id}`);
+            if (mobNote) mobNote.innerHTML = note;
+        });
+    }
     function updateLiveMatchWidget() {
         const widget = document.getElementById("liveMatchWidget");
         if (!widget) return;
-
         const liveMatches = currentMatches.filter(m => m && m.date && getMatchStatus(m).isLive);
-
-        if (!liveMatches.length) {
-            widget.style.display = "none";
-            widget.innerHTML = "";
-            return;
-        }
-
+        if (!liveMatches.length) { widget.style.display = "none"; widget.innerHTML = ""; return; }
         widget.style.display = "flex";
         widget.innerHTML = liveMatches.map(m => {
             const rawScore = currentData[`actual_${m.id}`] || (m.defaultActual || "0-0");
             const scoreParts = String(rawScore).split("-");
-            const homeScore = (scoreParts[0] || "0").trim();
-            const awayScore = (scoreParts[1] || "0").trim();
+            const homeScore = (scoreParts[0] || "0").trim(), awayScore = (scoreParts[1] || "0").trim();
             const scoreKey = `${homeScore}-${awayScore}`;
             const prevScore = previousLiveScores[m.id];
             const scoreChanged = prevScore && prevScore !== scoreKey;
             previousLiveScores[m.id] = scoreKey;
-
             const teamParts = m.match.split("-").map(t => t.trim());
-            const homeTeam = teamParts[0] || m.match;
-            const awayTeam = teamParts[1] || "";
-
-            const minute = getLiveMinuteDisplay(m);
-
+            const homeTeam = teamParts[0] || m.match, awayTeam = teamParts[1] || "";
+            const apiInfo = apiScoreForMatch(m);
+            const minute = (apiInfo && apiInfo.minute) ? apiInfo.minute : getLiveMinuteDisplay(m);
+            const autoLabel = !autoScoreEnabled ? '⏸ עדכון אוטומטי כבוי'
+                : (lastFetchOk ? (apiInfo ? `🔄 מתעדכן אוטומטית${lastAutoFetchLabel ? ' • ' + lastAutoFetchLabel : ''}` : '🔍 מחפש שידור חי...')
+                : `⚠️ אין חיבור לנתונים – מנסה שוב (${consecutiveFailures})`);
+            const errorBanner = (!autoScoreEnabled || lastFetchOk) ? '' : `<div class="lm-error-banner">⚠️ אין חיבור לנתונים – מנסה שוב (ניסיון ${consecutiveFailures})</div>`;
+            const sourceLine = (autoScoreEnabled && lastFetchOk && lastAutoFetchLabel) ? `<div class="lm-source-line">📡 TheSportsDB • עודכן ${lastAutoFetchLabel}</div>` : '';
+            const leftTeam = homeTeam, rightTeam = awayTeam, leftScore = homeScore, rightScore = awayScore;
             return `
                 <div class="live-match-card">
                     ${scoreChanged ? `<div class="lm-goal-banner">⚽ GOAL!</div>` : ''}
+                    ${errorBanner}
                     <div class="lm-top-row">
                         <span class="lm-live-dot"></span>
                         <span class="lm-live-label">משחק חי</span>
                         <span class="lm-comp-name">• ${m.comp || "לה ליגה"}</span>
                     </div>
                     <div class="lm-scoreline">
-                        <span class="lm-team-name">${homeTeam}</span>
-                        <span class="lm-score-box ${scoreChanged ? 'score-flash' : ''}">${homeScore} - ${awayScore}</span>
-                        <span class="lm-team-name">${awayTeam}</span>
+                        <span class="lm-team-name">${rightTeam}</span>
+                        <span class="lm-score-box ${scoreChanged ? 'score-flash' : ''}">${leftScore} - ${rightScore}</span>
+                        <span class="lm-team-name">${leftTeam}</span>
                     </div>
-                    <div class="lm-bottom-row">
-                        <span class="lm-minute-badge">
-                            <span class="lm-minute-val">⏱ ${minute}</span>
-                        </span>
-                        <button class="lm-goto-btn" style="margin-right:10px;" onclick="scrollToMatch('${m.id}')">📝 עדכן תוצאה</button>
+                    <div class="lm-bottom-row" style="flex-wrap:wrap; gap:8px;">
+                        <span class="lm-minute-badge"><span class="lm-minute-val">⏱ ${minute}</span></span>
+                        <button class="lm-goto-btn" onclick="toggleAutoScore()">${autoLabel}</button>
+                        <button class="lm-goto-btn" onclick="scrollToMatch('${m.id}')">📝 עדכן ידנית</button>
                     </div>
-                </div>
-            `;
+                    ${sourceLine}
+                </div>`;
         }).join("");
     }
-
     function updateHeaderCountdownWidget() {
         const now = new Date().getTime();
         let nextMatch = null;
-
         for (let m of currentMatches) {
             if (!m || !m.date) continue;
             const timeStr = currentData[`time_${m.id}`] !== undefined ? currentData[`time_${m.id}`] : (m.time || "22:00");
             const matchTime = new Date(`${m.date}T${timeStr}`).getTime();
-            if (matchTime > now) {
-                nextMatch = { ...m, calculatedTime: matchTime, timeStr };
-                break;
-            }
+            if (matchTime > now) { nextMatch = { ...m, calculatedTime: matchTime, timeStr }; break; }
         }
-
         const containerEl = document.getElementById("hnmTeamsContainer");
         const infoEl = document.getElementById("hnmInfo");
         const timerEl = document.getElementById("hnmTimer");
-
         if (!nextMatch) {
             if (containerEl) containerEl.innerHTML = "<span>אין משחקים קרובים כרגע</span>";
             if (infoEl) infoEl.innerText = "--/-- | --:--";
             if (timerEl) timerEl.innerText = "00:00:00";
-            targetNextMatchId = "";
-            return;
+            targetNextMatchId = ""; return;
         }
-
         targetNextMatchId = nextMatch.id;
         if (containerEl) containerEl.innerHTML = `<span>${nextMatch.match}</span>`;
         if (infoEl) infoEl.innerText = `${formatDateDisplay(nextMatch.date)} | ${nextMatch.timeStr}`;
-
         const diff = nextMatch.calculatedTime - now;
-        if (diff <= 0) {
-            if (timerEl) timerEl.innerText = "המשחק החל!";
-            return;
-        }
-
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
+        if (diff <= 0) { if (timerEl) timerEl.innerText = "המשחק החל!"; return; }
+        const days = Math.floor(diff / 86400000);
+        const hours = Math.floor((diff % 86400000) / 3600000);
+        const minutes = Math.floor((diff % 3600000) / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
         let timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        if (days > 0) {
-            timeString = `${days} ימים, ` + timeString;
-        }
+        if (days > 0) timeString = `${days} ימים, ` + timeString;
         if (timerEl) timerEl.innerText = timeString;
     }
-
-    function scrollToHeaderTargetMatch() {
-        if (!targetNextMatchId) return;
-        scrollToMatch(targetNextMatchId);
-    }
-
+    function scrollToHeaderTargetMatch() { if (targetNextMatchId) scrollToMatch(targetNextMatchId); }
     function scrollToMatch(matchId) {
         if (!matchId) return;
-
         if (window.innerWidth >= 768) {
             const rows = document.querySelectorAll("#tableBody tr");
             currentMatches.forEach((m, idx) => {
@@ -1241,79 +635,44 @@
             }
         }
     }
-
     function scrollToNextMatch() {
         if (window.innerWidth >= 768) return;
-        const nextMatch = currentMatches.find(m => {
-            const st = getMatchStatus(m);
-            return !st.isEnded;
-        });
-
+        const nextMatch = currentMatches.find(m => !getMatchStatus(m).isEnded);
         if (nextMatch) {
             const cardElement = document.getElementById(`card_mobile_${nextMatch.id}`);
-            if (cardElement) {
-                cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            if (cardElement) cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     }
-
-    function saveToCloud() {
-        db.ref('league_data').set({
-            activePlayers: activePlayersList,
-            matches: currentMatches,
-            predictions: currentData
-        });
-    }
-
+    function saveToCloud() { db.ref('league_data').set({ activePlayers: activePlayersList, matches: currentMatches, predictions: currentData }); }
     function formatDateDisplay(dateStr) {
         if (!dateStr) return "";
         const parts = dateStr.split("-");
         return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : dateStr;
     }
-
     function getMatchStatus(match) {
         const timeStr = currentData[`time_${match.id}`] !== undefined ? currentData[`time_${match.id}`] : (match.time || "22:00");
         if (!match.date || !timeStr) return { text: "שעה לא קיימת", isLive: false, isEnded: false };
-        
         const matchTime = new Date(`${match.date}T${timeStr}`).getTime();
         const now = new Date().getTime();
         const diff = matchTime - now;
-
-        if (diff <= 0 && diff > -7200000) {
-            return { text: "⚽ המשחק בעיצומו!", isLive: true, isEnded: false };
-        } else if (diff <= -7200000) {
-            return { text: "✓ הסתיים", isLive: false, isEnded: true };
-        }
-
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-        if (days > 0) {
-            return { text: `⏳ עוד ${days} ימים, ${hours}ש'`, isLive: false, isEnded: false };
-        } else {
-            return { text: `⏳ ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`, isLive: false, isEnded: false };
-        }
+        if (diff <= 0 && diff > -7200000) return { text: "⚽ המשחק בעיצומו!", isLive: true, isEnded: false };
+        if (diff <= -7200000) return { text: "✓ הסתיים", isLive: false, isEnded: true };
+        const days = Math.floor(diff / 86400000);
+        const hours = Math.floor((diff % 86400000) / 3600000);
+        const minutes = Math.floor((diff % 3600000) / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+        if (days > 0) return { text: `⏳ עוד ${days} ימים, ${hours}ש'`, isLive: false, isEnded: false };
+        return { text: `⏳ ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`, isLive: false, isEnded: false };
     }
-
     function updateCountdowns() {
         currentMatches.forEach(m => {
             const st = getMatchStatus(m);
             const elMobile = document.getElementById(`cd_mobile_${m.id}`);
             const elTable = document.getElementById(`cd_table_${m.id}`);
-
-            if (elMobile && elMobile.innerText !== st.text) {
-                renderUI(); 
-                return;
-            }
-            if (elTable && elTable.innerText !== st.text) {
-                renderUI();
-                return;
-            }
+            if (elMobile && elMobile.innerText !== st.text) { renderUI(); return; }
+            if (elTable && elTable.innerText !== st.text) { renderUI(); return; }
         });
     }
-
     function getCompBadge(compName) {
         switch(compName) {
             case "ליגת האלופות": return `<span class="comp-badge comp-ucl">צ'מפיונס</span>`;
@@ -1323,169 +682,112 @@
             default: return `<span class="comp-badge comp-la_liga">לה ליגה</span>`;
         }
     }
-
     function addNewPlayer() {
         const input = document.getElementById("newPlayerName");
         const name = input.value.trim();
         if (!name) return;
         if (activePlayersList.includes(name)) { alert("השחקן כבר קיים ברשימה פעילה"); return; }
-        
-        activePlayersList.push(name);
-        input.value = "";
-        saveToCloud();
+        activePlayersList.push(name); input.value = ""; saveToCloud();
     }
-
     function removePlayer(name) {
         if (confirm(`האם להסיר את השחקן ${name} מהטבלה?`)) {
-            activePlayersList = activePlayersList.filter(p => p !== name);
-            saveToCloud();
+            activePlayersList = activePlayersList.filter(p => p !== name); saveToCloud();
         }
     }
-
     function addNewMatch() {
         const nameInput = document.getElementById("newMatchName");
         const dateInput = document.getElementById("newMatchDate");
         const timeInput = document.getElementById("newMatchTime");
         const compSelect = document.getElementById("newMatchComp");
-
-        const matchName = nameInput.value.trim();
-        const matchDate = dateInput.value;
-        const matchTime = timeInput.value.trim() || "22:00";
-        const comp = compSelect.value;
-
-        if (!matchName || !matchDate) {
-            alert("נא למלא את שם המשחק ואת התאריך!");
-            return;
-        }
-
+        const matchName = nameInput.value.trim(), matchDate = dateInput.value;
+        const matchTime = timeInput.value.trim() || "22:00", comp = compSelect.value;
+        if (!matchName || !matchDate) { alert("נא למלא את שם המשחק ואת התאריך!"); return; }
         const newId = "user_m_" + Date.now();
-        const isClasico = matchName.includes("ברצלונה");
-
-        currentMatches.push({
-            id: newId,
-            match: matchName,
-            date: matchDate,
-            time: matchTime,
-            comp: comp,
-            isClasico: isClasico,
-            isUserCreated: true
-        });
-
+        currentMatches.push({ id: newId, match: matchName, date: matchDate, time: matchTime, comp: comp, isClasico: matchName.includes("ברצלונה"), isUserCreated: true });
         currentMatches.sort((a, b) => new Date(`${a.date}T${a.time || '22:00'}`) - new Date(`${b.date}T${b.time || '22:00'}`));
-
-        nameInput.value = "";
-        dateInput.value = "";
-        timeInput.value = "22:00";
-
+        nameInput.value = ""; dateInput.value = ""; timeInput.value = "22:00";
         saveToCloud();
     }
-
     function deleteMatch(matchId) {
         if (confirm("האם למחוק את המשחק הזה?")) {
             currentMatches = currentMatches.filter(m => m.id !== matchId);
-            Object.keys(currentData).forEach(key => {
-                if (key.includes(matchId)) {
-                    delete currentData[key];
-                }
-            });
+            Object.keys(currentData).forEach(key => { if (key.includes(matchId)) delete currentData[key]; });
             saveToCloud();
         }
     }
-
     function onInputSave(key, value) {
         currentData[key] = value;
         db.ref(`league_data/predictions/${key}`).set(value);
+        syncAutoWinners(); renderUI();
     }
-
     function onWinnerToggle(matchId, player) {
         const key = `winners_${matchId}`;
         let winners = currentData[key] || [];
-
-        if (winners.includes(player)) {
-            winners = winners.filter(p => p !== player);
-        } else {
-            winners.push(player);
-        }
-
+        if (winners.includes(player)) winners = winners.filter(p => p !== player);
+        else winners.push(player);
         currentData[key] = winners;
+        currentData[`manualWinners_${matchId}`] = true;
         db.ref(`league_data/predictions/${key}`).set(winners);
+        db.ref(`league_data/predictions/manualWinners_${matchId}`).set(true);
+        renderUI();
     }
-
     function updateScores() {
         const scores = {};
         activePlayersList.forEach(p => scores[p] = 0);
-
         currentMatches.forEach(m => {
-            const winners = currentData[`winners_${m.id}`] || [];
-            winners.forEach(player => {
-                if (scores[player] !== undefined) scores[player]++;
-            });
+            (currentData[`winners_${m.id}`] || []).forEach(player => { if (scores[player] !== undefined) scores[player]++; });
         });
-
         activePlayersList.forEach(player => {
             const el = document.getElementById(`score_${player}`);
             if (el) el.innerText = `${scores[player]} נק'`;
         });
     }
-
     function renderUI() {
+        syncAutoWinners();
         document.getElementById("playersBar").innerHTML = activePlayersList.map(player => `
             <div class="player-card">
                 <button class="remove-btn" onclick="removePlayer('${player}')">×</button>
                 <span>${player}</span>
                 <span class="score" id="score_${player}">0 נק'</span>
-            </div>
-        `).join("");
-
+            </div>`).join("");
         const mobileContainer = document.getElementById("mobileCardsContainer");
         mobileContainer.innerHTML = currentMatches.map(m => {
             const savedActual = currentData[`actual_${m.id}`] !== undefined ? currentData[`actual_${m.id}`] : (m.defaultActual || "");
             const savedTime = currentData[`time_${m.id}`] !== undefined ? currentData[`time_${m.id}`] : (m.time || "22:00");
             const savedWinners = currentData[`winners_${m.id}`] || [];
             const st = getMatchStatus(m);
-            
+            const apiStatus = getMatchApiStatus(m);
+            const sourceNote = getMatchSourceNote(m);
+            const unlocked = !!currentData[`unlocked_${m.id}`];
             const locked = isPredictionLocked(m);
-            const disabledAttr = (st.isEnded || locked) ? 'disabled' : '';
-
-            const deleteBtnHTML = m.isUserCreated 
-                ? `<button class="delete-match-btn" title="מחק משחק" onclick="deleteMatch('${m.id}')">🗑️</button>` 
-                : '';
-
+            const disabledAttr = (!unlocked && (st.isEnded || locked)) ? 'disabled' : '';
+            const winnersDisabled = (!unlocked && st.isEnded) ? 'disabled' : '';
+            const isManualWinners = !!currentData[`manualWinners_${m.id}`];
+            const lockBtnHTML = `<button class="delete-match-btn" title="${unlocked ? 'נעל מחדש' : 'בטל נעילה ואפשר עריכה'}" onclick="toggleManualLock('${m.id}')">${unlocked ? '🔓' : '🔒'}</button>`;
+            const autoWinnersBtnHTML = isManualWinners ? `<button class="winner-btn" title="חזרה לחישוב אוטומטי" onclick="resetWinnersToAuto('${m.id}')">↺ אוטומטי</button>` : '';
+            const deleteBtnHTML = m.isUserCreated ? `<button class="delete-match-btn" title="מחק משחק" onclick="deleteMatch('${m.id}')">🗑️</button>` : '';
             const winnersHTML = activePlayersList.map(player => {
                 const isChecked = savedWinners.includes(player);
-                return `
-                    <button class="winner-btn ${isChecked ? 'active' : ''}" ${st.isEnded ? 'disabled' : ''} onclick="onWinnerToggle('${m.id}', '${player}')">
-                        ${player}
-                    </button>
-                `;
+                return `<button class="winner-btn ${isChecked ? 'active' : ''}" ${winnersDisabled} onclick="onWinnerToggle('${m.id}', '${player}')">${player}</button>`;
             }).join("");
-
             const predictionsMobileHTML = activePlayersList.map(player => {
                 const savedPred = currentData[`pred_${m.id}_${player}`] || "";
-                return `
-                    <div class="pred-box-mini">
-                        <span>${player}</span>
-                        <input type="text" class="score-in" value="${savedPred}" placeholder="-" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)">
-                    </div>
-                `;
+                return `<div class="pred-box-mini"><span>${player}</span><input type="text" class="score-in" value="${savedPred}" placeholder="-" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)"></div>`;
             }).join("");
-
             let badgeClass = "countdown-badge";
-            if (st.isLive) badgeClass += " live";
-            else if (st.isEnded) badgeClass += " ended";
-
+            if (st.isLive) badgeClass += " live"; else if (st.isEnded) badgeClass += " ended";
             return `
                 <div class="match-mobile-card ${m.isClasico ? 'clasico-card' : ''}" id="card_mobile_${m.id}">
                     <div class="match-card-header">
-                        <div class="match-card-title">
-                            ${deleteBtnHTML}
-                            ${m.isClasico ? '🔥 ' : ''}<span>${m.match}</span>
-                        </div>
+                        <div class="match-card-title">${deleteBtnHTML}${lockBtnHTML}${m.isClasico ? '🔥 ' : ''}<span>${m.match}</span></div>
                         <div>${getCompBadge(m.comp)}</div>
                     </div>
                     <div class="match-card-info">
                         <span>📅 ${formatDateDisplay(m.date)}</span>
                         <span id="cd_mobile_${m.id}" class="${badgeClass}">${st.text}</span>
+                    </div>
+                    <div class="match-api-status">
+                        <span class="api-pill ${apiStatus.cls}" id="api_status_mobile_${m.id}">${apiStatus.label}</span>
                     </div>
                     <div class="match-card-actual">
                         <div>
@@ -1495,95 +797,70 @@
                         <div>
                             <span style="font-weight: 700; font-size: 0.8rem; display: block; color: var(--text-muted); margin-bottom: 4px;">תוצאה:</span>
                             <input type="text" class="score-in actual-in" value="${savedActual}" placeholder="0-0" onchange="onInputSave('actual_${m.id}', this.value)">
+                            <span id="src_mobile_${m.id}">${sourceNote}</span>
                         </div>
                     </div>
                     <div style="font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: var(--text-muted);">ניחושי שחקנים:</div>
-                    <div class="match-card-predictions">
-                        ${predictionsMobileHTML}
-                    </div>
-                    <div style="font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: var(--text-muted);">מי צדק?</div>
-                    <div class="winners-box" style="grid-template-columns: repeat(3, 1fr);">
-                        ${winnersHTML}
-                    </div>
-                </div>
-            `;
+                    <div class="match-card-predictions">${predictionsMobileHTML}</div>
+                    <div style="font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: var(--text-muted);">מי צדק? ${isManualWinners ? '(עריכה ידנית)' : '(מזוהה אוטומטית)'}</div>
+                    <div class="winners-box" style="grid-template-columns: repeat(3, 1fr);">${winnersHTML}${autoWinnersBtnHTML}</div>
+                </div>`;
         }).join("");
-
         document.getElementById("tableHeaderRow").innerHTML = `
             <th style="text-align: right; padding-right: 12px; width: 20%;">משחק</th>
             <th style="width: 10%;">מסגרת</th>
-            <th style="width: 12%;">תאריך</th>
-            <th style="width: 10%;">שעה</th>
-            <th style="width: 12%;">ספירה לאחור</th>
-            <th style="width: 10%;">תוצאה</th>
+            <th style="width: 11%;">תאריך</th>
+            <th style="width: 9%;">שעה</th>
+            <th style="width: 15%;">ספירה לאחור</th>
+            <th style="width: 9%;">תוצאה</th>
             <th style="width: 12%;">מי צדק?</th>
-            ${activePlayersList.map(p => `<th class="player-th" style="width: ${Math.max(6, 14 / activePlayersList.length)}%;">${p}</th>`).join("")}
-        `;
-
+            ${activePlayersList.map(p => `<th class="player-th" style="width: ${Math.max(6, 14 / activePlayersList.length)}%;">${p}</th>`).join("")}`;
         const tbody = document.getElementById("tableBody");
         tbody.innerHTML = "";
-
         currentMatches.forEach((m) => {
             const tr = document.createElement("tr");
             if (m.isClasico) tr.classList.add("clasico");
-
             const savedActual = currentData[`actual_${m.id}`] !== undefined ? currentData[`actual_${m.id}`] : (m.defaultActual || "");
             const savedTime = currentData[`time_${m.id}`] !== undefined ? currentData[`time_${m.id}`] : (m.time || "22:00");
             const savedWinners = currentData[`winners_${m.id}`] || [];
             const st = getMatchStatus(m);
-            
+            const apiStatus = getMatchApiStatus(m);
+            const unlocked = !!currentData[`unlocked_${m.id}`];
             const locked = isPredictionLocked(m);
-            const disabledAttr = (st.isEnded || locked) ? 'disabled' : '';
-
-            const deleteBtnHTML = m.isUserCreated 
-                ? `<button class="delete-match-btn" title="מחק משחק" onclick="deleteMatch('${m.id}')">🗑️</button>` 
-                : '';
-
+            const disabledAttr = (!unlocked && (st.isEnded || locked)) ? 'disabled' : '';
+            const winnersDisabled = (!unlocked && st.isEnded) ? 'disabled' : '';
+            const isManualWinners = !!currentData[`manualWinners_${m.id}`];
+            const lockBtnHTML = `<button class="delete-match-btn" title="${unlocked ? 'נעל מחדש' : 'בטל נעילה ואפשר עריכה'}" onclick="toggleManualLock('${m.id}')">${unlocked ? '🔓' : '🔒'}</button>`;
+            const autoWinnersBtnHTML = isManualWinners ? `<button class="winner-btn" title="חזרה לחישוב אוטומטי" onclick="resetWinnersToAuto('${m.id}')">↺ אוטומטי</button>` : '';
+            const deleteBtnHTML = m.isUserCreated ? `<button class="delete-match-btn" title="מחק משחק" onclick="deleteMatch('${m.id}')">🗑️</button>` : '';
             const winnersHTML = activePlayersList.map(player => {
                 const isChecked = savedWinners.includes(player);
-                return `
-                    <button class="winner-btn ${isChecked ? 'active' : ''}" ${st.isEnded ? 'disabled' : ''} onclick="onWinnerToggle('${m.id}', '${player}')">
-                        ${player}
-                    </button>
-                `;
+                return `<button class="winner-btn ${isChecked ? 'active' : ''}" ${winnersDisabled} onclick="onWinnerToggle('${m.id}', '${player}')">${player}</button>`;
             }).join("");
-
             const predictionsHTML = activePlayersList.map(player => {
                 const savedPred = currentData[`pred_${m.id}_${player}`] || "";
-                return `
-                    <td>
-                        <input type="text" class="score-in" value="${savedPred}" placeholder="-" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)">
-                    </td>
-                `;
+                return `<td><input type="text" class="score-in" value="${savedPred}" placeholder="-" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)"></td>`;
             }).join("");
-
             let badgeClass = "countdown-badge";
-            if (st.isLive) badgeClass += " live";
-            else if (st.isEnded) badgeClass += " ended";
-
+            if (st.isLive) badgeClass += " live"; else if (st.isEnded) badgeClass += " ended";
             tr.innerHTML = `
-                <td class="match-name">
-                    ${deleteBtnHTML}
-                    ${m.isClasico ? '🔥 ' : ''}<span>${m.match}</span>
-                </td>
+                <td class="match-name">${deleteBtnHTML}${lockBtnHTML}${m.isClasico ? '🔥 ' : ''}<span>${m.match}</span></td>
                 <td>${getCompBadge(m.comp)}</td>
                 <td class="match-date-cell">${formatDateDisplay(m.date)}</td>
                 <td><input type="text" class="time-text-in" value="${savedTime}" placeholder="22:00" onchange="onInputSave('time_${m.id}', this.value)"></td>
-                <td><span id="cd_table_${m.id}" class="${badgeClass}">${st.text}</span></td>
+                <td class="countdown-cell">
+                    <span id="cd_table_${m.id}" class="${badgeClass}">${st.text}</span>
+                    <span class="api-pill ${apiStatus.cls}" id="api_status_table_${m.id}">${apiStatus.label}</span>
+                </td>
                 <td><input type="text" class="score-in actual-in" value="${savedActual}" placeholder="0-0" onchange="onInputSave('actual_${m.id}', this.value)"></td>
-                <td><div class="winners-box" style="grid-template-columns: repeat(${Math.min(activePlayersList.length, 3)}, 1fr);">${winnersHTML}</div></td>
-                ${predictionsHTML}
-            `;
+                <td><div class="winners-box" style="grid-template-columns: repeat(${Math.min(activePlayersList.length, 3)}, 1fr);">${winnersHTML}${autoWinnersBtnHTML}</div></td>
+                ${predictionsHTML}`;
             tbody.appendChild(tr);
         });
-
         updateScores();
     }
-
     function resetAllData() {
-        if (confirm("האם אתה בטוח שברצונך לאפס את כל הנתונים והטבלה מחדש?")) {
-            db.ref('league_data').remove();
-        }
+        if (confirm("האם אתה בטוח שברצונך לאפס את כל הנתונים והטבלה מחדש?")) db.ref('league_data').remove();
     }
 </script>
 </body>
