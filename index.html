@@ -211,7 +211,6 @@
 <body>
 <div class="main-container">
     <header>
-        <button class="theme-toggle-btn" onclick="toggleTheme()">🌙 / ☀️ מצב תצוגה</button>
         <div class="header-content">
             <img class="blancos-banner" src="https://media.base44.com/images/public/6a91620bb63bd7c1b5a2d9e8/0a36110dd_717f280bed475230e0023ddf508c79d1_tplv-tiktokx-cropcenter_1080_1080-removebg-preview.png" alt="הבלאנקוס">
             <h1>ניחושי הבלאנקוס לשנת 26/27</h1>
@@ -229,17 +228,16 @@
         </div>
         <div class="controls-section">
             <div class="control-card">
-                <span class="section-label">👤 הוספת מנחש</span>
+                <span class="section-label">👤 הוספת פנאליסט</span>
                 <div class="form-group">
                     <input type="text" id="newPlayerName" placeholder="שם שחקן חדש...">
                     <button class="action-submit-btn" onclick="addNewPlayer()">+ הוסף</button>
                 </div>
             </div>
             <div class="control-card match-add-card">
-                <span class="section-label">⚽ הוספת משחק חדש ללוח</span>
                 <div class="form-row-labeled">
                     <div class="field">
-                        <label for="newMatchName">משחק (קבוצות)</label>
+                        <label for="newMatchName">הוספת משחק (קבוצות)</label>
                         <input type="text" id="newMatchName" placeholder="ריאל מדריד - ליברפול">
                     </div>
                     <div class="field field-date">
@@ -247,7 +245,7 @@
                         <input type="date" id="newMatchDate">
                     </div>
                     <div class="field field-time">
-                        <label for="newMatchTime">שעה (24h)</label>
+                        <label for="newMatchTime">שעת פתיחת המשחק</label>
                         <input type="text" id="newMatchTime" value="22:00" placeholder="22:00">
                     </div>
                     <div class="field field-comp">
@@ -261,14 +259,12 @@
                         </select>
                     </div>
                 </div>
-                <button class="action-submit-btn" onclick="addNewMatch()">+ הוסף משחק ללוח</button>
+                <button class="action-submit-btn" onclick="addNewMatch()">+ הוסף משחק ללוח המשחקים</button>
             </div>
         </div>
     </header>
     <div class="scoreboard" id="playersBar"></div>
     <div class="top-bar">
-        <span>⚡ ניהול שעות מלא (פורמט 24 שעות) וספירה לאחור אוטומטית</span>
-        <button class="reset-btn" onclick="resetAllData()">איפוס נתונים כללי</button>
     </div>
     <div class="mobile-cards-container" id="mobileCardsContainer"></div>
     <div class="table-wrapper">
