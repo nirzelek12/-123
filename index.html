@@ -159,7 +159,7 @@
         tr:hover td { background-color: rgba(212, 163, 46, 0.06); }
         td.match-name { text-align: right; font-weight: 700; padding-right: 12px; padding-left: 12px; }
         td.match-date-cell { color: var(--text-muted); font-size: 0.8rem; text-align: center; font-family: var(--font-mono); }
-        td.countdown-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; overflow: visible; padding: 24px 8px; }
+        td.countdown-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; overflow: visible; padding: 30px 15px; }
         td.countdown-cell .countdown-badge { width: 100%; justify-content: center; box-sizing: border-box; padding: 10px 10px; font-size: 0.82rem; }
         td.countdown-cell .api-pill { padding: 7px 12px; font-size: 0.74rem; }
         tr.clasico td { background-color: var(--clasico-bg) !important; }
@@ -982,7 +982,7 @@
             <th style="width: 11%;">בית/חוץ</th>
             <th style="width: 19%;">תאריך</th>
             <th style="width: 7%;">שעה</th>
-            <th style="width: 16%;">ספירה לאחור</th>
+            <th style="width: 20%;">ספירה לאחור</th>
             <th style="width: 7%;">תוצאה</th>
             <th style="width: 17%;">מי צדק?</th>
             ${activePlayersList.map(p => `<th class="player-th" style="width: ${Math.max(6, 16 / activePlayersList.length)}%;">${p}</th>`).join("")}`;
