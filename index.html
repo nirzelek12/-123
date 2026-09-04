@@ -40,7 +40,7 @@
         html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
         body { 
             background-color: var(--bg-body); 
-            background-image: linear-gradient(rgba(5, 22, 19, 0.75), rgba(5, 22, 19, 0.85)), url('background.jpg');
+            background-image: linear-gradient(rgba(5, 22, 19, 0.75), rgba(5, 22, 19, 0.85)), url('רקע.JPG'); 
             background-size: cover; background-position: center; background-attachment: fixed;
             color: var(--text-main); padding: 14px 6px; -webkit-tap-highlight-color: transparent; 
             min-height: 100vh; position: relative; overflow-x: hidden; text-rendering: optimizeSpeed;
@@ -335,6 +335,7 @@
     const TSDB_KEY = "123";
     const REAL_MADRID_ID = "133738";
     const TSDB_NEXT_URL = `https://www.thesportsdb.com/api/v1/json/${TSDB_KEY}/eventsnext.php?id=${REAL_MADRID_ID}`;
+    const TSDB_LAST_URL = `https://www.thesportsdb.com/api/v1/json/${TSDB_KEY}/eventslast.php?id=${REAL_MADRID_ID}`;
     let apiEvents = [];           // raw events from API
     let autoScoreEnabled = localStorage.getItem("autoScore") !== "off";
     let lastAutoFetchLabel = "";
@@ -402,16 +403,35 @@
         return { score, minute, status: ev.strStatus || "", event: ev };
     }
 
-    /* ---- Fetch live + upcoming from TheSportsDB ---- */
+    /* ---- Fetch live, upcoming and recently finished from TheSportsDB ---- */
     async function fetchLiveScores() {
         if (!autoScoreEnabled) return;
         try {
-            const res = await fetch(TSDB_NEXT_URL, { cache: "no-store" });
-            if (!res.ok) throw new Error("HTTP " + res.status);
-            const json = await res.json();
-            apiEvents = (json && json.events) || [];
-            // filter out null/empty events
-            apiEvents = apiEvents.filter(e => e && e.strHomeTeam && e.strAwayTeam);
+            const [resNext, resLast] = await Promise.all([
+                fetch(TSDB_NEXT_URL, { cache: "no-store" }),
+                fetch(TSDB_LAST_URL, { cache: "no-store" })
+            ]);
+            
+            let combinedEvents = [];
+            if (resNext.ok) {
+                const jsonNext = await resNext.json();
+                if (jsonNext && jsonNext.events) combinedEvents = combinedEvents.concat(jsonNext.events);
+            }
+            if (resLast.ok) {
+                const jsonLast = await resLast.json();
+                if (jsonLast && jsonLast.results) combinedEvents = combinedEvents.concat(jsonLast.results);
+            }
+
+            apiEvents = combinedEvents.filter(e => e && e.strHomeTeam && e.strAwayTeam);
+            // Deduplicate by idEvent
+            const seenIds = new Set();
+            apiEvents = apiEvents.filter(e => {
+                if (!e.idEvent) return true;
+                if (seenIds.has(e.idEvent)) return false;
+                seenIds.add(e.idEvent);
+                return true;
+            });
+
             consecutiveFailures = 0; lastFetchOk = true; lastFetchTime = new Date();
             lastAutoFetchLabel = lastFetchTime.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
             console.log(`[TSDB] OK — ${apiEvents.length} events. Live:`, apiEvents.filter(e => isEventLive(e)).map(e => `${e.strHomeTeam} ${e.intHomeScore}-${e.intAwayScore} ${e.strAwayTeam} (${e.strStatus})`));
@@ -427,6 +447,10 @@
     function isEventLive(ev) {
         const st = (ev.strStatus || "").toUpperCase();
         return st && st !== "FT" && st !== "MATCH FINISHED" && st !== "FINISHED" && st !== "NS" && st !== "POSTPONED" && st !== "NOT STARTED";
+    }
+    function isEventEnded(ev) {
+        const st = (ev.strStatus || "").toUpperCase();
+        return st === "FT" || st === "MATCH FINISHED" || st === "FINISHED";
     }
     function hasLiveMatch() { return apiEvents.some(isEventLive); }
     function currentRefreshDelay() {
@@ -462,7 +486,7 @@
         } catch (e) {}
     }
 
-    /* ---- Apply API scores to user matches that are live ---- */
+    /* ---- Apply API scores to user matches that are live or ended ---- */
     function applyAutoScores() {
         if (!autoScoreEnabled) return;
         let changed = false;
@@ -471,8 +495,12 @@
             const info = apiScoreForMatch(m);
             if (!info) return;
             const evLive = isEventLive(info.event);
-            // Only auto-write the actual score if the API event is live OR finished (has a real score)
-            if (!evLive && info.status === "") return;
+            const evEnded = isEventEnded(info.event);
+            const st = getMatchStatus(m);
+            
+            // עדכון תוצאה בשידור חי או מיד כשהמשחק מסתיים ב-API או לפי סטטוס המשחק
+            if (!evLive && !evEnded && info.status === "" && !st.isEnded) return;
+            
             if (currentData[`actual_${m.id}`] !== info.score) {
                 currentData[`actual_${m.id}`] = info.score;
                 db.ref(`league_data/predictions/actual_${m.id}`).set(info.score);
@@ -578,12 +606,17 @@
        MATCH STATUS / COUNTDOWN
        ============================================================ */
     function getMatchStatus(match) {
+        const info = apiScoreForMatch(match);
+        if (autoScoreEnabled && info && isEventEnded(info.event)) {
+            return { text: "✓ הסתיים", isLive: false, isEnded: true };
+        }
         const timeStr = currentData[`time_${match.id}`] !== undefined ? currentData[`time_${match.id}`] : (match.time || "22:00");
         const dateStr = currentData[`date_${match.id}`] !== undefined ? currentData[`date_${match.id}`] : match.date;
         if (!dateStr || !timeStr) return { text: "שעה לא קיימת", isLive: false, isEnded: false };
         const matchTime = new Date(`${dateStr}T${timeStr}`).getTime();
         const now = new Date().getTime();
         const diff = matchTime - now;
+        if (autoScoreEnabled && info && isEventLive(info.event)) return { text: "⚽ המשחק משוחק כעת!", isLive: true, isEnded: false };
         if (diff <= 0 && diff > -7200000) return { text: "⚽ המשחק משוחק כעת!", isLive: true, isEnded: false };
         if (diff <= -7200000) return { text: "✓ הסתיים", isLive: false, isEnded: true };
         const days = Math.floor(diff / 86400000);
@@ -613,7 +646,7 @@
         if (!autoScoreEnabled) return { key: "manual", label: "עדכון ידני", cls: "api-manual" };
         if (!lastFetchOk) return { key: "down", label: "API לא זמין", cls: "api-down" };
         if (info && isEventLive(info.event)) return { key: "live", label: "LIVE פעיל", cls: "api-live" };
-        if (info && st.isEnded) return { key: "live", label: "תוצאה מ-API", cls: "api-live" };
+        if (info && (st.isEnded || isEventEnded(info.event))) return { key: "live", label: "תוצאה מ-API", cls: "api-live" };
         return { key: "searching", label: "מחפש שידור…", cls: "api-searching" };
     }
     function getMatchSourceNote(match) {
@@ -641,7 +674,6 @@
     function updateLiveMatchWidget() {
         const widget = document.getElementById("liveMatchWidget");
         if (!widget) return;
-        // Show ALL live Real Madrid events from the API directly (even if not in user's match list)
         const liveEvents = apiEvents.filter(isEventLive);
         if (!liveEvents.length) { widget.style.display = "none"; widget.innerHTML = ""; return; }
         widget.style.display = "flex";
@@ -652,7 +684,6 @@
             const prevScore = previousLiveScores[ev.idEvent];
             const scoreChanged = prevScore && prevScore !== scoreKey;
             previousLiveScores[ev.idEvent] = scoreKey;
-            // show Real Madrid first
             const homeIsReal = canonicalTeam(ev.strHomeTeam) === "real madrid";
             const realName = homeIsReal ? ev.strHomeTeam : ev.strAwayTeam;
             const oppName = homeIsReal ? ev.strAwayTeam : ev.strHomeTeam;
@@ -660,7 +691,6 @@
             const oppScore = homeIsReal ? awayScore : homeScore;
             const realBadge = homeIsReal ? ev.strHomeTeamBadge : ev.strAwayTeamBadge;
             const oppBadge = homeIsReal ? ev.strAwayTeamBadge : ev.strHomeTeamBadge;
-            // minute from status
             const st = (ev.strStatus || "").toUpperCase();
             let minute = "—";
             if (st === "HT") minute = "מחצית";
@@ -1047,7 +1077,6 @@
        ============================================================ */
     fetchLiveScores();
     scheduleNextFetch();
-    // expose test helper
     window.testApi = async function() {
         console.log("=== TEST: TheSportsDB eventsnext for Real Madrid ===");
         try {
