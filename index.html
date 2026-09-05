@@ -154,12 +154,12 @@
         table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; text-align: center; font-size: 0.9rem; }
         th { background-color: var(--th-bg); color: var(--gold-bright); padding: 14px 6px; font-weight: 700; border-bottom: 2px solid var(--gold-accent); border-left: 1px solid var(--border-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: sticky; top: 0; z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
         th.player-th { background-color: var(--th-player); background-image: linear-gradient(180deg, var(--th-player), var(--th-bg)); }
-        td { padding: 12px 6px; border-bottom: 1px solid var(--border-color); border-left: 1px solid var(--border-color); overflow: hidden; text-overflow: ellipsis; }
+        td { padding: 5px 6px; border-bottom: 1px solid var(--border-color); border-left: 1px solid var(--border-color); overflow: hidden; text-overflow: ellipsis; }
         tr:nth-child(even) td { background-color: var(--tr-even); }
         tr:hover td { background-color: rgba(212, 163, 46, 0.06); }
         td.match-name { text-align: right; font-weight: 700; padding-right: 12px; padding-left: 12px; }
         td.match-date-cell { color: var(--text-muted); font-size: 0.8rem; text-align: center; font-family: var(--font-mono); }
-        td.countdown-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; overflow: visible; padding: 30px 15px; }
+        td.countdown-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; overflow: visible; padding: 24px 8px; }
         td.countdown-cell .countdown-badge { width: 100%; justify-content: center; box-sizing: border-box; padding: 10px 10px; font-size: 0.82rem; }
         td.countdown-cell .api-pill { padding: 7px 12px; font-size: 0.74rem; }
         tr.clasico td { background-color: var(--clasico-bg) !important; }
@@ -336,7 +336,7 @@
     const REAL_MADRID_ID = "133738";
     const TSDB_NEXT_URL = `https://www.thesportsdb.com/api/v1/json/${TSDB_KEY}/eventsnext.php?id=${REAL_MADRID_ID}`;
     const TSDB_LAST_URL = `https://www.thesportsdb.com/api/v1/json/${TSDB_KEY}/eventslast.php?id=${REAL_MADRID_ID}`;
-    let apiEvents = [];           // raw events from API
+    let apiEvents = [];           // merged events from API (upcoming + live + recent results)
     let autoScoreEnabled = localStorage.getItem("autoScore") !== "off";
     let lastAutoFetchLabel = "";
     const LIVE_REFRESH_MS = 15000;   // 15s during live matches
@@ -346,21 +346,161 @@
 
     /* ---- Team name canonicalization (API ↔ user match names) ---- */
     const TEAM_ALIASES = {
-        "real madrid": ["ריאל", "ריאל מדריד"], "barcelona": ["ברצלונה", "ברצה"],
-        "atletico madrid": ["אתלטיקו", "אתלטיקו מדריד"], "athletic bilbao": ["בילבאו", "אתלטיק בילבאו"],
-        "real sociedad": ["סוסיאדד", "ריאל סוסיאדד"], "real betis": ["בטיס", "ריאל בטיס"],
-        "sevilla": ["סביליה"], "valencia": ["ולנסיה"], "villarreal": ["ויאריאל"],
-        "getafe": ["חטאפה"], "osasuna": ["אוססונה"], "girona": ["חירונה"],
-        "rayo vallecano": ["ראיו", "ראיו ויאקנו"], "celta vigo": ["סלטה", "סלטה ויגו"],
-        "mallorca": ["מיורקה"], "alaves": ["אלאבס"], "espanyol": ["אספניול"],
-        "levante": ["לבנטה"], "elche": ["אלצ'ה"], "real oviedo": ["אוביידו", "ריאל אוביידו"],
-        "liverpool": ["ליברפול"], "arsenal": ["ארסנל"],
-        "manchester city": ["מנצ'סטר סיטי", "מן סיטי"], "manchester united": ["מנצ'סטר יונייטד"],
-        "chelsea": ["צ'לסי"], "tottenham": ["טוטנהאם"],
-        "bayern munich": ["בייארן", "באיירן", "בייארן מינכן"], "borussia dortmund": ["דורטמונד"],
-        "juventus": ["יובנטוס"], "inter": ["אינטר"], "ac milan": ["מילאן"], "napoli": ["נאפולי"],
-        "paris sg": ["פריז", "פ.ס.ז'", "פ.ס.ז", "פריז סן ז'רמן"],
-        "benfica": ["בנפיקה"], "porto": ["פורטו"], "ajax": ["איאקס"]
+        // === La Liga 2026/27 (all teams) ===
+        "real madrid": ["ריאל", "ריאל מדריד", "ריאל מדריד (h)", "ריאל מדריד (a)"],
+        "barcelona": ["ברצלונה", "ברצה", "בארסה", "בארסה"],
+        "atletico madrid": ["אתלטיקו", "אתלטיקו מדריד", "אתלטיקה"],
+        "athletic bilbao": ["בילבאו", "אתלטיק בילבאו", "אתלטיק בילבאו"],
+        "real sociedad": ["סוסיאדד", "ריאל סוסיאדד"],
+        "real betis": ["בטיס", "ריאל בטיס"],
+        "sevilla": ["סביליה"],
+        "valencia": ["ולנסיה", "ואלנסיה"],
+        "villarreal": ["ויאריאל", "ויאריאל"],
+        "getafe": ["חטאפה", "גטאפה", "חטפה"],
+        "osasuna": ["אוססונה"],
+        "girona": ["חירונה", "ג'ירונה", "ז'ירונה"],
+        "rayo vallecano": ["ראיו", "ראיו ויאקנו", "ראיו ולקאנו"],
+        "celta vigo": ["סלטה", "סלטה ויגו", "סלטה ויגו"],
+        "mallorca": ["מיורקה", "מאיורקה"],
+        "alaves": ["אלאבס", "אלבס", "דפורטיבו אלאבס"],
+        "espanyol": ["אספניול", "אספניול", "ספרדי"],
+        "levante": ["לבנטה", "לבאנטה"],
+        "elche": ["אלצ'ה", "אלצ'ה", "אלצ'ה"],
+        "real oviedo": ["אוביידו", "ריאל אוביידו"],
+        "malaga": ["מאלגה", "מלאגה", "מלגה"],
+        "las palmas": ["לאס פאלמס", "לאס פלמס", "פאלמס"],
+        "cadiz": ["קדיס", "קאדיס", "קדיז"],
+        "granada": ["גרנדה", "גרנאדה", "גרנדה"],
+        "almeria": ["אלמריה", "אלמריה"],
+        "leganes": ["לגאנס", "לגאנייס", "לגאנס"],
+        "valladolid": ["ואיאדוליד", "ואלאדוליד", "ואיאדוליד"],
+        "huesca": ["ואסקה", "הואסקה"],
+        "eibar": ["אייבר", "איבר"],
+        "numancia": ["נומנסיה"],
+        "tenerife": ["טנריפה", "טנריפה"],
+        "deportivo": ["דפורטיבו", "דפורטיבו לה קורוניה"],
+        // === Premier League ===
+        "liverpool": ["ליברפול"],
+        "arsenal": ["ארסנל"],
+        "manchester city": ["מנצ'סטר סיטי", "מן סיטי", "מאנצ'סטר סיטי", "סיטי"],
+        "manchester united": ["מנצ'סטר יונייטד", "מאנצ'סטר יונייטד", "יונייטד", "מנצ'סטר"],
+        "chelsea": ["צ'לסי", "צ'לסי"],
+        "tottenham": ["טוטנהאם", "טוטנהם", "ספרס"],
+        "newcastle": ["ניוקאסל", "ניוקאסל יונייטד"],
+        "aston villa": ["אסטון וילה", "אסטון וילה"],
+        "brighton": ["ברייטון"],
+        "west ham": ["וסט האם", "וסטהאם"],
+        "everton": ["אברטון"],
+        "leicester": ["לסטר", "לסטר סיטי"],
+        "wolves": ["וולבס", "וולברהמפטון"],
+        "crystal palace": ["קריסטל פאלאס", "קריסטל פאלאס"],
+        "brentford": ["ברנטפורד"],
+        "fulham": ["פולהאם", "פולהאם"],
+        "nottingham forest": ["נוטינגהאם", "נוטינגהם פורסט", "פורסט"],
+        "bournemouth": ["בורנמות'", "בורנמות", "בורנמות'"],
+        "burnley": ["ברנלי"],
+        "luton": ["לוטון", "לוטון טאון"],
+        "sheffield united": ["שפילד", "שפילד יונייטד"],
+        "leeds": ["לידס", "לידס יונייטד"],
+        "southampton": ["סאות'המפטון", "סאותהמפטון"],
+        "ipswich": ["איפסוויץ'", "איפסוויץ"],
+        // === Bundesliga ===
+        "bayern munich": ["בייארן", "באיירן", "בייארן מינכן", "באיירן מינכן"],
+        "borussia dortmund": ["דורטמונד", "בורוסיה דורטמונד", "בורוסיה"],
+        "rb leipzig": ["לייפציג", "ר.ב. לייפציג", "רב לייפציג"],
+        "bayer leverkusen": ["לברקוזן", "באייר לברקוזן"],
+        "eintracht frankfurt": ["פרנקפורט", "איינטרכט פרנקפורט"],
+        "vfb stuttgart": ["שטוטגרט", "שטוטגארט"],
+        "wolfsburg": ["וולפסבורג"],
+        "borussia monchengladbach": ["מנשנגלדבך", "גלדבך", "מנשנגלאדבך"],
+        "werder bremen": ["ברמן", "ורדר ברמן"],
+        "hoffenheim": ["הופנהיים", "הופנהיים"],
+        "union berlin": ["אוניון ברלין"],
+        "freiburg": ["פרייבורג"],
+        "mainz": ["מיינץ"],
+        "augsburg": ["אאוגסבורג", "אוגסבורג"],
+        "bochum": ["בוכום"],
+        "darmstadt": ["דארמשטאדט"],
+        // === Serie A ===
+        "juventus": ["יובנטוס", "יובה"],
+        "inter": ["אינטר", "אינטר מילאנו", "אינטרנציונלה"],
+        "ac milan": ["מילאן", "מילאן", "מילאן"],
+        "napoli": ["נאפולי", "נאפולי"],
+        "roma": ["רומא", "רומא"],
+        "lazio": ["לאציו", "לאציו"],
+        "atalanta": ["אטאלנטה"],
+        "fiorentina": ["פיורנטינה"],
+        "bologna": ["בולוניה"],
+        "torino": ["טורינו", "טורינו"],
+        "udinese": ["אודינזה", "אודינזה"],
+        "sassuolo": ["ססואולו", "סאסואולו"],
+        "monza": ["מונצה", "מונזה"],
+        "genoa": ["ג'נובה", "גנואה"],
+        "lecce": ["לצ'ה", "לצ'ה"],
+        "salernitana": ["סלרניטנה"],
+        "cagliari": ["קליארי"],
+        "hellas verona": ["ורונה", "הלאס ורונה"],
+        "empoli": ["אמפולי"],
+        "frosinone": ["פרוזינונה"],
+        "cremonese": ["קרמונזה"],
+        "como": ["קומו"],
+        "parma": ["פארמה"],
+        "venezia": ["ונציה", "ונציה"],
+        // === Ligue 1 ===
+        "paris sg": ["פריז", "פ.ס.ז'", "פ.ס.ז", "פריז סן ז'רמן", "פסז", "psg"],
+        "marseille": ["מרסיי", "מרסיי"],
+        "monaco": ["מונקו"],
+        "lyon": ["ליון"],
+        "lille": ["ליל"],
+        "nice": ["ניס"],
+        "rennes": ["רן", "רנס"],
+        "lens": ["לאנס"],
+        "nantes": ["נאנט"],
+        "strasbourg": ["סטרסבורג"],
+        "brest": ["ברסט"],
+        "toulouse": ["טולוז"],
+        "montpellier": ["מונפלייה"],
+        "reims": ["ריימס"],
+        "le havre": ["לה האבר"],
+        "metz": ["מץ"],
+        "lorient": ["לוריאן"],
+        "clermont": ["קלרמון"],
+        "angers": ["אנז'ה"],
+        "auxerre": ["אוסר"],
+        "troyes": ["טרואה"],
+        "brest": ["ברסט"],
+        // === Primeira Liga / Portugal ===
+        "benfica": ["בנפיקה"],
+        "porto": ["פורטו"],
+        "sporting cp": ["ספורטינג", "ספורטינג ליסבון", "ספורטינג"],
+        "braga": ["בראגה"],
+        // === Eredivisie ===
+        "ajax": ["איאקס"],
+        "psv": ["פ.ס.ו", "פסו", "איינדהובן"],
+        "feyenoord": ["פיינורד", "פיינורד"],
+        "az alkmaar": ["אלקמאר", "א.ז. אלקמאר"],
+        "twente": ["טוונטה"],
+        // === Other European ===
+        "celtic": ["סלטיק"],
+        "rangers": ["ריינג'רס", "ריינג'רס"],
+        "shakhtar donetsk": ["שחטאר", "שחטאר דונצק"],
+        "dinamo zagreb": ["דינמו זאגרב"],
+        "red star belgrade": ["כוכב אדום", "כוכב אדום בלגרד"],
+        "young boys": ["יאנג בויז", "יאנג בויז"],
+        "salzburg": ["זלצבורג", "רד בול זלצבורג"],
+        "atletico madrid": ["אתלטיקו מדריד"],
+        // === Champions League / Europa regulars (extras) ===
+        "galatasaray": ["גלאטסראיי", "גלטסראיי"],
+        "fenerbahce": ["פנרבחצ'ה", "פנרבחצ'ה"],
+        "besiktas": ["בשיקטאש", "בשיקטאש"],
+        "olympiacos": ["אולימפיאקוס"],
+        "panathinaikos": ["פנאתינאיקוס"],
+        "fc copenhagen": ["קופנהגן"],
+        "fc basel": ["בזל"],
+        // === Saudi / Other (in case) ===
+        "al nassr": ["אל נאסר", "אל-נאסר"],
+        "al hilal": ["אל הילאל", "אל-הילאל"],
+        "al ittihad": ["אל איתיחאד", "אל-איתיחאד"]
     };
     function normTeam(str) {
         return String(str || "").toLowerCase().replace(/\b(fc|cf|sc|ud|cd|club|de|the)\b/g, " ").replace(/[^a-z\u0590-\u05ff ]/g, " ").replace(/\s+/g, " ").trim();
@@ -403,38 +543,52 @@
         return { score, minute, status: ev.strStatus || "", event: ev };
     }
 
-    /* ---- Fetch live, upcoming and recently finished from TheSportsDB ---- */
+    /* ---- Auto date/time from API event (converted to Israel time) ---- */
+    function getAutoDateTime(m) {
+        const ev = findApiEvent(m);
+        if (!ev || !ev.dateEvent || !ev.strTime) return null;
+        const d = new Date(`${ev.dateEvent}T${ev.strTime}Z`);
+        if (isNaN(d.getTime())) return null;
+        return {
+            date: d.toLocaleDateString("en-CA", { timeZone: "Asia/Jerusalem" }),
+            time: d.toLocaleTimeString("en-GB", { timeZone: "Asia/Jerusalem", hour: "2-digit", minute: "2-digit" })
+        };
+    }
+    function autoDateHTML(m, savedDate) {
+        const auto = getAutoDateTime(m);
+        if (auto) return `<div style="padding:8px 4px;border:1px solid var(--gold-accent);border-radius:10px;text-align:center;font-family:var(--font-mono);font-size:0.82rem;background:var(--actual-bg);color:var(--gold-bright);white-space:nowrap;">🤖 ${formatDateDisplay(auto.date)}</div>`;
+        return dateSelectsHTML('date_' + m.id, savedDate);
+    }
+    function autoTimeHTML(m, savedTime) {
+        const auto = getAutoDateTime(m);
+        if (auto) return `<div style="padding:8px;border:1px solid var(--gold-accent);border-radius:8px;text-align:center;font-family:var(--font-mono);font-size:0.85rem;background:var(--actual-bg);color:var(--gold-bright);white-space:nowrap;">🤖 ${auto.time}</div>`;
+        return `<input type="text" class="time-text-in" value="${savedTime}" placeholder="22:00" onchange="onInputSave('time_${m.id}', this.value)">`;
+    }
+
+    /* ---- Fetch live + upcoming from TheSportsDB ---- */
     async function fetchLiveScores() {
         if (!autoScoreEnabled) return;
         try {
-            const [resNext, resLast] = await Promise.all([
-                fetch(TSDB_NEXT_URL, { cache: "no-store" }),
-                fetch(TSDB_LAST_URL, { cache: "no-store" })
+            // Fetch both upcoming/live events AND recent finished results, then merge (dedupe by idEvent)
+            const [nextRes, lastRes] = await Promise.all([
+                fetch(TSDB_NEXT_URL, { cache: "no-store" }).then(r => r.json()).catch(() => ({ events: [] })),
+                fetch(TSDB_LAST_URL, { cache: "no-store" }).then(r => r.json()).catch(() => ({ results: [] }))
             ]);
-            
-            let combinedEvents = [];
-            if (resNext.ok) {
-                const jsonNext = await resNext.json();
-                if (jsonNext && jsonNext.events) combinedEvents = combinedEvents.concat(jsonNext.events);
-            }
-            if (resLast.ok) {
-                const jsonLast = await resLast.json();
-                if (jsonLast && jsonLast.results) combinedEvents = combinedEvents.concat(jsonLast.results);
-            }
-
-            apiEvents = combinedEvents.filter(e => e && e.strHomeTeam && e.strAwayTeam);
-            // Deduplicate by idEvent
-            const seenIds = new Set();
-            apiEvents = apiEvents.filter(e => {
-                if (!e.idEvent) return true;
-                if (seenIds.has(e.idEvent)) return false;
-                seenIds.add(e.idEvent);
-                return true;
+            const nextEvents = (nextRes && nextRes.events) || [];
+            const lastEvents = (lastRes && lastRes.results) || [];
+            // merge: upcoming/live first, then finished (dedupe by idEvent)
+            const merged = [];
+            const seen = new Set();
+            [...nextEvents, ...lastEvents].forEach(e => {
+                if (!e || !e.strHomeTeam || !e.strAwayTeam) return;
+                const key = e.idEvent || `${e.strHomeTeam}_${e.strAwayTeam}_${e.dateEvent}`;
+                if (seen.has(key)) return;
+                seen.add(key); merged.push(e);
             });
-
+            apiEvents = merged;
             consecutiveFailures = 0; lastFetchOk = true; lastFetchTime = new Date();
             lastAutoFetchLabel = lastFetchTime.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-            console.log(`[TSDB] OK — ${apiEvents.length} events. Live:`, apiEvents.filter(e => isEventLive(e)).map(e => `${e.strHomeTeam} ${e.intHomeScore}-${e.intAwayScore} ${e.strAwayTeam} (${e.strStatus})`));
+            console.log(`[TSDB] OK — ${apiEvents.length} events (next:${nextEvents.length} last:${lastEvents.length}). Live:`, apiEvents.filter(e => isEventLive(e)).map(e => `${e.strHomeTeam} ${e.intHomeScore}-${e.intAwayScore} ${e.strAwayTeam} (${e.strStatus})`));
             applyAutoScores();
             updateLiveMatchWidget();
             renderStatusIndicators();
@@ -448,7 +602,7 @@
         const st = (ev.strStatus || "").toUpperCase();
         return st && st !== "FT" && st !== "MATCH FINISHED" && st !== "FINISHED" && st !== "NS" && st !== "POSTPONED" && st !== "NOT STARTED";
     }
-    function isEventEnded(ev) {
+    function isEventFinished(ev) {
         const st = (ev.strStatus || "").toUpperCase();
         return st === "FT" || st === "MATCH FINISHED" || st === "FINISHED";
     }
@@ -486,7 +640,7 @@
         } catch (e) {}
     }
 
-    /* ---- Apply API scores to user matches that are live or ended ---- */
+    /* ---- Apply API scores to user matches that are live ---- */
     function applyAutoScores() {
         if (!autoScoreEnabled) return;
         let changed = false;
@@ -495,12 +649,23 @@
             const info = apiScoreForMatch(m);
             if (!info) return;
             const evLive = isEventLive(info.event);
-            const evEnded = isEventEnded(info.event);
-            const st = getMatchStatus(m);
-            
-            // עדכון תוצאה בשידור חי או מיד כשהמשחק מסתיים ב-API או לפי סטטוס המשחק
-            if (!evLive && !evEnded && info.status === "" && !st.isEnded) return;
-            
+            const evFinished = isEventFinished(info.event);
+            // auto-fill date + time from API for ANY matched event (upcoming, live, finished)
+            const autoDT = getAutoDateTime(m);
+            if (autoDT) {
+                if (currentData[`date_${m.id}`] !== autoDT.date) {
+                    currentData[`date_${m.id}`] = autoDT.date;
+                    db.ref(`league_data/predictions/date_${m.id}`).set(autoDT.date);
+                    changed = true;
+                }
+                if (currentData[`time_${m.id}`] !== autoDT.time) {
+                    currentData[`time_${m.id}`] = autoDT.time;
+                    db.ref(`league_data/predictions/time_${m.id}`).set(autoDT.time);
+                    changed = true;
+                }
+            }
+            // auto-fill score only when the match is live or finished
+            if (!evLive && !evFinished) return;
             if (currentData[`actual_${m.id}`] !== info.score) {
                 currentData[`actual_${m.id}`] = info.score;
                 db.ref(`league_data/predictions/actual_${m.id}`).set(info.score);
@@ -508,7 +673,7 @@
                 changed = true;
             }
         });
-        if (changed) { syncAutoWinners(); renderUI(); }
+        if (changed) { sortMatches(); syncAutoWinners(); renderUI(); }
     }
 
     /* ============================================================
@@ -606,17 +771,12 @@
        MATCH STATUS / COUNTDOWN
        ============================================================ */
     function getMatchStatus(match) {
-        const info = apiScoreForMatch(match);
-        if (autoScoreEnabled && info && isEventEnded(info.event)) {
-            return { text: "✓ הסתיים", isLive: false, isEnded: true };
-        }
         const timeStr = currentData[`time_${match.id}`] !== undefined ? currentData[`time_${match.id}`] : (match.time || "22:00");
         const dateStr = currentData[`date_${match.id}`] !== undefined ? currentData[`date_${match.id}`] : match.date;
         if (!dateStr || !timeStr) return { text: "שעה לא קיימת", isLive: false, isEnded: false };
         const matchTime = new Date(`${dateStr}T${timeStr}`).getTime();
         const now = new Date().getTime();
         const diff = matchTime - now;
-        if (autoScoreEnabled && info && isEventLive(info.event)) return { text: "⚽ המשחק משוחק כעת!", isLive: true, isEnded: false };
         if (diff <= 0 && diff > -7200000) return { text: "⚽ המשחק משוחק כעת!", isLive: true, isEnded: false };
         if (diff <= -7200000) return { text: "✓ הסתיים", isLive: false, isEnded: true };
         const days = Math.floor(diff / 86400000);
@@ -646,7 +806,7 @@
         if (!autoScoreEnabled) return { key: "manual", label: "עדכון ידני", cls: "api-manual" };
         if (!lastFetchOk) return { key: "down", label: "API לא זמין", cls: "api-down" };
         if (info && isEventLive(info.event)) return { key: "live", label: "LIVE פעיל", cls: "api-live" };
-        if (info && (st.isEnded || isEventEnded(info.event))) return { key: "live", label: "תוצאה מ-API", cls: "api-live" };
+        if (info && st.isEnded) return { key: "live", label: "תוצאה מ-API", cls: "api-live" };
         return { key: "searching", label: "מחפש שידור…", cls: "api-searching" };
     }
     function getMatchSourceNote(match) {
@@ -674,6 +834,7 @@
     function updateLiveMatchWidget() {
         const widget = document.getElementById("liveMatchWidget");
         if (!widget) return;
+        // Show ALL live Real Madrid events from the API directly (even if not in user's match list)
         const liveEvents = apiEvents.filter(isEventLive);
         if (!liveEvents.length) { widget.style.display = "none"; widget.innerHTML = ""; return; }
         widget.style.display = "flex";
@@ -684,6 +845,7 @@
             const prevScore = previousLiveScores[ev.idEvent];
             const scoreChanged = prevScore && prevScore !== scoreKey;
             previousLiveScores[ev.idEvent] = scoreKey;
+            // show Real Madrid first
             const homeIsReal = canonicalTeam(ev.strHomeTeam) === "real madrid";
             const realName = homeIsReal ? ev.strHomeTeam : ev.strAwayTeam;
             const oppName = homeIsReal ? ev.strAwayTeam : ev.strHomeTeam;
@@ -691,6 +853,7 @@
             const oppScore = homeIsReal ? awayScore : homeScore;
             const realBadge = homeIsReal ? ev.strHomeTeamBadge : ev.strAwayTeamBadge;
             const oppBadge = homeIsReal ? ev.strAwayTeamBadge : ev.strHomeTeamBadge;
+            // minute from status
             const st = (ev.strStatus || "").toUpperCase();
             let minute = "—";
             if (st === "HT") minute = "מחצית";
@@ -987,11 +1150,11 @@
                         </div>
                         <div style="flex: 1; min-width: 110px;">
                             <span style="font-weight: 700; font-size: 0.8rem; display: block; color: var(--text-muted); margin-bottom: 4px;">תאריך:</span>
-                            ${dateSelectsHTML('date_' + m.id, savedDate)}
+                            ${autoDateHTML(m, savedDate)}
                         </div>
                         <div>
                             <span style="font-weight: 700; font-size: 0.8rem; display: block; color: var(--text-muted); margin-bottom: 4px;">שעה (24h):</span>
-                            <input type="text" class="time-text-in" value="${savedTime}" placeholder="22:00" onchange="onInputSave('time_${m.id}', this.value)">
+                            ${autoTimeHTML(m, savedTime)}
                         </div>
                         <div>
                             <span style="font-weight: 700; font-size: 0.8rem; display: block; color: var(--text-muted); margin-bottom: 4px;">תוצאה:</span>
@@ -1010,9 +1173,9 @@
             <th style="text-align: right; padding-right: 12px; width: 19%;">משחק</th>
             <th style="width: 8%;">מסגרת</th>
             <th style="width: 11%;">בית/חוץ</th>
-            <th style="width: 19%;">תאריך</th>
-            <th style="width: 7%;">שעה</th>
-            <th style="width: 20%;">ספירה לאחור</th>
+            <th style="width: 22%;">תאריך</th>
+            <th style="width: 10%;">שעה</th>
+            <th style="width: 16%;">ספירה לאחור</th>
             <th style="width: 7%;">תוצאה</th>
             <th style="width: 17%;">מי צדק?</th>
             ${activePlayersList.map(p => `<th class="player-th" style="width: ${Math.max(6, 16 / activePlayersList.length)}%;">${p}</th>`).join("")}`;
@@ -1056,8 +1219,8 @@
                         <button type="button" class="venue-btn ${!isHome ? 'active-a' : ''}" onclick="setVenueType('${m.id}', 'חוץ')">A</button>
                     </div>
                 </td>
-                <td class="match-date-cell">${dateSelectsHTML('date_' + m.id, savedDate)}</td>
-                <td><input type="text" class="time-text-in" value="${savedTime}" placeholder="22:00" onchange="onInputSave('time_${m.id}', this.value)"></td>
+                <td class="match-date-cell">${autoDateHTML(m, savedDate)}</td>
+                <td>${autoTimeHTML(m, savedTime)}</td>
                 <td class="countdown-cell">
                     <span id="cd_table_${m.id}" class="${badgeClass}">${st.text}</span>
                     <span class="api-pill ${apiStatus.cls}" id="api_status_table_${m.id}">${apiStatus.label}</span>
@@ -1077,6 +1240,7 @@
        ============================================================ */
     fetchLiveScores();
     scheduleNextFetch();
+    // expose test helper
     window.testApi = async function() {
         console.log("=== TEST: TheSportsDB eventsnext for Real Madrid ===");
         try {
