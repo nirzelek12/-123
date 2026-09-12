@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -40,7 +41,8 @@
         html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
         body { 
             background-color: var(--bg-body); 
-            background-image: linear-gradient(rgba(5, 22, 19, 0.75), rgba(5, 22, 19, 0.85)), url('background.jpg');            background-size: cover; background-position: center; background-attachment: fixed;
+            background-image: linear-gradient(rgba(5, 22, 19, 0.75), rgba(5, 22, 19, 0.85)), url('background.jpg'); 
+            background-size: cover; background-position: center; background-attachment: fixed;
             color: var(--text-main); padding: 14px 6px; -webkit-tap-highlight-color: transparent; 
             min-height: 100vh; position: relative; overflow-x: hidden; text-rendering: optimizeSpeed;
         }
@@ -161,9 +163,9 @@
         tr:hover td:first-child { box-shadow: inset 3px 0 0 var(--gold-accent); }
         td.match-name { text-align: right; font-weight: 800; padding-right: 16px; padding-left: 16px; font-size: 0.95rem; color: var(--text-main); }
         td.match-date-cell { color: var(--text-muted); font-size: 0.8rem; text-align: center; font-family: var(--font-mono); }
-        td.countdown-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 63.5px; overflow: visible; padding: 14px 8px; }
+        td.countdown-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; overflow: visible; padding: 42px 8px; }
         td.countdown-cell .countdown-badge { width: 100%; justify-content: center; box-sizing: border-box; padding: 10px 10px; font-size: 0.82rem; }
-        td.countdown-cell .api-pill { padding: 7px 12px; font-size: 0.74rem; }
+        td.countdown-cell .api-pill { width: 100%; box-sizing: border-box; justify-content: center; padding: 7px 12px; font-size: 0.74rem; }
         tr.clasico td { background-color: var(--clasico-bg) !important; }
         tr.clasico td.match-name { color: var(--clasico-text); font-weight: 800; }
         .comp-badge { display: inline-block; padding: 5px 11px; border-radius: 9px; font-size: 0.72rem; font-weight: 800; white-space: nowrap; letter-spacing: 0.4px; background: #1a2420; border: 1px solid var(--gold-accent); color: var(--gold-bright); }
@@ -869,7 +871,8 @@
         if (!autoScoreEnabled) return { key: "manual", label: "עדכון ידני", cls: "api-manual" };
         if (!lastFetchOk) return { key: "down", label: "API לא זמין", cls: "api-down" };
         if (info && isEventLive(info.event)) return { key: "live", label: "LIVE פעיל", cls: "api-live" };
-        if (info && st.isEnded) return { key: "live", label: "תוצאה מ-API", cls: "api-live" };
+        if (info && st.isEnded) return { key: "live", label: "תוצאה מעודכנת", cls: "api-live" };
+        if (st.isEnded) return { key: "no-data", label: "תוצאה ידנית!", cls: "api-waiting" };
         return { key: "searching", label: "מחפש שידור…", cls: "api-searching" };
     }
     function getMatchSourceNote(match) {
