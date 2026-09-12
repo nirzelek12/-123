@@ -40,8 +40,7 @@
         html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
         body { 
             background-color: var(--bg-body); 
-            background-image: linear-gradient(rgba(5, 22, 19, 0.75), rgba(5, 22, 19, 0.85)), url('background.jpg');
-            background-size: cover; background-position: center; background-attachment: fixed;
+            background-image: linear-gradient(rgba(5, 22, 19, 0.75), rgba(5, 22, 19, 0.85)), url('background.jpg');            background-size: cover; background-position: center; background-attachment: fixed;
             color: var(--text-main); padding: 14px 6px; -webkit-tap-highlight-color: transparent; 
             min-height: 100vh; position: relative; overflow-x: hidden; text-rendering: optimizeSpeed;
         }
@@ -60,6 +59,7 @@
         .match-add-card .field { display: flex; flex-direction: column; gap: 6px; }
         .match-add-card .field label { font-size: 0.78rem; font-weight: 800; color: var(--gold-bright); letter-spacing: 0.3px; }
         .match-add-card .field input, .match-add-card .field select { width: 100%; padding: 11px 14px; border: 1px solid var(--border-color); border-radius: 11px; font-size: 0.95rem; outline: none; background-color: var(--input-bg); color: var(--text-main); text-align: right; }
+        .match-add-card .date-selects select { text-align: center; padding: 9px 26px 9px 10px; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23d4a32e' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat: no-repeat; background-position: left 8px center; }
         .match-add-card .field input:focus, .match-add-card .field select:focus { border-color: var(--gold-accent); box-shadow: 0 0 0 3px rgba(212, 163, 46, 0.18); }
         .match-add-card .action-submit-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--crest-blue), var(--crest-navy)); color: #ffffff; border: none; border-radius: 12px; font-weight: 800; font-size: 0.98rem; cursor: pointer; box-shadow: 0 6px 18px rgba(5, 22, 19, 0.4); transition: transform 0.2s, filter 0.2s; margin-top: 12px; }
         .match-add-card .action-submit-btn:hover { filter: brightness(1.08); transform: translateY(-2px); }
@@ -103,10 +103,11 @@
         .controls-section input::placeholder { color: var(--text-muted); opacity: 0.6; }
         .controls-section input:focus, .controls-section select:focus { border-color: var(--gold-accent); box-shadow: 0 0 0 3px rgba(212, 163, 46, 0.18); }
         input.time-text-in { direction: ltr; text-align: center; }
-        .date-selects { display: flex; gap: 6px; direction: rtl; width: 100%; }
-        .date-selects select { flex: 1; min-width: 0; padding: 8px 4px; border: 1px solid var(--border-color); border-radius: 10px; font-size: 0.82rem; font-weight: 600; background-color: var(--input-bg); color: var(--text-main); text-align: center; outline: none; cursor: pointer; }
-        .date-selects select:focus { border-color: var(--gold-accent); box-shadow: 0 0 0 3px rgba(212, 163, 46, 0.18); }
-        .table-wrapper .date-selects select { padding: 6px 2px; font-size: 0.75rem; border-radius: 8px; }
+        .date-selects { display: flex; gap: 8px; direction: rtl; width: 100%; }
+        .date-selects select { flex: 1; min-width: 0; padding: 9px 26px 9px 10px; border: 1px solid rgba(212, 163, 46, 0.4); border-radius: 9px; font-size: 0.86rem; font-weight: 700; background-color: #1a2420; color: var(--text-main); text-align: center; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23d4a32e' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat: no-repeat; background-position: left 8px center; transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s; }
+        .date-selects select:hover { border-color: var(--gold-bright); background-color: rgba(11, 45, 39, 0.6); }
+        .date-selects select:focus { border-color: var(--gold-bright); box-shadow: 0 0 0 2px rgba(212, 163, 46, 0.3); }
+        .table-wrapper .date-selects select { padding: 7px 22px 7px 8px; font-size: 0.78rem; border-radius: 9px; background-position: left 6px center; }
         .controls-section select option { background-color: var(--bg-card); color: var(--text-main); }
         .controls-section button.action-submit-btn { background: linear-gradient(135deg, var(--gold-accent), var(--gold-deep)); color: #051613; border: none; padding: 11px 18px; border-radius: 10px; font-weight: 800; cursor: pointer; width: 100%; font-size: 0.95rem; box-shadow: 0 6px 16px rgba(212, 163, 46, 0.35); transition: transform 0.2s, filter 0.2s; }
         .controls-section button.action-submit-btn:hover { filter: brightness(1.08); transform: translateY(-2px); }
@@ -124,16 +125,16 @@
         .player-card .score { background: linear-gradient(135deg, var(--crest-blue), var(--crest-navy)); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.74rem; font-weight: 800; border-bottom: 2px solid var(--gold-accent); font-family: var(--font-mono); }
         .remove-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1.1rem; line-height: 1; opacity: 0.5; transition: opacity 0.2s, transform 0.2s; }
         .remove-btn:hover { opacity: 1; transform: scale(1.2); }
-        .countdown-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(212, 163, 46, 0.1); color: var(--gold-bright); border: 1px solid rgba(212, 163, 46, 0.25); padding: 3px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; direction: ltr; white-space: nowrap; font-family: var(--font-mono); }
+        .countdown-badge { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg, rgba(212, 163, 46, 0.12), rgba(212, 163, 46, 0.06)); color: var(--gold-bright); border: 1px solid rgba(212, 163, 46, 0.3); padding: 6px 12px; border-radius: 10px; font-size: 0.76rem; font-weight: 800; direction: ltr; white-space: nowrap; font-family: var(--font-mono); box-shadow: inset 0 1px 0 rgba(212,163,46,0.1); }
         .countdown-badge.live { background: linear-gradient(135deg, #ef4444, #dc2626); color: #ffffff; border-color: #dc2626; animation: pulse 1.5s infinite; box-shadow: 0 0 16px rgba(239, 68, 68, 0.5); }
-        .countdown-badge.ended { background: rgba(100, 116, 139, 0.15); color: var(--text-muted); border-color: var(--border-color); }
+        .countdown-badge.ended { background: rgba(100, 116, 139, 0.12); color: var(--text-muted); border-color: var(--border-color); box-shadow: none; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.55; } 100% { opacity: 1; } }
-        .api-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 7px; font-size: 0.68rem; font-weight: 800; white-space: nowrap; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-muted); letter-spacing: 0.2px; }
-        .api-pill.api-live { background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff; border-color: #15803d; box-shadow: 0 0 10px rgba(22,163,74,0.45); animation: pulse 1.6s infinite; }
-        .api-pill.api-waiting { background: rgba(100,116,139,0.14); color: var(--text-muted); }
+        .api-pill { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 6px 12px; border-radius: 8px; font-size: 0.72rem; font-weight: 800; white-space: nowrap; border: 1px solid var(--border-color); background: #1a2420; color: var(--text-muted); letter-spacing: 0.2px; }
+        .api-pill.api-live { background: linear-gradient(135deg, #00c457, #00a854); color: #ffffff; border-color: #00a854; box-shadow: 0 2px 12px rgba(0,168,84,0.45); animation: pulse 1.6s infinite; }
+        .api-pill.api-waiting { background: #1a2420; color: var(--text-muted); border-color: var(--border-color); }
         .api-pill.api-down { background: linear-gradient(135deg, #ef4444, #dc2626); color: #ffffff; border-color: #dc2626; box-shadow: 0 0 10px rgba(239,68,68,0.4); }
         .api-pill.api-searching { background: rgba(245,158,11,0.16); color: #fbbf24; border-color: rgba(245,158,11,0.45); }
-        .api-pill.api-manual { background: rgba(22,78,66,0.2); color: var(--gold-bright); }
+        .api-pill.api-manual { background: rgba(22,78,66,0.2); color: var(--gold-bright); border-color: rgba(212,163,46,0.4); }
         .match-api-status { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
         .actual-source { font-size: 0.66rem; color: var(--text-muted); font-weight: 600; margin-top: 4px; display: flex; align-items: center; gap: 4px; direction: ltr; font-family: var(--font-mono); }
         .mobile-cards-container { display: flex; flex-direction: column; gap: 14px; will-change: transform; transform: translateZ(0); }
@@ -150,39 +151,39 @@
         .pred-box-mini { background: var(--bg-card); border: 1px solid var(--border-color); padding: 8px 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
         .pred-box-mini:focus-within { border-color: var(--gold-accent); box-shadow: 0 0 0 2px rgba(212, 163, 46, 0.2); }
         .pred-box-mini span { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); }
-        .table-wrapper { display: none; width: 100%; border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--shadow-soft); overflow-x: visible; background: var(--bg-card); will-change: transform; transform: translateZ(0); }
-        table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; text-align: center; font-size: 0.9rem; }
-        th { background-color: var(--th-bg); color: var(--gold-bright); padding: 14px 6px; font-weight: 700; border-bottom: 2px solid var(--gold-accent); border-left: 1px solid var(--border-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: sticky; top: 0; z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
-        th.player-th { background-color: var(--th-player); background-image: linear-gradient(180deg, var(--th-player), var(--th-bg)); }
-        td { padding: 5px 6px; border-bottom: 1px solid var(--border-color); border-left: 1px solid var(--border-color); overflow: hidden; text-overflow: ellipsis; }
-        tr:nth-child(even) td { background-color: var(--tr-even); }
-        tr:hover td { background-color: rgba(212, 163, 46, 0.06); }
-        td.match-name { text-align: right; font-weight: 700; padding-right: 12px; padding-left: 12px; }
+        .table-wrapper { display: none; width: 100%; border: 1px solid rgba(212, 163, 46, 0.25); border-radius: 18px; box-shadow: var(--shadow-card), inset 0 1px 0 rgba(212, 163, 46, 0.08); overflow-x: visible; background: linear-gradient(180deg, var(--bg-card) 0%, rgba(5, 22, 19, 0.92) 100%); will-change: transform; transform: translateZ(0); }
+        table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; text-align: center; font-size: 0.88rem; }
+        th { background: linear-gradient(180deg, #041511 0%, var(--th-bg) 100%); color: var(--gold-bright); padding: 16px 8px; font-weight: 800; border-bottom: 2px solid var(--gold-accent); border-left: 1px solid rgba(18, 56, 48, 0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: sticky; top: 0; z-index: 2; text-shadow: 0 1px 3px rgba(0,0,0,0.6); letter-spacing: 0.3px; font-size: 0.82rem; }
+        th.player-th { background: linear-gradient(180deg, #072420 0%, var(--th-player) 100%); color: var(--gold-accent); border-bottom-color: var(--gold-deep); }
+        td { padding: 12px 8px; border-bottom: 1px solid rgba(18, 56, 48, 0.5); border-left: 1px solid rgba(18, 56, 48, 0.35); overflow: hidden; text-overflow: ellipsis; vertical-align: middle; transition: background-color 0.2s; }
+        tr:nth-child(even) td { background-color: rgba(7, 28, 25, 0.5); }
+        tr:hover td { background-color: rgba(212, 163, 46, 0.08); }
+        tr:hover td:first-child { box-shadow: inset 3px 0 0 var(--gold-accent); }
+        td.match-name { text-align: right; font-weight: 800; padding-right: 16px; padding-left: 16px; font-size: 0.95rem; color: var(--text-main); }
         td.match-date-cell { color: var(--text-muted); font-size: 0.8rem; text-align: center; font-family: var(--font-mono); }
-        td.countdown-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; overflow: visible; padding: 24px 8px; }
+        td.countdown-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 63.5px; overflow: visible; padding: 14px 8px; }
         td.countdown-cell .countdown-badge { width: 100%; justify-content: center; box-sizing: border-box; padding: 10px 10px; font-size: 0.82rem; }
         td.countdown-cell .api-pill { padding: 7px 12px; font-size: 0.74rem; }
         tr.clasico td { background-color: var(--clasico-bg) !important; }
         tr.clasico td.match-name { color: var(--clasico-text); font-weight: 800; }
-        .comp-badge { display: inline-block; padding: 4px 8px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; white-space: nowrap; letter-spacing: 0.3px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.1); }
-        .comp-la_liga { background-color: #0b2d27; color: #f3c65d; border: 1px solid #164e42; }
-        .comp-ucl { background: linear-gradient(135deg, #051613, #164e42); color: #ffffff; border: 1px solid var(--gold-accent); box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
-        .comp-copa { background: linear-gradient(135deg, #b91c1c, #7f1d1d); color: #ffffff; box-shadow: 0 2px 6px rgba(185,28,28,0.3); }
-        .comp-supercopa { background: linear-gradient(135deg, #b45309, #92400e); color: #ffffff; box-shadow: 0 2px 6px rgba(180,83,9,0.3); }
-        .comp-supercup_eu { background: linear-gradient(135deg, #0369a1, #075985); color: #ffffff; box-shadow: 0 2px 6px rgba(3,105,161,0.3); }
-        input.score-in { width: 44px; height: 36px; text-align: center; padding: 2px; border: 1px solid var(--border-color); border-radius: 8px; font-weight: 700; direction: ltr; background-color: var(--input-bg); color: var(--text-main); font-size: 0.9rem; margin: 0 auto; display: block; }
-        input.score-in:focus { border-color: var(--gold-accent); outline: none; box-shadow: 0 0 0 3px rgba(212, 163, 46, 0.2); }
-        input.score-in:disabled { background-color: rgba(100, 116, 139, 0.15); color: var(--text-muted); cursor: not-allowed; opacity: 0.7; }
-        input.actual-in { border-color: rgba(243, 198, 93, 0.5); background: linear-gradient(135deg, var(--actual-bg), var(--input-bg)); color: var(--actual-text); font-weight: 800; width: 58px; }
-        input.time-text-in { border-color: var(--border-color); background-color: var(--input-bg); color: var(--text-main); font-weight: 700; width: 68px; font-size: 0.85rem; height: 36px; text-align: center; border-radius: 8px; border: 1px solid var(--border-color); font-family: var(--font-mono); }
-        input.time-text-in:focus { border-color: var(--gold-accent); outline: none; box-shadow: 0 0 0 3px rgba(212, 163, 46, 0.2); }
-        .venue-toggle-group { display: inline-flex; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 2px; gap: 2px; height: 36px; align-items: center; justify-content: center; box-sizing: border-box; }
-        .venue-btn { background: transparent; border: none; color: var(--text-muted); font-weight: 800; font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; cursor: pointer; }
+        .comp-badge { display: inline-block; padding: 5px 11px; border-radius: 9px; font-size: 0.72rem; font-weight: 800; white-space: nowrap; letter-spacing: 0.4px; background: #1a2420; border: 1px solid var(--gold-accent); color: var(--gold-bright); }
+        .comp-ucl { color: #ffffff; border-color: var(--gold-accent); }
+        .comp-copa { color: #ff8fa8; border-color: rgba(239,68,68,0.5); }
+        .comp-supercopa { color: #fbbf24; border-color: rgba(180,83,9,0.5); }
+        .comp-supercup_eu { color: #7dd3fc; border-color: rgba(3,105,161,0.5); }
+        input.score-in { width: 48px; height: 38px; text-align: center; padding: 2px; border: 1px solid rgba(212, 163, 46, 0.4); border-radius: 9px; font-weight: 800; direction: ltr; background-color: #1a2420; color: var(--text-main); font-size: 0.92rem; margin: 0 auto; display: block; transition: border-color 0.2s, box-shadow 0.2s; }
+        input.score-in:focus { border-color: var(--gold-bright); outline: none; box-shadow: 0 0 0 2px rgba(212, 163, 46, 0.3); }
+        input.score-in:disabled { background-color: rgba(100, 116, 139, 0.15); color: var(--text-muted); cursor: not-allowed; opacity: 0.7; border-color: var(--border-color); }
+        input.actual-in { border: 1px solid var(--gold-accent); background: #1a2420; color: var(--gold-bright); font-weight: 800; width: 62px; }
+        input.time-text-in { background-color: #1a2420; color: var(--text-main); font-weight: 700; width: 72px; font-size: 0.85rem; height: 38px; text-align: center; border-radius: 9px; border: 1px solid rgba(212, 163, 46, 0.4); font-family: var(--font-mono); }
+        input.time-text-in:focus { border-color: var(--gold-bright); outline: none; box-shadow: 0 0 0 2px rgba(212, 163, 46, 0.3); }
+        .venue-toggle-group { display: inline-flex; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 3px; gap: 3px; height: 38px; align-items: center; justify-content: center; box-sizing: border-box; }
+        .venue-btn { background: transparent; border: 1px solid transparent; color: var(--text-muted); font-weight: 800; font-size: 0.76rem; padding: 5px 12px; border-radius: 7px; cursor: pointer; transition: color 0.2s, background 0.2s, box-shadow 0.2s, border-color 0.2s; }
         .venue-btn:hover { color: var(--text-main); }
-        .venue-btn.active-h { background: linear-gradient(135deg, var(--crest-blue), var(--crest-navy)); color: var(--gold-bright); box-shadow: 0 2px 6px rgba(5, 22, 19, 0.4); }
-        .venue-btn.active-a { background: linear-gradient(135deg, #b91c1c, #7f1d1d); color: #ffffff; box-shadow: 0 2px 6px rgba(185, 28, 28, 0.4); }
-        .winners-box { display: grid; grid-template-columns: repeat(3, minmax(35px, 1fr)); gap: 4px; justify-content: center; }
-        .winner-btn { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 7px; padding: 5px 3px; font-size: 0.72rem; cursor: pointer; color: var(--text-muted); font-weight: 600; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .venue-btn.active-h { background: linear-gradient(135deg, var(--crest-blue), var(--crest-navy)); color: var(--gold-bright); border-color: var(--gold-accent); box-shadow: 0 0 10px rgba(212,163,46,0.4), inset 0 1px 0 rgba(212,163,46,0.2); }
+        .venue-btn.active-a { background: linear-gradient(135deg, #b91c1c, #7f1d1d); color: #ffffff; border-color: rgba(239,68,68,0.6); box-shadow: 0 2px 8px rgba(185, 28, 28, 0.45), inset 0 1px 0 rgba(255,255,255,0.12); }
+        .winners-box { display: grid; grid-template-columns: repeat(3, minmax(38px, 1fr)); gap: 5px; justify-content: center; }
+        .winner-btn { background: #1a2420; border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 4px; font-size: 0.74rem; cursor: pointer; color: var(--text-muted); font-weight: 700; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: border-color 0.2s, color 0.2s, transform 0.15s; }
         .winner-btn:hover { border-color: var(--gold-accent); color: var(--text-main); transform: translateY(-1px); }
         .winner-btn.active { background: linear-gradient(135deg, var(--crest-blue), var(--crest-navy)); color: var(--gold-bright); border-color: var(--gold-accent); font-weight: 800; box-shadow: 0 4px 12px rgba(5, 22, 19, 0.4), var(--glow-gold); }
         .winner-btn:disabled { cursor: not-allowed; opacity: 0.5; filter: grayscale(0.5); }
@@ -325,6 +326,8 @@
     let activePlayersList = [], currentMatches = [], currentData = {};
     let hasScrolledToNext = false, targetNextMatchId = "", previousLiveScores = {};
     let currentFilter = "all";
+    let notifiedEndedMatches = new Set();
+    let endedNotifInitialized = false;
 
     /* ============================================================
        THE SPORTS DB — FREE API (Real Madrid team id = 133738)
@@ -556,12 +559,12 @@
     }
     function autoDateHTML(m, savedDate) {
         const auto = getAutoDateTime(m);
-        if (auto) return `<div style="padding:8px 4px;border:1px solid var(--gold-accent);border-radius:10px;text-align:center;font-family:var(--font-mono);font-size:0.82rem;background:var(--actual-bg);color:var(--gold-bright);white-space:nowrap;">🤖 ${formatDateDisplay(auto.date)}</div>`;
+        if (auto) return `<div style="padding:8px 4px;border:1px solid var(--gold-accent);border-radius:9px;text-align:center;font-family:var(--font-mono);font-size:0.82rem;background:#1a2420;color:var(--gold-bright);white-space:nowrap;">🤖 ${formatDateDisplay(auto.date)}</div>`;
         return dateSelectsHTML('date_' + m.id, savedDate);
     }
     function autoTimeHTML(m, savedTime) {
         const auto = getAutoDateTime(m);
-        if (auto) return `<div style="padding:8px;border:1px solid var(--gold-accent);border-radius:8px;text-align:center;font-family:var(--font-mono);font-size:0.85rem;background:var(--actual-bg);color:var(--gold-bright);white-space:nowrap;">🤖 ${auto.time}</div>`;
+        if (auto) return `<div style="padding:8px;border:1px solid var(--gold-accent);border-radius:9px;text-align:center;font-family:var(--font-mono);font-size:0.85rem;background:#1a2420;color:var(--gold-bright);white-space:nowrap;">🤖 ${auto.time}</div>`;
         return `<input type="text" class="time-text-in" value="${savedTime}" placeholder="22:00" onchange="onInputSave('time_${m.id}', this.value)">`;
     }
 
@@ -639,6 +642,29 @@
             n.onclick = () => { window.focus(); n.close(); };
         } catch (e) {}
     }
+    function notifyMatchEnded(match) {
+        if (!("Notification" in window) || Notification.permission !== "granted") return;
+        try {
+            const actual = currentData[`actual_${match.id}`] !== undefined ? currentData[`actual_${match.id}`] : "";
+            const body = actual ? `${match.match}  —  תוצאה: ${actual}` : `${match.match}  —  הסתיים המשחק`;
+            const n = new Notification("✓ המשחק הסתיים! עדכן נקודות וסגור ניחוש", {
+                body, tag: "ended_" + match.id,
+                icon: "https://images.unsplash.com/photo-1540747913346-25e1f3f3e3c5?w=128&q=80"
+            });
+            n.onclick = () => { window.focus(); n.close(); };
+        } catch (e) {}
+    }
+    function checkMatchEndedNotifications() {
+        currentMatches.forEach(m => {
+            if (!m) return;
+            const st = getMatchStatus(m);
+            if (st.isEnded && !notifiedEndedMatches.has(m.id)) {
+                if (endedNotifInitialized) notifyMatchEnded(m);
+                notifiedEndedMatches.add(m.id);
+            }
+        });
+        endedNotifInitialized = true;
+    }
 
     /* ---- Remove duplicate matches (same teams + same date, any order) ---- */
     function matchTeamPair(m) {
@@ -709,6 +735,7 @@
         });
         if (changed) { sortMatches(); syncAutoWinners(); renderUI(); }
         if (dedupeDuplicateMatches()) { sortMatches(); syncAutoWinners(); renderUI(); }
+        checkMatchEndedNotifications();
     }
 
     /* ============================================================
@@ -733,7 +760,7 @@
             return new Date(`${dateA}T${timeA}`) - new Date(`${dateB}T${timeB}`);
         });
     }
-    setInterval(() => { updateCountdowns(); updateHeaderCountdownWidget(); updateLiveMatchWidget(); }, 1000);
+    setInterval(() => { updateCountdowns(); updateHeaderCountdownWidget(); updateLiveMatchWidget(); checkMatchEndedNotifications(); }, 1000);
 
     /* ============================================================
        FILTERS / VENUE
@@ -1209,9 +1236,9 @@
             <th style="text-align: right; padding-right: 12px; width: 19%;">משחק</th>
             <th style="width: 8%;">מסגרת</th>
             <th style="width: 11%;">בית/חוץ</th>
-            <th style="width: 19%;">תאריך</th>
+            <th style="width: 27%;">תאריך</th>
             <th style="width: 10%;">שעה</th>
-            <th style="width: 16%;">ספירה לאחור</th>
+            <th style="width: 20%;">ספירה לאחור</th>
             <th style="width: 7%;">תוצאה</th>
             <th style="width: 17%;">מי צדק?</th>
             ${activePlayersList.map(p => `<th class="player-th" style="width: ${Math.max(6, 16 / activePlayersList.length)}%;">${p}</th>`).join("")}`;
