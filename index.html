@@ -164,7 +164,7 @@
         td.match-date-cell { color: var(--text-muted); font-size: 0.8rem; text-align: center; font-family: var(--font-mono); }
         td.countdown-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; overflow: visible; padding: 50px 6px; }
         td.countdown-cell .countdown-badge { width: 100%; justify-content: center; box-sizing: border-box; padding: 14px 8px; font-size: 1rem; min-height: 48px; }
-        td.countdown-cell .api-pill { padding: 7px 50px; font-size: 0.74rem; }
+        td.countdown-cell .api-pill { padding: 7px 12px; font-size: 0.74rem; }
         tr.clasico td { background-color: var(--clasico-bg) !important; }
         tr.clasico td.match-name { color: var(--clasico-text); font-weight: 800; }
         .comp-badge { display: inline-block; padding: 5px 11px; border-radius: 9px; font-size: 0.72rem; font-weight: 800; white-space: nowrap; letter-spacing: 0.4px; background: #1a2420; border: 1px solid var(--gold-accent); color: var(--gold-bright); }
@@ -560,35 +560,94 @@
         if (isNaN(d.getTime())) return null;
         return d.toLocaleDateString("en-CA", { timeZone: "Asia/Jerusalem" });
     }
+    function hasScore(ev) {
+        if (!ev) return false;
+        const h = ev.intHomeScore, a = ev.intAwayScore;
+        return h !== null && h !== undefined && h !== "" && a !== null && a !== undefined && a !== "";
+    }
+    /* how far along an event is: finished > half time > live (by minute) > not started */
+    function eventRank(ev) {
+        if (!ev) return -1;
+        if (isEventFinished(ev)) return 3000;
+        const st = (ev.strStatus || "").toUpperCase();
+        const min = parseInt(ev.strProgress, 10) || 0;
+        if (st === "HT") return 2000;
+        if (isEventLive(ev)) return 1000 + min;
+        return min;
+    }
+    function daysBetween(dateA, dateB) {
+        if (!dateA || !dateB) return null;
+        return Math.abs(new Date(`${dateA}T00:00:00`) - new Date(`${dateB}T00:00:00`)) / 86400000;
+    }
+    /* pick the event closest to the match date, then the one furthest along */
+    function pickEvent(candidates, matchDate) {
+        if (!candidates || !candidates.length) return null;
+        const dated = candidates.filter(ev => eventToLocalDate(ev));
+        if (matchDate && dated.length) {
+            const diffs = dated.map(ev => daysBetween(eventToLocalDate(ev), matchDate));
+            const minDiff = Math.min.apply(null, diffs);
+            const closest = dated.filter((ev, i) => diffs[i] === minDiff);
+            return closest.sort((a, b) => eventRank(b) - eventRank(a))[0];
+        }
+        return [...candidates].sort((a, b) => eventRank(b) - eventRank(a))[0];
+    }
     function findApiEvent(match) {
         if (!apiEvents.length) return null;
+        const matchDate = currentData[`date_${match.id}`] !== undefined ? currentData[`date_${match.id}`] : match.date;
         const parts = String(match.match || "").split("-").map(t => canonicalTeam(t));
+        // 1) the same two teams, close in date (so an older meeting is never picked)
         if (parts.length >= 2 && parts[0] && parts[1]) {
-            const exact = apiEvents.find(ev => {
+            const byTeams = apiEvents.filter(ev => {
                 const h = canonicalTeam(ev.strHomeTeam), a = canonicalTeam(ev.strAwayTeam);
                 return (h === parts[0] && a === parts[1]) || (h === parts[1] && a === parts[0]);
             });
-            if (exact) return exact;
+            const near = byTeams.filter(ev => {
+                const d = daysBetween(eventToLocalDate(ev), matchDate);
+                return d === null || d <= 2;
+            });
+            let best = pickEvent(near, matchDate);
+            // only candidate for that pair and it is being played right now — the stored date is just off
+            if (!best && byTeams.length === 1 && isEventLive(byTeams[0])) best = byTeams[0];
+            if (best) return best;
         }
-        // Fallback: match by date (Real Madrid plays at most once per day)
-        const matchDate = currentData[`date_${match.id}`] !== undefined ? currentData[`date_${match.id}`] : match.date;
-        if (!matchDate) return null;
-        return apiEvents.find(ev => {
-            const evDate = eventToLocalDate(ev);
-            if (!evDate || evDate !== matchDate) return false;
-            const h = canonicalTeam(ev.strHomeTeam), a = canonicalTeam(ev.strAwayTeam);
-            return h === "real madrid" || a === "real madrid" || parts.includes(h) || parts.includes(a);
-        }) || null;
+        // 2) same day, Real Madrid involved (Real Madrid plays at most once per day)
+        if (matchDate) {
+            const sameDay = apiEvents.filter(ev => {
+                if (eventToLocalDate(ev) !== matchDate) return false;
+                const h = canonicalTeam(ev.strHomeTeam), a = canonicalTeam(ev.strAwayTeam);
+                return h === "real madrid" || a === "real madrid" || parts.includes(h) || parts.includes(a);
+            });
+            const best = pickEvent(sameDay, matchDate);
+            if (best) return best;
+        }
+        // 3) safety net: while a Real Madrid game is being played, the matching row must pick it up
+        const live = apiEvents.filter(ev => isEventLive(ev) && (canonicalTeam(ev.strHomeTeam) === "real madrid" || canonicalTeam(ev.strAwayTeam) === "real madrid"));
+        if (live.length) {
+            const ev = live[0];
+            const d = daysBetween(eventToLocalDate(ev), matchDate);
+            const st = getMatchStatus(match);
+            if ((d !== null && d <= 2) || st.isLive || st.isEnded) return ev;
+        }
+        return null;
+    }
+    /* ---- Score of an event, in the row's home-away order ("" when the API has no score yet) ---- */
+    function eventScoreForMatch(match, ev) {
+        if (!ev || !hasScore(ev)) return "";
+        const h = canonicalTeam(ev.strHomeTeam), a = canonicalTeam(ev.strAwayTeam);
+        const parts = String(match.match || "").split("-").map(t => canonicalTeam(t));
+        let flipped;
+        if (h === parts[0] && a === parts[1]) flipped = false;
+        else if (h === parts[1] && a === parts[0]) flipped = true;
+        else flipped = (h === "real madrid") !== (parts[0] === "real madrid");
+        const home = parseInt(ev.intHomeScore, 10) || 0;
+        const away = parseInt(ev.intAwayScore, 10) || 0;
+        return flipped ? `${away}-${home}` : `${home}-${away}`;
     }
     /* ---- Extract score + minute from API event ---- */
     function apiScoreForMatch(match) {
         const ev = findApiEvent(match);
         if (!ev) return null;
-        const parts = String(match.match || "").split("-").map(t => canonicalTeam(t));
-        const home = parseInt(ev.intHomeScore ?? "0", 10) || 0;
-        const away = parseInt(ev.intAwayScore ?? "0", 10) || 0;
-        const flipped = canonicalTeam(ev.strHomeTeam) !== parts[0];
-        const score = flipped ? `${away}-${home}` : `${home}-${away}`;
+        const score = eventScoreForMatch(match, ev);
         let minute = "";
         const st = (ev.strStatus || "").toUpperCase();
         if (st === "HT") minute = "מחצית";
@@ -625,20 +684,22 @@
         if (!autoScoreEnabled) return;
         try {
             // Fetch both upcoming/live events AND recent finished results, then merge (dedupe by idEvent)
+            const bust = `&_=${Date.now()}`;
             const [nextRes, lastRes] = await Promise.all([
-                fetch(TSDB_NEXT_URL, { cache: "no-store" }).then(r => r.json()).catch(() => ({ events: [] })),
-                fetch(TSDB_LAST_URL, { cache: "no-store" }).then(r => r.json()).catch(() => ({ results: [] }))
+                fetch(TSDB_NEXT_URL + bust, { cache: "no-store" }).then(r => r.json()).catch(() => ({ events: [] })),
+                fetch(TSDB_LAST_URL + bust, { cache: "no-store" }).then(r => r.json()).catch(() => ({ results: [] }))
             ]);
             const nextEvents = (nextRes && nextRes.events) || [];
             const lastEvents = (lastRes && lastRes.results) || [];
-            // merge: upcoming/live first, then finished (dedupe by idEvent)
+            // merge (dedupe by idEvent) — when both endpoints return the same event, keep the fresher snapshot
             const merged = [];
-            const seen = new Set();
+            const seen = new Map();
             [...nextEvents, ...lastEvents].forEach(e => {
                 if (!e || !e.strHomeTeam || !e.strAwayTeam) return;
                 const key = e.idEvent || `${e.strHomeTeam}_${e.strAwayTeam}_${e.dateEvent}`;
-                if (seen.has(key)) return;
-                seen.add(key); merged.push(e);
+                if (!seen.has(key)) { seen.set(key, merged.length); merged.push(e); return; }
+                const prev = merged[seen.get(key)];
+                if (eventRank(e) > eventRank(prev) || (!hasScore(prev) && hasScore(e))) merged[seen.get(key)] = e;
             });
             apiEvents = merged;
             consecutiveFailures = 0; lastFetchOk = true; lastFetchTime = new Date();
@@ -747,13 +808,15 @@
         const oppName = homeIsReal ? ev.strAwayTeam : ev.strHomeTeam;
         const realScore = homeIsReal ? newHome : newAway;
         const oppScore = homeIsReal ? newAway : newHome;
-        let scorerName = realName;
+        const realBadge = homeIsReal ? ev.strHomeTeamBadge : ev.strAwayTeamBadge;
+        const oppBadge = homeIsReal ? ev.strAwayTeamBadge : ev.strHomeTeamBadge;
+        let scorerName = realName, scorerBadge = realBadge;
         try {
             const prevScorePart = String(prevScoreKey || "").split("_")[1] || "0-0";
             const [pH, pA] = prevScorePart.split("-").map(n => parseInt(n) || 0);
             const nH = parseInt(newHome) || 0, nA = parseInt(newAway) || 0;
-            if (nH > pH) scorerName = homeIsReal ? realName : oppName;
-            else if (nA > pA) scorerName = homeIsReal ? oppName : realName;
+            if (nH > pH) { scorerName = homeIsReal ? realName : oppName; scorerBadge = homeIsReal ? realBadge : oppBadge; }
+            else if (nA > pA) { scorerName = homeIsReal ? oppName : realName; scorerBadge = homeIsReal ? oppBadge : realBadge; }
         } catch (e) {}
         const overlay = document.getElementById("goalOverlay");
         if (overlay) {
@@ -850,8 +913,10 @@
                     changed = true;
                 }
             }
-            // auto-fill score only when the match is live or finished
-            if (!evLive && !evFinished) return;
+            // auto-fill the score as soon as the game is being played (or already finished)
+            if (!info.score) return;
+            const rowStatus = getMatchStatus(m);
+            if (!evLive && !evFinished && !rowStatus.isLive && !rowStatus.isEnded) return;
             if (currentData[`actual_${m.id}`] !== info.score) {
                 currentData[`actual_${m.id}`] = info.score;
                 db.ref(`league_data/predictions/actual_${m.id}`).set(info.score);
@@ -862,6 +927,22 @@
         if (changed) { sortMatches(); syncAutoWinners(); renderUI(); }
         if (dedupeDuplicateMatches()) { sortMatches(); syncAutoWinners(); renderUI(); }
         checkMatchEndedNotifications();
+    }
+    /* ---- Keep the result column of the match being played in sync with the live score ---- */
+    function syncLiveScoresToRows() {
+        if (!autoScoreEnabled || !apiEvents.length) return;
+        let changed = false;
+        currentMatches.forEach(m => {
+            if (!m) return;
+            const info = apiScoreForMatch(m);
+            if (!info || !info.score || !isEventLive(info.event)) return;
+            if (currentData[`actual_${m.id}`] === info.score) return;
+            currentData[`actual_${m.id}`] = info.score;
+            db.ref(`league_data/predictions/actual_${m.id}`).set(info.score);
+            notifyScoreChange(m, info.score);
+            changed = true;
+        });
+        if (changed) { syncAutoWinners(); renderUI(); }
     }
 
     /* ============================================================
@@ -886,7 +967,7 @@
             return new Date(`${dateA}T${timeA}`) - new Date(`${dateB}T${timeB}`);
         });
     }
-    setInterval(() => { updateCountdowns(); updateHeaderCountdownWidget(); updateLiveMatchWidget(); checkMatchEndedNotifications(); }, 1000);
+    setInterval(() => { updateCountdowns(); updateHeaderCountdownWidget(); syncLiveScoresToRows(); updateLiveMatchWidget(); checkMatchEndedNotifications(); }, 1000);
 
     /* ============================================================
        FILTERS / VENUE
@@ -1366,10 +1447,10 @@
             <th style="width: 7%;">מסגרת</th>
             <th style="width: 9%;">בית/חוץ</th>
             <th style="width: 24%;">תאריך</th>
-            <th style="width: 11%;">שעה</th>
+            <th style="width: 8%;">שעה</th>
             <th style="width: 18%;">ספירה לאחור</th>
             <th style="width: 7%;">תוצאה</th>
-            <th style="width: 17%;">מי צדק?</th>
+            <th style="width: 15%;">מי צדק?</th>
             ${activePlayersList.map(p => `<th class="player-th" style="width: ${Math.max(6, 16 / activePlayersList.length)}%;">${p}</th>`).join("")}`;
         const tbody = document.getElementById("tableBody");
         tbody.innerHTML = "";
