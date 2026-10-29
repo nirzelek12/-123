@@ -81,6 +81,7 @@
         .lmv-minute-pill { margin-right: auto; background: rgba(5,22,19,0.8); color: var(--gold-bright); font-family: var(--font-mono); font-weight: 800; font-size: 0.82rem; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--gold-accent); direction: ltr; }
         .lmv-body { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 18px 16px 20px; direction: ltr; }
         .lmv-team { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+        .lmv-team-badge { width: 46px; height: 46px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5)); }
         .lmv-team-name { font-family: var(--font-display); font-size: 0.92rem; font-weight: 800; color: var(--text-main); text-align: center; line-height: 1.2; }
         .lmv-scoreboard { display: flex; align-items: center; gap: 14px; background: linear-gradient(135deg, rgba(5,22,19,0.9), rgba(11,45,39,0.9)); border: 1px solid var(--gold-accent); border-radius: 14px; padding: 10px 22px; box-shadow: inset 0 0 20px rgba(5,22,19,0.9); direction: ltr; }
         .lmv-score-num { font-family: var(--font-mono); font-size: 2.4rem; font-weight: 800; color: var(--gold-bright); direction: ltr; line-height: 1; text-shadow: 0 0 14px rgba(243,198,93,0.5); min-width: 38px; text-align: center; }
@@ -115,15 +116,62 @@
         .filter-btn:hover { border-color: var(--gold-accent); color: var(--text-main); }
         .filter-btn.active { background: linear-gradient(135deg, var(--crest-blue), var(--crest-navy)); color: #ffffff; border-color: var(--gold-accent); box-shadow: 0 4px 12px rgba(5, 22, 19, 0.4); }
         .filter-btn.active.live-filter { background: linear-gradient(135deg, #ef4444, #dc2626); border-color: #dc2626; box-shadow: 0 0 14px rgba(239,68,68,0.4); }
-        .scoreboard { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 16px; background: linear-gradient(135deg, var(--bg-sub-card), var(--bg-card)); padding: 16px; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow-soft); }
-        .scoreboard-title { width: 100%; text-align: center; font-family: var(--font-display); font-weight: 800; font-size: 0.8rem; color: var(--gold-accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
-        .player-card { background: linear-gradient(135deg, var(--bg-card), var(--bg-sub-card)); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; font-size: 0.88rem; box-shadow: 0 3px 10px rgba(0,0,0,0.2); transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; }
+        
+        /* ------------------------------------------------------------
+           סרגל דירוג מנחשים: שורה אחת בלבד שמתאימה את עצמה אוטומטית לכמות האנשים
+           ------------------------------------------------------------ */
+        .scoreboard { 
+            display: flex; 
+            flex-wrap: nowrap; 
+            gap: 6px; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 16px; 
+            background: linear-gradient(135deg, var(--bg-sub-card), var(--bg-card)); 
+            padding: 12px 14px; 
+            border-radius: 16px; 
+            border: 1px solid var(--border-color); 
+            box-shadow: var(--shadow-soft); 
+            overflow: hidden; 
+            width: 100%;
+        }
+        .scoreboard-title { 
+            font-family: var(--font-display); 
+            font-weight: 800; 
+            font-size: 0.78rem; 
+            color: var(--gold-accent); 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            flex-shrink: 0; 
+            white-space: nowrap;
+        }
+        .player-card { 
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-sub-card)); 
+            border: 1px solid var(--border-color); 
+            padding: 6px 10px; 
+            border-radius: 22px; 
+            font-weight: 700; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            font-size: 0.8rem; 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2); 
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; 
+            white-space: nowrap; 
+            flex: 1 1 0; 
+            min-width: 0; 
+            justify-content: center;
+        }
         .player-card:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.3); border-color: var(--gold-accent); }
-        .player-card.top-rank { border-color: var(--gold-accent); box-shadow: 0 4px 14px rgba(212,163,46,0.25), var(--glow-gold); }
-        .player-card .rank { font-family: var(--font-mono); font-weight: 800; font-size: 0.85rem; color: var(--text-muted); min-width: 20px; text-align: center; }
-        .player-card .score { background: linear-gradient(135deg, var(--crest-blue), var(--crest-navy)); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.74rem; font-weight: 800; border-bottom: 2px solid var(--gold-accent); font-family: var(--font-mono); }
-        .remove-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1.1rem; line-height: 1; opacity: 0.5; transition: opacity 0.2s, transform 0.2s; }
-        .remove-btn:hover { opacity: 1; transform: scale(1.2); }
+        .player-card.top-rank { border-color: var(--gold-bright); box-shadow: 0 0 0 1px var(--gold-accent), 0 4px 14px rgba(212,163,46,0.35), var(--glow-gold); }
+        .player-card .rank { font-family: var(--font-mono); font-weight: 800; font-size: 0.85rem; color: var(--gold-bright); flex-shrink: 0; }
+        .player-card span:nth-of-type(1) { overflow: hidden; text-overflow: ellipsis; }
+        .player-card .score { background: #051613; color: var(--gold-bright); padding: 3px 8px; border-radius: 16px; font-size: 0.7rem; font-weight: 800; border: 1px solid var(--gold-accent); font-family: var(--font-mono); flex-shrink: 0; }
+        .remove-btn { background: none; border: none; color: rgba(185, 28, 28, 0.5); cursor: pointer; font-size: 0.78rem; line-height: 1; opacity: 0.6; transition: opacity 0.2s, transform 0.2s; padding: 0; flex-shrink: 0; }
+        .remove-btn:hover { opacity: 1; transform: scale(1.15); color: #ef4444; }
+        
+        #powered-by { text-align: center; font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; }
+        #powered-by a { color: var(--gold-accent); text-decoration: none; font-weight: 700; }
         .countdown-badge { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg, rgba(212, 163, 46, 0.12), rgba(212, 163, 46, 0.06)); color: var(--gold-bright); border: 1px solid rgba(212, 163, 46, 0.3); padding: 6px 12px; border-radius: 10px; font-size: 0.76rem; font-weight: 800; direction: ltr; white-space: nowrap; font-family: var(--font-mono); box-shadow: inset 0 1px 0 rgba(212,163,46,0.1); }
         .countdown-badge.live { background: linear-gradient(135deg, #ef4444, #dc2626); color: #ffffff; border-color: #dc2626; animation: pulse 1.5s infinite; box-shadow: 0 0 16px rgba(239, 68, 68, 0.5); }
         .countdown-badge.ended { background: rgba(100, 116, 139, 0.12); color: var(--text-muted); border-color: var(--border-color); box-shadow: none; }
@@ -135,6 +183,8 @@
         .api-pill.api-searching { background: rgba(245,158,11,0.16); color: #fbbf24; border-color: rgba(245,158,11,0.45); }
         .api-pill.api-manual { background: rgba(22,78,66,0.2); color: var(--gold-bright); border-color: rgba(212,163,46,0.4); }
         .match-api-status { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+        .manual-chip { display: inline-block; margin-top: 4px; background: rgba(212,163,46,0.14); color: var(--gold-bright); border: 1px solid rgba(212,163,46,0.4); border-radius: 7px; padding: 2px 7px; font-size: 0.66rem; font-weight: 800; cursor: pointer; font-family: var(--font-body); }
+        .manual-chip:hover { background: rgba(212,163,46,0.26); }
         .actual-source { font-size: 0.66rem; color: var(--text-muted); font-weight: 600; margin-top: 4px; display: flex; align-items: center; gap: 4px; direction: ltr; font-family: var(--font-mono); }
         .mobile-cards-container { display: flex; flex-direction: column; gap: 14px; will-change: transform; transform: translateZ(0); }
         .match-mobile-card { background: linear-gradient(160deg, var(--bg-card), var(--bg-sub-card)); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; box-shadow: var(--shadow-soft); scroll-margin-top: 20px; position: relative; overflow: hidden; }
@@ -162,7 +212,7 @@
         td.match-date-cell { color: var(--text-muted); font-size: 0.8rem; text-align: center; font-family: var(--font-mono); }
         td.countdown-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; overflow: visible; padding: 50px 6px; }
         td.countdown-cell .countdown-badge { width: 100%; justify-content: center; box-sizing: border-box; padding: 14px 8px; font-size: 1rem; min-height: 48px; }
-        td.countdown-cell .api-pill { padding: 7px 12px; font-size: 0.74rem; }
+        td.countdown-cell .api-pill { padding: 7px 50px; font-size: 0.74rem; }
         tr.clasico td { background-color: var(--clasico-bg) !important; }
         tr.clasico td.match-name { color: var(--clasico-text); font-weight: 800; }
         .comp-badge { display: inline-block; padding: 5px 11px; border-radius: 9px; font-size: 0.72rem; font-weight: 800; white-space: nowrap; letter-spacing: 0.4px; background: #1a2420; border: 1px solid var(--gold-accent); color: var(--gold-bright); }
@@ -170,15 +220,21 @@
         .comp-copa { color: #ff8fa8; border-color: rgba(239,68,68,0.5); }
         .comp-supercopa { color: #fbbf24; border-color: rgba(180,83,9,0.5); }
         .comp-supercup_eu { color: #7dd3fc; border-color: rgba(3,105,161,0.5); }
-        input.score-in { width: 56px; height: 38px; text-align: center; padding: 2px; border: 1px solid rgba(212, 163, 46, 0.4); border-radius: 9px; font-weight: 800; direction: ltr; background-color: #1a2420; color: var(--text-main); font-size: 0.92rem; margin: 0 auto; display: block; transition: border-color 0.2s, box-shadow 0.2s; }
+        input.score-in { width: 48px; height: 38px; text-align: center; padding: 2px; border: 1px solid rgba(212, 163, 46, 0.4); border-radius: 9px; font-weight: 800; direction: ltr; background-color: #1a2420; color: var(--text-main); font-size: 0.92rem; margin: 0 auto; display: block; transition: border-color 0.2s, box-shadow 0.2s; }
         input.score-in:focus { border-color: var(--gold-bright); outline: none; box-shadow: 0 0 0 2px rgba(212, 163, 46, 0.3); }
         input.score-in:disabled { background-color: rgba(100, 116, 139, 0.15); color: var(--text-muted); cursor: not-allowed; opacity: 0.7; border-color: var(--border-color); }
-        input.score-in.readonly, input.score-in.ro { opacity: 1; cursor: pointer; color: var(--gold-bright); border-color: var(--gold-accent); }
+        input.score-in.readonly, input.score-in.ro { opacity: 1; cursor: default; color: var(--gold-bright); border-color: var(--gold-accent); }
         input.score-in.ro:focus { box-shadow: none; }
+        .actual-cell .pred-logo, .actual-cell .pred-logo-empty { width: 13px; height: 13px; }
+        .actual-cell input.score-in.actual-in { width: 46px; }
         .pred-cell { display: flex; align-items: center; justify-content: center; gap: 2px; direction: ltr; min-width: 0; }
-        .pred-cell input.score-in { width: 54px; min-width: 0; flex: 0 1 auto; }
+        .pred-logo { width: 15px; height: 15px; flex: 0 0 auto; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
+        .pred-logo-empty { width: 15px; height: 15px; flex: 0 0 auto; }
+        .pred-cell input.score-in { width: 42px; min-width: 0; flex: 0 1 auto; }
         td.pred-td { padding-left: 2px; padding-right: 2px; }
+        .pred-box-mini .pred-logo, .pred-box-mini .pred-logo-empty { width: 14px; height: 14px; }
         input.actual-in { border: 1px solid var(--gold-accent); background: #1a2420; color: var(--gold-bright); font-weight: 800; width: 62px; }
+        input.actual-in.manual-actual { border-color: #f97316; box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.25); background: rgba(249, 115, 22, 0.08); }
         input.time-text-in { background-color: #1a2420; color: var(--text-main); font-weight: 700; width: 100%; min-width: 70px; font-size: 0.85rem; height: 38px; text-align: center; border-radius: 9px; border: 1px solid rgba(212, 163, 46, 0.4); font-family: var(--font-mono); box-sizing: border-box; }
         input.time-text-in:focus { border-color: var(--gold-bright); outline: none; box-shadow: 0 0 0 2px rgba(212, 163, 46, 0.3); }
         .venue-toggle-group { display: inline-flex; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 3px; gap: 3px; height: 38px; align-items: center; justify-content: center; box-sizing: border-box; }
@@ -194,6 +250,8 @@
         .delete-match-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.95rem; margin-left: 4px; opacity: 0.6; }
         .delete-match-btn:hover { opacity: 1; transform: scale(1.15); }
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.8rem; color: var(--text-muted); padding: 0 6px; font-weight: 600; flex-wrap: wrap; gap: 8px; }
+        .reset-btn { background: none; border: none; color: #ef4444; cursor: pointer; text-decoration: underline; font-weight: 600; }
+        .reset-btn:hover { color: #dc2626; }
         .empty-state { text-align: center; padding: 30px 16px; color: var(--text-muted); font-weight: 600; font-size: 0.9rem; }
         @media (max-width: 767px) {
             .blancos-banner { animation: none; }
@@ -210,11 +268,11 @@
             .match-add-card { padding: 14px; }
             .match-add-card .field-date { grid-column: 1 / -1; }
             .control-card { padding: 14px; }
-            .scoreboard { flex-direction: column; align-items: stretch; gap: 8px; }
-            .player-card { width: 100%; padding: 10px 14px; font-size: 0.92rem; }
-            .player-card .rank { min-width: 26px; }
-            .player-card .score { margin-right: auto; }
+            .player-card { padding: 5px 6px; font-size: 0.74rem; gap: 3px; }
+            .player-card .score { padding: 2px 5px; font-size: 0.62rem; }
+            .scoreboard-title { font-size: 0.7rem; }
             .lmv-score-num { font-size: 1.8rem; }
+            .lmv-team-badge { width: 38px; height: 38px; }
         }
         @media (min-width: 768px) {
             h1 { font-size: 2.4rem; } body { padding: 20px 10px; } .main-container { padding: 28px; }
@@ -235,6 +293,7 @@
         .goal-overlay-icon { font-size: clamp(3rem, 10vw, 5rem); animation: goalBallBounce 0.6s ease-in-out infinite alternate; filter: drop-shadow(0 4px 20px rgba(243,198,93,0.6)); position: relative; z-index: 1; }
         .goal-overlay-text { font-family: var(--font-display); font-size: clamp(2.5rem, 10vw, 5.5rem); font-weight: 900; background: linear-gradient(180deg, #ffffff 0%, var(--gold-bright) 60%, var(--gold-accent) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 8px; line-height: 1; filter: drop-shadow(0 0 30px rgba(243,198,93,0.8)); position: relative; z-index: 1; }
         .goal-overlay-team-row { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
+        .goal-overlay-badge { width: clamp(48px, 12vw, 72px); height: clamp(48px, 12vw, 72px); object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5)); }
         .goal-overlay-team { font-family: var(--font-display); font-size: clamp(1.3rem, 5vw, 2.4rem); font-weight: 800; color: var(--text-main); text-shadow: 0 2px 16px rgba(0,0,0,0.8); }
         .goal-overlay-score { font-family: var(--font-mono); font-size: clamp(2rem, 8vw, 3.5rem); font-weight: 800; color: var(--gold-bright); direction: ltr; background: linear-gradient(135deg, var(--crest-blue), var(--crest-navy)); padding: 8px 32px; border-radius: 16px; border: 1px solid var(--gold-accent); box-shadow: 0 8px 30px rgba(0,0,0,0.4), inset 0 1px 0 rgba(243,198,93,0.2); letter-spacing: 4px; position: relative; z-index: 1; }
         @keyframes goalOverlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -305,7 +364,9 @@
             </div>
         </div>
     </header>
-    <div class="scoreboard" id="playersBar"></div>
+    <div class="scoreboard" id="playersBar">
+        <div class="scoreboard-title">:🏆 דירוג מנחשים</div>
+    </div>
     <div class="filter-bar" id="filterBar">
         <button class="filter-btn active" data-filter="all" onclick="setMatchFilter('all')">הכל</button>
         <button class="filter-btn" data-filter="upcoming" onclick="setMatchFilter('upcoming')">קרובים</button>
@@ -328,6 +389,7 @@
         <div class="goal-overlay-icon">⚽</div>
         <div class="goal-overlay-text">GOAL!</div>
         <div class="goal-overlay-team-row">
+            <img class="goal-overlay-badge" id="goalOverlayBadge" src="" alt="" onerror="this.style.display='none'">
             <span class="goal-overlay-team" id="goalOverlayTeam"></span>
         </div>
         <div class="goal-overlay-score" id="goalOverlayScore"></div>
@@ -363,7 +425,7 @@
     let endedNotifInitialized = false;
 
     /* ============================================================
-       THE SPORTS DB — FREE API (Real Madrid team id = 133738)
+       THE SPORTS DB — FREE API
        ============================================================ */
     const TSDB_KEY = "123";
     const REAL_MADRID_ID = "133738";
@@ -377,42 +439,153 @@
     const MAX_BACKOFF_MS = 60000;
     let liveFetchTimer = null, consecutiveFailures = 0, lastFetchOk = true, lastFetchTime = null;
 
-    /* ---- Team name canonicalization ---- */
     const TEAM_ALIASES = {
         "real madrid": ["ריאל", "ריאל מדריד", "ריאל מדריד (h)", "ריאל מדריד (a)"],
         "barcelona": ["ברצלונה", "ברצה", "בארסה"],
-        "atletico madrid": ["אתלטיקו", "אתלטיקו מדריד"],
+        "atletico madrid": ["אתלטיקו", "אתלטיקו מדריד", "אתלטיקה"],
         "athletic bilbao": ["בילבאו", "אתלטיק בילבאו"],
         "real sociedad": ["סוסיאדד", "ריאל סוסיאדד"],
         "real betis": ["בטיס", "ריאל בטיס"],
         "sevilla": ["סביליה"],
         "valencia": ["ולנסיה", "ואלנסיה"],
         "villarreal": ["ויאריאל"],
-        "getafe": ["חטאפה", "גטאפה"],
+        "getafe": ["חטאפה", "גטאפה", "חטפה"],
         "osasuna": ["אוססונה"],
-        "girona": ["חירונה", "ג'ירונה"],
-        "rayo vallecano": ["ראיו", "ראיו ויאקנו", "ראיו ולקאנו"],
+        "girona": ["חירונה", "ג'ירונה", "ז'ירונה"],
+        "rayo vallecano": ["ראיו", "ראיו ויאקנו", "ראיו ולקאנו", "ראיו ואייקאנו"],
         "celta vigo": ["סלטה", "סלטה ויגו"],
         "mallorca": ["מיורקה", "מאיורקה"],
-        "alaves": ["אלאבס", "אלבס"],
-        "espanyol": ["אספניול"],
+        "alaves": ["אלאבס", "אלבס", "דפורטיבו אלאבס"],
+        "espanyol": ["אספניול", "ספרדי"],
         "levante": ["לבנטה", "לבאנטה"],
         "elche": ["אלצ'ה"],
+        "racing santander": ["ראסינג", "ראסינג סנטנדר", "ראסינג סנטאנדר", "ראסינג דה סנטנדר"],
         "real oviedo": ["אוביידו", "ריאל אוביידו"],
-        "las palmas": ["לאס פאלמס", "לאס פלמס"],
-        "cadiz": ["קדיס", "קאדיס"],
+        "malaga": ["מאלגה", "מלאגה", "מלגה"],
+        "las palmas": ["לאס פאלמס", "לאס פלמס", "פאלמס"],
+        "cadiz": ["קדיס", "קאדיס", "קדיז"],
         "granada": ["גרנדה", "גרנאדה"],
         "almeria": ["אלמריה"],
-        "leganes": ["לגאנס"],
+        "leganes": ["לגאנס", "לגאנייס"],
         "valladolid": ["ואיאדוליד", "ואלאדוליד"],
+        "huesca": ["ואסקה", "הואסקה"],
+        "eibar": ["אייבר", "איבר"],
+        "numancia": ["נומנסיה"],
+        "tenerife": ["טנריפה"],
+        "deportivo la coruna": ["דפורטיבו", "דפורטיבו לה קורוניה", "לה קורוניה"],
         "liverpool": ["ליברפול"],
         "arsenal": ["ארסנל"],
-        "manchester city": ["מנצ'סטר סיטי", "סיטי"],
-        "manchester united": ["מנצ'סטר יונייטד", "יונייטד"],
+        "manchester city": ["מנצ'סטר סיטי", "מן סיטי", "מאנצ'סטר סיטי", "סיטי"],
+        "manchester united": ["מנצ'סטר יונייטד", "מאנצ'סטר יונייטד", "יונייטד", "מנצ'סטר"],
         "chelsea": ["צ'לסי"],
-        "bayern munich": ["בייארן", "באיירן", "באיירן מינכן"],
-        "borussia dortmund": ["דורטמונד", "בורוסיה דורטמונד"],
-        "paris sg": ["פריז", "פ.ס.ז'", "פסז", "psg"]
+        "tottenham": ["טוטנהאם", "טוטנהם", "ספרס"],
+        "newcastle": ["ניוקאסל", "ניוקאסל יונייטד"],
+        "aston villa": ["אסטון וילה"],
+        "brighton": ["ברייטון"],
+        "west ham": ["וסט האם", "וסטהאם"],
+        "everton": ["אברטון"],
+        "leicester": ["לסטר", "לסטר סיטי"],
+        "wolves": ["וולבס", "וולברהמפטון"],
+        "crystal palace": ["קריסטל פאלאס"],
+        "brentford": ["ברנטפורד"],
+        "fulham": ["פולהאם"],
+        "nottingham forest": ["נוטינגהאם", "נוטינגהם פורסט", "פורסט"],
+        "bournemouth": ["בורנמות'", "בורנמות"],
+        "burnley": ["ברנלי"],
+        "luton": ["לוטון", "לוטון טאון"],
+        "sheffield united": ["שפילד", "שפילד יונייטד"],
+        "leeds": ["לידס", "לידס יונייטד"],
+        "southampton": ["סאות'המפטון", "סאותהמפטון"],
+        "ipswich": ["איפסוויץ'", "איפסוויץ"],
+        "bayern munich": ["בייארן", "באיירן", "בייארן מינכן", "באיירן מינכן"],
+        "borussia dortmund": ["דורטמונד", "בורוסיה דורטמונד", "בורוסיה"],
+        "rb leipzig": ["לייפציג", "ר.ב. לייפציג", "רב לייפציג"],
+        "bayer leverkusen": ["לברקוזן", "באייר לברקוזן"],
+        "eintracht frankfurt": ["פרנקפורט", "איינטרכט פרנקפורט"],
+        "vfb stuttgart": ["שטוטגרט", "שטוטגארט"],
+        "wolfsburg": ["וולפסבורג"],
+        "borussia monchengladbach": ["מנשנגלדבך", "גלדבך", "מנשנגלאדבך"],
+        "werder bremen": ["ברמן", "ורדר ברמן"],
+        "hoffenheim": ["הופנהיים"],
+        "union berlin": ["אוניון ברלין"],
+        "freiburg": ["פרייבורג"],
+        "mainz": ["מיינץ"],
+        "augsburg": ["אאוגסבורג", "אוגסבורג"],
+        "bochum": ["בוכום"],
+        "darmstadt": ["דארמשטאדט"],
+        "juventus": ["יובנטוס", "יובה"],
+        "inter milan": ["אינטר", "אינטר מילאנו", "אינטרנציונלה"],
+        "ac milan": ["מילאן"],
+        "napoli": ["נאפולי"],
+        "roma": ["רומא"],
+        "lazio": ["לאציו"],
+        "atalanta": ["אטאלנטה"],
+        "fiorentina": ["פיורנטינה"],
+        "bologna": ["בולוניה"],
+        "torino": ["טורינו"],
+        "udinese": ["אודינזה"],
+        "sassuolo": ["ססואולו", "סאסואולו"],
+        "monza": ["מונצה", "מונזה"],
+        "genoa": ["ג'נובה", "גנואה"],
+        "lecce": ["לצ'ה"],
+        "salernitana": ["סלרניטנה"],
+        "cagliari": ["קליארי"],
+        "hellas verona": ["ורונה", "הלאס ורונה"],
+        "empoli": ["אמפולי"],
+        "frosinone": ["פרוזינונה"],
+        "cremonese": ["קרמונזה"],
+        "como": ["קומו"],
+        "parma": ["פארמה"],
+        "venezia": ["ונציה"],
+        "paris sg": ["פריז", "פ.ס.ז'", "פ.ס.ז", "פריז סן ז'רמן", "פסז", "psg"],
+        "marseille": ["מרסיי"],
+        "monaco": ["מונקו"],
+        "lyon": ["ליון"],
+        "lille": ["ליל"],
+        "nice": ["ניס"],
+        "rennes": ["רן", "רנס"],
+        "lens": ["לאנס"],
+        "nantes": ["נאנט"],
+        "strasbourg": ["סטרסבורג"],
+        "brest": ["ברסט"],
+        "toulouse": ["טולוז"],
+        "montpellier": ["מונפלייה"],
+        "reims": ["ריימס"],
+        "le havre": ["לה האבר"],
+        "metz": ["מץ"],
+        "lorient": ["לוריאן"],
+        "clermont": ["קלרמון"],
+        "angers": ["אנז'ה"],
+        "auxerre": ["אוסר"],
+        "troyes": ["טרואה"],
+        "benfica": ["בנפיקה"],
+        "porto": ["פורטו"],
+        "sporting cp": ["ספורטינג", "ספורטינג ליסבון"],
+        "braga": ["בראגה"],
+        "ajax": ["איאקס"],
+        "psv": ["פ.ס.ו", "פסו", "איינדהובן"],
+        "feyenoord": ["פיינורד"],
+        "az alkmaar": ["אלקמאר", "א.ז. אלקמאר"],
+        "twente": ["טוונטה"],
+        "celtic": ["סלטיק"],
+        "rangers": ["ריינג'רס"],
+        "shakhtar donetsk": ["שחטאר", "שחטאר דונצק"],
+        "dinamo zagreb": ["דינמו זאגרב"],
+        "red star belgrade": ["כוכב אדום", "כוכב אדום בלגרד"],
+        "young boys": ["יאנג בויז"],
+        "salzburg": ["זלצבורג", "רד בול זלצבורג"],
+        "galatasaray": ["גלאטסראיי", "גלטסראיי"],
+        "fenerbahce": ["פנרבחצ'ה"],
+        "besiktas": ["בשיקטאש"],
+        "olympiacos": ["אולימפיאקוס"],
+        "panathinaikos": ["פנאתינאיקוס"],
+        "fc copenhagen": ["קופנהגן"],
+        "fc basel": ["בזל"],
+        "aek athens": ["א.א.ק אתונה", "א.א.ק.", "aek"],
+        "lask": ["לאסק", "לאסק לינץ"],
+        "al nassr": ["אל נאסר", "אל-נאסר"],
+        "al hilal": ["אל הילאל", "אל-הילאל"],
+        "al ittihad": ["אל איתיחאד", "אל-איתיחאד"]
     };
     function normTeam(str) {
         return String(str || "").toLowerCase().replace(/\b(fc|cf|sc|ud|cd|club|de|the)\b/g, " ").replace(/[^a-z\u0590-\u05ff ]/g, " ").replace(/\s+/g, " ").trim();
@@ -448,7 +621,60 @@
         };
     }
 
-    /* ---- Event Matching & Score Calculation ---- */
+    const teamBadgeCache = (() => { try { return JSON.parse(localStorage.getItem("teamBadges2") || "{}"); } catch (e) { return {}; } })();
+    function saveTeamBadges() { try { localStorage.setItem("teamBadges2", JSON.stringify(teamBadgeCache)); } catch (e) {} }
+    function registerEventBadges(ev) {
+        if (!ev) return;
+        if (ev.strHomeTeamBadge) teamBadgeCache[canonicalTeam(ev.strHomeTeam)] = ev.strHomeTeamBadge;
+        if (ev.strAwayTeamBadge) teamBadgeCache[canonicalTeam(ev.strAwayTeam)] = ev.strAwayTeamBadge;
+    }
+    function teamBadge(name) {
+        const url = teamBadgeCache[canonicalTeam(name)];
+        return url && url !== "none" ? url : "";
+    }
+    function matchBadges(m) {
+        const s = matchSides(m);
+        let left = teamBadge(s.realName || s.home);
+        let right = teamBadge(s.oppName || s.away);
+        const ev = findApiEvent(m);
+        if (ev && (!left || !right)) {
+            const evHomeIsReal = canonicalTeam(ev.strHomeTeam) === REAL_MADRID;
+            const evReal = evHomeIsReal ? ev.strHomeTeamBadge : ev.strAwayTeamBadge;
+            const evOpp = evHomeIsReal ? ev.strAwayTeamBadge : ev.strHomeTeamBadge;
+            if (!left && evReal) left = evReal;
+            if (!right && evOpp) right = evOpp;
+        }
+        return { left: left, right: right };
+    }
+    function badgeHTML(url) {
+        return url ? `<img class="pred-logo" src="${url}" alt="" onerror="this.style.visibility='hidden'">` : `<span class="pred-logo-empty"></span>`;
+    }
+    let badgeFetchInFlight = false;
+    async function fetchMissingBadges() {
+        if (badgeFetchInFlight || !currentMatches.length) return;
+        const missing = [];
+        currentMatches.forEach(m => {
+            String(m.match || "").split("-").slice(0, 2).map(t => canonicalTeam(t)).forEach(t => {
+                if (t && !teamBadgeCache[t] && !missing.includes(t)) missing.push(t);
+            });
+        });
+        if (!missing.length) return;
+        badgeFetchInFlight = true;
+        let gotNew = false;
+        for (const name of missing.slice(0, 14)) {
+            try {
+                const res = await fetch(`https://www.thesportsdb.com/api/v1/json/${TSDB_KEY}/searchteams.php?t=${encodeURIComponent(name)}&_=${Date.now()}`, { cache: "no-store" });
+                const json = await res.json();
+                const team = (json && json.teams && json.teams[0]) || null;
+                if (team && team.strBadge) { teamBadgeCache[name] = team.strBadge; gotNew = true; }
+                else if (!teamBadgeCache[name]) teamBadgeCache[name] = "none";
+            } catch (e) { break; }
+        }
+        badgeFetchInFlight = false;
+        saveTeamBadges();
+        if (gotNew) renderUI();
+    }
+
     function eventToLocalDate(ev) {
         if (!ev || !ev.dateEvent || !ev.strTime) return null;
         const d = new Date(`${ev.dateEvent}T${ev.strTime}Z`);
@@ -490,18 +716,22 @@
         const d = daysBetween(saved, m.date);
         return (d !== null && d > 3) ? m.date : saved;
     }
-    function strictPairEvent(m) {
-        if (!apiEvents.length) return null;
+    function sameFixtureEvents(m) {
+        if (!apiEvents.length) return [];
         const parts = String(m.match || "").split("-").map(t => canonicalTeam(t));
-        if (parts.length < 2 || !parts[0] || !parts[1]) return null;
+        if (parts.length < 2 || !parts[0] || !parts[1]) return [];
         const anchor = matchAnchorDate(m);
         const samePair = apiEvents.filter(ev => {
             const h = canonicalTeam(ev.strHomeTeam), a = canonicalTeam(ev.strAwayTeam);
             if (!((h === parts[0] && a === parts[1]) || (h === parts[1] && a === parts[0]))) return false;
             const d = daysBetween(eventToLocalDate(ev), anchor);
-            return d !== null && d <= 2;
+            return d !== null && d <= 10;
         });
-        return pickEvent(samePair, anchor);
+        const sameSides = samePair.filter(ev => canonicalTeam(ev.strHomeTeam) === parts[0]);
+        return sameSides.length ? sameSides : samePair;
+    }
+    function strictPairEvent(m) {
+        return pickEvent(sameFixtureEvents(m), matchAnchorDate(m));
     }
     function findApiEvent(match) {
         if (!apiEvents.length) return null;
@@ -512,13 +742,9 @@
                 const h = canonicalTeam(ev.strHomeTeam), a = canonicalTeam(ev.strAwayTeam);
                 return (h === parts[0] && a === parts[1]) || (h === parts[1] && a === parts[0]);
             });
-            const near = byTeams.filter(ev => {
-                const d = daysBetween(eventToLocalDate(ev), matchDate);
-                return d === null || d <= 2;
-            });
-            let best = pickEvent(near, matchDate);
-            if (!best && byTeams.length === 1 && isEventLive(byTeams[0])) best = byTeams[0];
+            const best = pickEvent(sameFixtureEvents(match), matchDate);
             if (best) return best;
+            if (byTeams.length === 1 && isEventLive(byTeams[0])) return byTeams[0];
         }
         if (matchDate) {
             const sameDay = apiEvents.filter(ev => {
@@ -538,24 +764,14 @@
         }
         return null;
     }
-
-    /* תוצאה קבועה: ריאל מדריד בשמאל, היריבה בימין */
     function eventScoreForMatch(match, ev) {
         if (!ev || !hasScore(ev)) return "";
         const home = parseInt(ev.intHomeScore, 10) || 0;
         const away = parseInt(ev.intAwayScore, 10) || 0;
         const evHomeIsReal = canonicalTeam(ev.strHomeTeam) === REAL_MADRID;
         const evAwayIsReal = canonicalTeam(ev.strAwayTeam) === REAL_MADRID;
-        
-        if (evHomeIsReal) {
-            return `${home}-${away}`;
-        } else if (evAwayIsReal) {
-            return `${away}-${home}`;
-        } else {
-            return `${home}-${away}`;
-        }
+        return (evAwayIsReal && !evHomeIsReal) ? `${away}-${home}` : `${home}-${away}`;
     }
-
     function apiScoreForMatch(match) {
         const ev = findApiEvent(match);
         if (!ev) return null;
@@ -579,6 +795,14 @@
             time: d.toLocaleTimeString("en-GB", { timeZone: "Asia/Jerusalem", hour: "2-digit", minute: "2-digit" })
         };
     }
+    function matchDateTime(m) {
+        const auto = getAutoDateTime(m);
+        if (auto) return auto;
+        return {
+            date: currentData[`date_${m.id}`] !== undefined ? currentData[`date_${m.id}`] : m.date,
+            time: currentData[`time_${m.id}`] !== undefined ? currentData[`time_${m.id}`] : (m.time || "22:00")
+        };
+    }
     function autoDateHTML(m, savedDate) {
         const auto = getAutoDateTime(m);
         if (auto) return `<div style="padding:10px 6px;border:1px solid var(--gold-accent);border-radius:9px;text-align:center;font-family:var(--font-mono);font-size:0.88rem;background:#1a2420;color:var(--gold-bright);white-space:nowrap;width:100%;box-sizing:border-box;">🤖 ${formatDateDisplay(auto.date)}</div>`;
@@ -590,7 +814,6 @@
         return `<input type="text" class="time-text-in" value="${savedTime}" placeholder="22:00" onchange="onInputSave('time_${m.id}', this.value)">`;
     }
 
-    /* ---- Fetch live + upcoming from TheSportsDB ---- */
     async function fetchLiveScores() {
         if (!autoScoreEnabled) return;
         try {
@@ -611,11 +834,14 @@
                 if (eventRank(e) > eventRank(prev) || (!hasScore(prev) && hasScore(e))) merged[seen.get(key)] = e;
             });
             apiEvents = merged;
+            apiEvents.forEach(registerEventBadges);
+            saveTeamBadges();
             consecutiveFailures = 0; lastFetchOk = true; lastFetchTime = new Date();
             lastAutoFetchLabel = lastFetchTime.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
             applyAutoScores();
             updateLiveMatchWidget();
             renderStatusIndicators();
+            fetchMissingBadges();
         } catch (e) {
             consecutiveFailures++; lastFetchOk = false;
             updateLiveMatchWidget(); renderStatusIndicators();
@@ -645,7 +871,6 @@
         scheduleNextFetch(); updateLiveMatchWidget(); renderStatusIndicators(); renderUI();
     }
 
-    /* ---- Notifications ---- */
     function ensureNotifyPermission() {
         if (!("Notification" in window)) return;
         if (Notification.permission === "default") Notification.requestPermission().then(() => {});
@@ -686,7 +911,6 @@
         endedNotifInitialized = true;
     }
 
-    /* ---- Goal overlay + sound ---- */
     let goalAudioCtx = null;
     function playGoalSound() {
         try {
@@ -715,24 +939,28 @@
         const oppName = homeIsReal ? ev.strAwayTeam : ev.strHomeTeam;
         const realScore = homeIsReal ? newHome : newAway;
         const oppScore = homeIsReal ? newAway : newHome;
-        let scorerName = realName;
+        const realBadge = homeIsReal ? ev.strHomeTeamBadge : ev.strAwayTeamBadge;
+        const oppBadge = homeIsReal ? ev.strAwayTeamBadge : ev.strHomeTeamBadge;
+        let scorerName = realName, scorerBadge = realBadge;
         try {
             const prevScorePart = String(prevScoreKey || "").split("_")[1] || "0-0";
             const [pH, pA] = prevScorePart.split("-").map(n => parseInt(n) || 0);
             const nH = parseInt(newHome) || 0, nA = parseInt(newAway) || 0;
-            if (nH > pH) { scorerName = homeIsReal ? realName : oppName; }
-            else if (nA > pA) { scorerName = homeIsReal ? oppName : realName; }
+            if (nH > pH) { scorerName = homeIsReal ? realName : oppName; scorerBadge = homeIsReal ? realBadge : oppBadge; }
+            else if (nA > pA) { scorerName = homeIsReal ? oppName : realName; scorerBadge = homeIsReal ? oppBadge : realBadge; }
         } catch (e) {}
         const overlay = document.getElementById("goalOverlay");
         if (overlay) {
             document.getElementById("goalOverlayTeam").innerText = scorerName;
             document.getElementById("goalOverlayScore").innerText = `${realScore} - ${oppScore}`;
+            const badgeEl = document.getElementById("goalOverlayBadge");
+            if (badgeEl) { badgeEl.src = scorerBadge || ''; badgeEl.style.display = scorerBadge ? '' : 'none'; }
             overlay.classList.add("show");
             setTimeout(() => overlay.classList.remove("show"), 5000);
         }
         playGoalSound();
     }
-
+    
     let floatingBtnMode = "next";
     function updateFloatingBtn() {
         const btn = document.getElementById("floatingScrollBtn");
@@ -788,7 +1016,6 @@
         saveToCloud();
         return true;
     }
-
     function applyAutoScores() {
         if (!autoScoreEnabled) return;
         let changed = false;
@@ -825,7 +1052,6 @@
         if (dedupeDuplicateMatches()) { sortMatches(); syncAutoWinners(); renderUI(); }
         checkMatchEndedNotifications();
     }
-
     function syncLiveScoresToRows() {
         if (!autoScoreEnabled || !apiEvents.length) return;
         let changed = false;
@@ -842,9 +1068,6 @@
         if (changed) { syncAutoWinners(); renderUI(); }
     }
 
-    /* ============================================================
-       FIREBASE SYNC & DATA REPAIR
-       ============================================================ */
     function repairBorrowedDates() {
         let fixed = 0;
         currentMatches.forEach(m => {
@@ -861,40 +1084,80 @@
         });
         return fixed;
     }
-
-    /* הפיכת תוצאות שמאוחסנות בפורמט היריבה בשמאל כך שריאל תהיה תמיד בשמאל והסרת משחקי בטיס מראש אם קיימים */
-    function repairAwayResultsOrder() {
+    let resultOrderRepairRan = false;
+    function repairResultOrder() {
+        if (resultOrderRepairRan || currentData.resultOrderFix) return 0;
+        resultOrderRepairRan = true;
         let fixed = 0;
-        
-        // הסרת משחקים מול ריאל בטיס אם נוספו בטעות
-        const initialLen = currentMatches.length;
-        currentMatches = currentMatches.filter(m => {
-            const matchName = String(m.match || "").toLowerCase();
-            return !matchName.includes("בטיס") && !matchName.includes("betis");
-        });
-        if (currentMatches.length < initialLen) fixed++;
-
         currentMatches.forEach(m => {
             if (!m) return;
+            const actual = normalizeScoreStr(currentData[`actual_${m.id}`]);
+            if (!actual) return;
             const parts = String(m.match || "").split("-").map(t => canonicalTeam(t));
-            if (parts.length >= 2 && parts[1] === REAL_MADRID && parts[0] !== REAL_MADRID) {
-                const actualKey = `actual_${m.id}`;
-                const val = normalizeScoreStr(currentData[actualKey]);
-                if (val && !currentData[`flipped_${m.id}`]) {
-                    const scoreParts = val.split("-");
-                    if (scoreParts.length === 2) {
-                        const flippedVal = `${scoreParts[1]}-${scoreParts[0]}`;
-                        currentData[actualKey] = flippedVal;
-                        db.ref(`league_data/predictions/${actualKey}`).set(flippedVal);
-                        currentData[`flipped_${m.id}`] = true;
-                        db.ref(`league_data/predictions/flipped_${m.id}`).set(true);
-                        fixed++;
-                    }
-                }
-            }
+            if (parts.length < 2 || parts[0] === "real madrid" || parts[1] !== "real madrid") return;
+            const [home, away] = actual.split("-");
+            const flipped = `${away}-${home}`;
+            currentData[`actual_${m.id}`] = flipped;
+            db.ref(`league_data/predictions/actual_${m.id}`).set(flipped);
+            fixed++;
         });
-        if (fixed > 0) saveToCloud();
+        currentData.resultOrderFix = true;
+        db.ref('league_data/predictions/resultOrderFix').set(true);
         return fixed;
+    }
+    let predOrderFixRan = false;
+    function repairPredOrder() {
+        if (predOrderFixRan || currentData.predOrderFix) return 0;
+        predOrderFixRan = true;
+        let fixed = 0;
+        currentMatches.forEach(m => {
+            if (!m || matchSides(m).realFirst) return;
+            activePlayersList.forEach(p => {
+                const key = `pred_${m.id}_${p}`;
+                const cur = normalizeScoreStr(currentData[key]);
+                if (!cur) return;
+                const parts = cur.split("-");
+                const swapped = `${parts[1]}-${parts[0]}`;
+                if (currentData[key] === swapped) return;
+                currentData[key] = swapped;
+                db.ref(`league_data/predictions/${key}`).set(swapped);
+                fixed++;
+            });
+        });
+        currentData.predOrderFix = true;
+        db.ref('league_data/predictions/predOrderFix').set(true);
+        return fixed;
+    }
+    const MISSING_LIGA_FIXTURES = [
+        { id: "m4",  match: "ריאל בטיס - ריאל מדריד",    date: "2026-09-06", time: "22:00", comp: "ליגה", isClasico: false, venueType: "חוץ" },
+        { id: "m8",  match: "ריאל מדריד - ויאריאל",      date: "2026-10-04", time: "22:00", comp: "ליגה", isClasico: false, venueType: "בית" },
+        { id: "m22", match: "ראיו ואייקאנו - ריאל מדריד", date: "2027-01-31", time: "22:00", comp: "ליגה", isClasico: false, venueType: "חוץ" },
+        { id: "m25", match: "ריאל מדריד - אלצ'ה",         date: "2027-02-21", time: "22:00", comp: "ליגה", isClasico: false, venueType: "בית" },
+        { id: "m33", match: "סביליה - ריאל מדריד",        date: "2027-04-25", time: "22:00", comp: "ליגה", isClasico: false, venueType: "חוץ" },
+        { id: "m35", match: "ריאל מדריד - ברצלונה",       date: "2027-05-08", time: "22:00", comp: "ליגה", isClasico: true,  venueType: "בית" }
+    ];
+    function restoreMissingFixtures() {
+        if (currentData.fixturesRestored) return 0;
+        const have = new Set(currentMatches.map(m => {
+            const s = matchSides(m);
+            return canonicalTeam(s.oppName) + "@" + (s.realFirst ? "H" : "A");
+        }));
+        let added = 0;
+        MISSING_LIGA_FIXTURES.forEach(f => {
+            const s = matchSides(f);
+            const key = canonicalTeam(s.oppName) + "@" + (s.realFirst ? "H" : "A");
+            if (currentMatches.some(m => m.id === f.id) || have.has(key)) return;
+            delete currentData[`actual_${f.id}`];
+            db.ref(`league_data/predictions/actual_${f.id}`).remove();
+            delete currentData[`manualScore_${f.id}`];
+            db.ref(`league_data/predictions/manualScore_${f.id}`).remove();
+            currentMatches.push({ ...f });
+            have.add(key);
+            added++;
+        });
+        currentData.fixturesRestored = true;
+        saveToCloud();
+        return added;
     }
 
     db.ref('league_data').on('value', snapshot => {
@@ -903,29 +1166,26 @@
         currentMatches = data.matches || DEFAULT_MATCHES;
         currentData = data.predictions || {};
         repairBorrowedDates();
-        repairAwayResultsOrder();
+        repairResultOrder();
+        repairPredOrder();
+        restoreMissingFixtures();
         dedupeDuplicateMatches();
         sortMatches();
         renderUI(); updateHeaderCountdownWidget(); updateLiveMatchWidget(); renderStatusIndicators();
+        fetchMissingBadges();
+        if (apiEvents.length) applyAutoScores();
         if (!hasScrolledToNext) { setTimeout(scrollToNextMatch, 400); hasScrolledToNext = true; }
     });
-
     function sortMatches() {
         currentMatches.sort((a, b) => {
-            const dateA = matchAnchorDate(a);
-            const dateB = matchAnchorDate(b);
-            const timeA = currentData[`time_${a.id}`] !== undefined ? currentData[`time_${a.id}`] : (a.time || "22:00");
-            const timeB = currentData[`time_${b.id}`] !== undefined ? currentData[`time_${b.id}`] : (b.time || "22:00");
-            return new Date(`${dateA}T${timeA}`) - new Date(`${dateB}T${timeB}`);
+            const dtA = matchDateTime(a);
+            const dtB = matchDateTime(b);
+            return new Date(`${dtA.date}T${dtA.time}`) - new Date(`${dtB.date}T${dtB.time}`);
         });
     }
-
     setInterval(() => { updateCountdowns(); updateHeaderCountdownWidget(); syncLiveScoresToRows(); updateLiveMatchWidget(); checkMatchEndedNotifications(); if (renderPending) renderUI(); }, 1000);
     document.addEventListener("visibilitychange", () => { if (!document.hidden && autoScoreEnabled) fetchLiveScores(); });
 
-    /* ============================================================
-       FILTERS / VENUE
-       ============================================================ */
     function setMatchFilter(f) {
         currentFilter = f;
         document.querySelectorAll(".filter-btn").forEach(b => b.classList.toggle("active", b.dataset.filter === f));
@@ -946,15 +1206,11 @@
         });
     }
 
-    /* ============================================================
-       PREDICTION LOCK / WINNERS / EDIT SCORE
-       ============================================================ */
     function isPredictionLocked(match) {
         if (currentData[`unlocked_${match.id}`]) return false;
-        const timeStr = currentData[`time_${match.id}`] !== undefined ? currentData[`time_${match.id}`] : (match.time || "22:00");
-        const dateStr = matchAnchorDate(match);
-        if (!dateStr || !timeStr) return false;
-        const matchTime = new Date(`${dateStr}T${timeStr}`).getTime();
+        const dt = matchDateTime(match);
+        if (!dt.date || !dt.time) return false;
+        const matchTime = new Date(`${dt.date}T${dt.time}`).getTime();
         return (matchTime - new Date().getTime()) <= -900000;
     }
     function toggleManualLock(matchId) {
@@ -992,26 +1248,8 @@
         syncAutoWinners(); renderUI();
     }
 
-    /* פונקציית פתיחת עריכה לתוצאה האמיתית עם קוד 9086 */
-    function promptUnlockActual(matchId, inputEl) {
-        if (!inputEl.readOnly) return; 
-        const code = prompt("הכנס קוד אבטחה לעריכת התוצאה האמיתית:");
-        if (code === "9086") {
-            inputEl.readOnly = false;
-            inputEl.classList.remove("ro");
-            inputEl.focus();
-            inputEl.select();
-        } else if (code !== null) {
-            alert("קוד שגוי!");
-        }
-    }
-
-    /* ============================================================
-       MATCH STATUS / COUNTDOWN
-       ============================================================ */
     function getMatchStatus(match) {
-        const timeStr = currentData[`time_${match.id}`] !== undefined ? currentData[`time_${match.id}`] : (match.time || "22:00");
-        const dateStr = currentData[`date_${match.id}`] !== undefined ? currentData[`date_${match.id}`] : match.date;
+        const { date: dateStr, time: timeStr } = matchDateTime(match);
         if (!dateStr || !timeStr) return { text: "שעה לא קיימת", isLive: false, isEnded: false };
         const matchTime = new Date(`${dateStr}T${timeStr}`).getTime();
         const now = new Date().getTime();
@@ -1035,9 +1273,6 @@
         });
     }
 
-    /* ============================================================
-       API STATUS PILLS
-       ============================================================ */
     function getMatchApiStatus(match) {
         const st = getMatchStatus(match);
         const info = apiScoreForMatch(match);
@@ -1068,9 +1303,6 @@
         });
     }
 
-    /* ============================================================
-       LIVE MATCH WIDGET
-       ============================================================ */
     function updateLiveMatchWidget() {
         const widget = document.getElementById("liveMatchWidget");
         if (!widget) return;
@@ -1085,13 +1317,13 @@
             const scoreChanged = prevScore && prevScore !== scoreKey;
             if (scoreChanged) triggerGoalOverlay(ev, homeScore, awayScore, prevScore);
             previousLiveScores[ev.idEvent] = scoreKey;
-            
             const homeIsReal = canonicalTeam(ev.strHomeTeam) === "real madrid";
             const realName = homeIsReal ? ev.strHomeTeam : ev.strAwayTeam;
             const oppName = homeIsReal ? ev.strAwayTeam : ev.strHomeTeam;
             const realScore = homeIsReal ? homeScore : awayScore;
             const oppScore = homeIsReal ? awayScore : homeScore;
-
+            const realBadge = homeIsReal ? ev.strHomeTeamBadge : ev.strAwayTeamBadge;
+            const oppBadge = homeIsReal ? ev.strAwayTeamBadge : ev.strHomeTeamBadge;
             const st = (ev.strStatus || "").toUpperCase();
             let minute = "—";
             if (st === "HT") minute = "מחצית";
@@ -1111,6 +1343,7 @@
                     </div>
                     <div class="lmv-body">
                         <div class="lmv-team">
+                            <img class="lmv-team-badge" src="${realBadge || ''}" alt="" onerror="this.style.display='none'">
                             <span class="lmv-team-name">${realName}</span>
                         </div>
                         <div class="lmv-scoreboard ${scoreChanged ? 'flash' : ''}">
@@ -1119,6 +1352,7 @@
                             <span class="lmv-score-num">${oppScore}</span>
                         </div>
                         <div class="lmv-team">
+                            <img class="lmv-team-badge" src="${oppBadge || ''}" alt="" onerror="this.style.display='none'">
                             <span class="lmv-team-name">${oppName}</span>
                         </div>
                     </div>
@@ -1130,19 +1364,16 @@
         }).join("");
     }
 
-    /* ============================================================
-       HEADER NEXT-MATCH WIDGET
-       ============================================================ */
     function updateHeaderCountdownWidget() {
         const now = new Date().getTime();
         let nextMatch = null;
         for (let m of currentMatches) {
             if (!m) continue;
-            const dateStr = currentData[`date_${m.id}`] !== undefined ? currentData[`date_${m.id}`] : m.date;
-            const timeStr = currentData[`time_${m.id}`] !== undefined ? currentData[`time_${m.id}`] : (m.time || "22:00");
-            if (!dateStr) continue;
-            const matchTime = new Date(`${dateStr}T${timeStr}`).getTime();
-            if (matchTime > now) { nextMatch = { ...m, calculatedTime: matchTime, timeStr }; break; }
+            const dt = matchDateTime(m);
+            if (!dt.date) continue;
+            const matchTime = new Date(`${dt.date}T${dt.time}`).getTime();
+            if (isNaN(matchTime) || matchTime <= now) continue;
+            if (!nextMatch || matchTime < nextMatch.calculatedTime) nextMatch = { ...m, calculatedTime: matchTime, timeStr: dt.time, dateStr: dt.date };
         }
         const containerEl = document.getElementById("hnmTeamsContainer");
         const infoEl = document.getElementById("hnmInfo");
@@ -1155,7 +1386,7 @@
         }
         targetNextMatchId = nextMatch.id;
         if (containerEl) containerEl.innerHTML = `<span>${nextMatch.match}</span>`;
-        if (infoEl) infoEl.innerText = `${formatDateDisplay(currentData[`date_${nextMatch.id}`] !== undefined ? currentData[`date_${nextMatch.id}`] : nextMatch.date)} | ${nextMatch.timeStr}`;
+        if (infoEl) infoEl.innerText = `${formatDateDisplay(nextMatch.dateStr)} | ${nextMatch.timeStr}`;
         const diff = nextMatch.calculatedTime - now;
         if (diff <= 0) { if (timerEl) timerEl.innerText = "המשחק החל!"; return; }
         const days = Math.floor(diff / 86400000);
@@ -1199,9 +1430,6 @@
         }
     }
 
-    /* ============================================================
-       SAVE / ADD / DELETE
-       ============================================================ */
     function saveToCloud() { db.ref('league_data').set({ activePlayers: activePlayersList, matches: currentMatches, predictions: currentData }); }
     const MONTH_NAMES = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
     const PICKER_YEARS = [2025, 2026, 2027, 2028];
@@ -1316,9 +1544,6 @@
         renderUI();
     }
 
-    /* ============================================================
-       RENDER UI
-       ============================================================ */
     let renderPending = false;
     function renderUI() {
         const typing = document.activeElement;
@@ -1328,13 +1553,14 @@
         const scores = computeScores();
         const ranked = [...activePlayersList].sort((a, b) => scores[b] - scores[a]);
         const medals = ["🥇", "🥈", "🥉"];
-        document.getElementById("playersBar").innerHTML = (activePlayersList.length ? `<div class="scoreboard-title">🏆 דירוג מנחשים</div>` : "") + ranked.map((player, i) => `
+        document.getElementById("playersBar").innerHTML = `<div class="scoreboard-title">🏆 דירוג מנחשים</div>` + ranked.map((player, i) => `
             <div class="player-card ${i < 3 ? 'top-rank' : ''}">
                 <span class="rank">${i < 3 ? medals[i] : (i + 1)}</span>
                 <button class="remove-btn" onclick="removePlayer('${player}')">×</button>
                 <span>${player}</span>
                 <span class="score">${scores[player]} נק'</span>
             </div>`).join("");
+            
         const filteredMatches = getFilteredMatches();
         const mobileContainer = document.getElementById("mobileCardsContainer");
         if (!filteredMatches.length && currentMatches.length) {
@@ -1362,12 +1588,11 @@
                 const isChecked = savedWinners.includes(player);
                 return `<button class="winner-btn ${isChecked ? 'active' : ''}" ${winnersDisabled} onclick="onWinnerToggle('${m.id}', '${player}')">${player}</button>`;
             }).join("");
-            
+            const badges = matchBadges(m);
             const predictionsMobileHTML = activePlayersList.map(player => {
                 const savedPred = currentData[`pred_${m.id}_${player}`] || "";
-                return `<div class="pred-box-mini"><span>${player}</span><div class="pred-cell"><input type="text" class="score-in" value="${savedPred}" placeholder="-" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)"></div></div>`;
+                return `<div class="pred-box-mini"><span>${player}</span><div class="pred-cell">${badgeHTML(badges.left)}<input type="text" class="score-in" value="${savedPred}" placeholder="-" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)">${badgeHTML(badges.right)}</div></div>`;
             }).join("");
-            
             let badgeClass = "countdown-badge";
             if (st.isLive) badgeClass += " live"; else if (st.isEnded) badgeClass += " ended";
             return `
@@ -1401,7 +1626,7 @@
                         </div>
                         <div>
                             <span style="font-weight: 700; font-size: 0.8rem; display: block; color: var(--text-muted); margin-bottom: 4px;">תוצאה:</span>
-                            <div class="pred-cell actual-cell"><input type="text" class="score-in actual-in ro" value="${savedActual}" placeholder="-" readonly tabindex="-1" onclick="promptUnlockActual('${m.id}', this)" onchange="onInputSave('actual_${m.id}', this.value)" title="לחץ להזנת קוד עריכה"></div>
+                            <div class="pred-cell actual-cell">${badgeHTML(badges.left)}<input type="text" class="score-in actual-in ro" value="${savedActual}" placeholder="-" readonly tabindex="-1" title="מתעדכן אוטומטית">${badgeHTML(badges.right)}</div>
                             <span id="src_mobile_${m.id}">${sourceNote}</span>
                         </div>
                     </div>
@@ -1414,13 +1639,13 @@
         }
         document.getElementById("tableHeaderRow").innerHTML = `
             <th style="text-align: right; padding-right: 12px; width: 15%;">משחק</th>
-            <th style="width: 7%;">מסגרת</th>
+            <th style="width: 8%;">מסגרת</th>
             <th style="width: 8%;">בית/חוץ</th>
             <th style="width: 21%;">תאריך</th>
-            <th style="width: 9%;">שעה</th>
-            <th style="width: 20%;">ספירה לאחור</th>
+            <th style="width: 10%;">שעה</th>
+            <th style="width: 21%;">ספירה לאחור</th>
             <th style="width: 10%;">תוצאה</th>
-            <th style="width: 14%;">מי צדק?</th>
+            <th style="width: 15%;">מי צדק?</th>
             ${activePlayersList.map(p => `<th class="player-th" style="width: ${Math.max(6, 18 / activePlayersList.length)}%;">${p}</th>`).join("")}`;
         const tbody = document.getElementById("tableBody");
         tbody.innerHTML = "";
@@ -1447,12 +1672,11 @@
                 const isChecked = savedWinners.includes(player);
                 return `<button class="winner-btn ${isChecked ? 'active' : ''}" ${winnersDisabled} onclick="onWinnerToggle('${m.id}', '${player}')">${player}</button>`;
             }).join("");
-            
+            const badges = matchBadges(m);
             const predictionsHTML = activePlayersList.map(player => {
                 const savedPred = currentData[`pred_${m.id}_${player}`] || "";
-                return `<td class="pred-td"><div class="pred-cell"><input type="text" class="score-in" value="${savedPred}" placeholder="-" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)"></div></td>`;
+                return `<td class="pred-td"><div class="pred-cell">${badgeHTML(badges.left)}<input type="text" class="score-in" value="${savedPred}" placeholder="-" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)">${badgeHTML(badges.right)}</div></td>`;
             }).join("");
-            
             let badgeClass = "countdown-badge";
             if (st.isLive) badgeClass += " live"; else if (st.isEnded) badgeClass += " ended";
             tr.innerHTML = `
@@ -1470,7 +1694,7 @@
                     <span id="cd_table_${m.id}" class="${badgeClass}">${st.text}</span>
                     <span class="api-pill ${apiStatus.cls}" id="api_status_table_${m.id}">${apiStatus.label}</span>
                 </td>
-                <td><div class="pred-cell actual-cell"><input type="text" class="score-in actual-in ro" value="${savedActual}" placeholder="-" readonly tabindex="-1" onclick="promptUnlockActual('${m.id}', this)" onchange="onInputSave('actual_${m.id}', this.value)" title="לחץ להזנת קוד עריכה"></div></td>
+                <td><div class="pred-cell actual-cell">${badgeHTML(badges.left)}<input type="text" class="score-in actual-in ro" value="${savedActual}" placeholder="-" readonly tabindex="-1" title="מתעדכן אוטומטית">${badgeHTML(badges.right)}</div></td>
                 <td><div class="winners-box" style="grid-template-columns: repeat(${Math.min(activePlayersList.length, 3)}, 1fr);">${winnersHTML}${autoWinnersBtnHTML}</div></td>
                 ${predictionsHTML}`;
             tbody.appendChild(tr);
