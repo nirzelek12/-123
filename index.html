@@ -45,7 +45,7 @@
             color: var(--text-main); padding: 14px 6px; -webkit-tap-highlight-color: transparent; 
             min-height: 100vh; position: relative; overflow-x: hidden; text-rendering: optimizeSpeed;
         }
-        body::before { content: ""; position: fixed; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% -5%, rgba(22, 78, 66, 0.28), transparent 60%), radial-gradient(ellipse 50% 40% at 90% 100%, rgba(212, 163, 46, 0.08), transparent 55%); pointer-events: none; z-index: 0; }
+        body::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% -5%, rgba(22, 78, 66, 0.28), transparent 60%), radial-gradient(ellipse 50% 40% at 90% 100%, rgba(212, 163, 46, 0.08), transparent 55%); pointer-events: none; z-index: 0; }
         .main-container { width: 100%; max-width: 98vw; margin: 0 auto; background: rgba(8, 34, 30, 0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 18px; border-radius: 24px; box-shadow: var(--shadow-card); border: 1px solid var(--border-color); position: relative; z-index: 1; }     
         header { background: transparent !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; color: var(--text-main); padding: 34px 22px 26px; border-radius: 22px; text-align: center; margin-bottom: 20px; position: relative; box-shadow: none; border: 1px solid var(--border-color); overflow: hidden; }
         header::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--gold-deep), var(--gold-bright), var(--gold-deep)); box-shadow: var(--glow-gold); }
@@ -111,24 +111,21 @@
         .controls-section select option { background-color: var(--bg-card); color: var(--text-main); }
         .controls-section button.action-submit-btn { background: linear-gradient(135deg, var(--gold-accent), var(--gold-deep)); color: #051613; border: none; padding: 11px 18px; border-radius: 10px; font-weight: 800; cursor: pointer; width: 100%; font-size: 0.95rem; box-shadow: 0 6px 16px rgba(212, 163, 46, 0.35); transition: transform 0.2s, filter 0.2s; }
         .controls-section button.action-submit-btn:hover { filter: brightness(1.08); transform: translateY(-2px); }
-        .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 14px; }
+        .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 14px; margin-top: 14px; }
         .filter-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s; }
         .filter-btn:hover { border-color: var(--gold-accent); color: var(--text-main); }
         .filter-btn.active { background: linear-gradient(135deg, var(--crest-blue), var(--crest-navy)); color: #ffffff; border-color: var(--gold-accent); box-shadow: 0 4px 12px rgba(5, 22, 19, 0.4); }
         .filter-btn.active.live-filter { background: linear-gradient(135deg, #ef4444, #dc2626); border-color: #dc2626; box-shadow: 0 0 14px rgba(239,68,68,0.4); }
         
-        /* ------------------------------------------------------------
-           סרגל דירוג מנחשים: שורה אחת בלבד שמתאימה את עצמה אוטומטית לכמות האנשים
-           ------------------------------------------------------------ */
         .scoreboard { 
             display: flex; 
-            flex-wrap: nowrap; 
-            gap: 6px; 
-            justify-content: space-between; 
+            flex-direction: row;
             align-items: center; 
+            justify-content: space-between; 
+            gap: 6px; 
             margin-bottom: 16px; 
             background: linear-gradient(135deg, var(--bg-sub-card), var(--bg-card)); 
-            padding: 12px 14px; 
+            padding: 10px 14px; 
             border-radius: 16px; 
             border: 1px solid var(--border-color); 
             box-shadow: var(--shadow-soft); 
@@ -138,38 +135,41 @@
         .scoreboard-title { 
             font-family: var(--font-display); 
             font-weight: 800; 
-            font-size: 0.78rem; 
+            font-size: 0.82rem; 
             color: var(--gold-accent); 
             text-transform: uppercase; 
             letter-spacing: 1px; 
-            flex-shrink: 0; 
-            white-space: nowrap;
+            white-space: nowrap; 
+            margin-left: 6px;
+            flex-shrink: 0;
         }
         .player-card { 
+            flex: 1; 
+            min-width: 0; 
             background: linear-gradient(135deg, var(--bg-card), var(--bg-sub-card)); 
             border: 1px solid var(--border-color); 
             padding: 6px 10px; 
-            border-radius: 22px; 
+            border-radius: 12px; 
             font-weight: 700; 
             display: flex; 
             align-items: center; 
-            gap: 5px; 
-            font-size: 0.8rem; 
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2); 
+            justify-content: space-between; 
+            gap: 4px; 
+            font-size: 0.82rem; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2); 
             transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; 
-            white-space: nowrap; 
-            flex: 1 1 0; 
-            min-width: 0; 
-            justify-content: center;
         }
-        .player-card:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.3); border-color: var(--gold-accent); }
-        .player-card.top-rank { border-color: var(--gold-bright); box-shadow: 0 0 0 1px var(--gold-accent), 0 4px 14px rgba(212,163,46,0.35), var(--glow-gold); }
+        .player-card:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.3); border-color: var(--gold-accent); }
+        .player-card.top-rank { border-color: var(--gold-bright); box-shadow: 0 0 0 1px var(--gold-accent), 0 2px 10px rgba(212,163,46,0.25); }
+        .player-card .player-info { display: flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; }
+        .player-card .player-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .player-card .rank { font-family: var(--font-mono); font-weight: 800; font-size: 0.85rem; color: var(--gold-bright); flex-shrink: 0; }
-        .player-card span:nth-of-type(1) { overflow: hidden; text-overflow: ellipsis; }
-        .player-card .score { background: #051613; color: var(--gold-bright); padding: 3px 8px; border-radius: 16px; font-size: 0.7rem; font-weight: 800; border: 1px solid var(--gold-accent); font-family: var(--font-mono); flex-shrink: 0; }
-        .remove-btn { background: none; border: none; color: rgba(185, 28, 28, 0.5); cursor: pointer; font-size: 0.78rem; line-height: 1; opacity: 0.6; transition: opacity 0.2s, transform 0.2s; padding: 0; flex-shrink: 0; }
-        .remove-btn:hover { opacity: 1; transform: scale(1.15); color: #ef4444; }
-        
+        .player-card .score { background: #051613; color: var(--gold-bright); padding: 2px 6px; border-radius: 8px; font-size: 0.72rem; font-weight: 800; border: 1px solid var(--gold-accent); font-family: var(--font-mono); flex-shrink: 0; white-space: nowrap; }
+        .remove-btn { background: none; border: none; color: rgba(185, 28, 28, 0.6); cursor: pointer; font-size: 0.85rem; line-height: 1; opacity: 0.7; transition: opacity 0.2s; padding: 0 2px; flex-shrink: 0; }
+        .remove-btn:hover { opacity: 1; color: #ef4444; }
+
+        .league-widget-card { overflow: hidden; }
+        .league-widget-card > div[data-widget-type] { min-height: 180px; }
         #powered-by { text-align: center; font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; }
         #powered-by a { color: var(--gold-accent); text-decoration: none; font-weight: 700; }
         .countdown-badge { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg, rgba(212, 163, 46, 0.12), rgba(212, 163, 46, 0.06)); color: var(--gold-bright); border: 1px solid rgba(212, 163, 46, 0.3); padding: 6px 12px; border-radius: 10px; font-size: 0.76rem; font-weight: 800; direction: ltr; white-space: nowrap; font-family: var(--font-mono); box-shadow: inset 0 1px 0 rgba(212,163,46,0.1); }
@@ -225,8 +225,11 @@
         input.score-in:disabled { background-color: rgba(100, 116, 139, 0.15); color: var(--text-muted); cursor: not-allowed; opacity: 0.7; border-color: var(--border-color); }
         input.score-in.readonly, input.score-in.ro { opacity: 1; cursor: default; color: var(--gold-bright); border-color: var(--gold-accent); }
         input.score-in.ro:focus { box-shadow: none; }
-        .actual-cell .pred-logo, .actual-cell .pred-logo-empty { width: 13px; height: 13px; }
-        .actual-cell input.score-in.actual-in { width: 46px; }
+        .actual-cell { gap: 5px; }
+        .actual-cell .pred-logo, .actual-cell .pred-logo-empty { width: 20px; height: 20px; }
+        .actual-cell input.score-in.actual-in { width: 50px; }
+        input.score-in.ro { cursor: pointer; }
+        input.score-in.actual-in.editable { cursor: text; color: var(--gold-bright); border-color: var(--gold-bright); box-shadow: 0 0 0 2px rgba(212, 163, 46, 0.3); }
         .pred-cell { display: flex; align-items: center; justify-content: center; gap: 2px; direction: ltr; min-width: 0; }
         .pred-logo { width: 15px; height: 15px; flex: 0 0 auto; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
         .pred-logo-empty { width: 15px; height: 15px; flex: 0 0 auto; }
@@ -253,6 +256,7 @@
         .reset-btn { background: none; border: none; color: #ef4444; cursor: pointer; text-decoration: underline; font-weight: 600; }
         .reset-btn:hover { color: #dc2626; }
         .empty-state { text-align: center; padding: 30px 16px; color: var(--text-muted); font-weight: 600; font-size: 0.9rem; }
+
         @media (max-width: 767px) {
             .blancos-banner { animation: none; }
             .live-match-card { animation: none; }
@@ -268,12 +272,25 @@
             .match-add-card { padding: 14px; }
             .match-add-card .field-date { grid-column: 1 / -1; }
             .control-card { padding: 14px; }
-            .player-card { padding: 5px 6px; font-size: 0.74rem; gap: 3px; }
-            .player-card .score { padding: 2px 5px; font-size: 0.62rem; }
-            .scoreboard-title { font-size: 0.7rem; }
+            
+            .scoreboard { 
+                flex-direction: column; 
+                align-items: stretch;
+                gap: 6px; 
+                padding: 10px; 
+            }
+            .scoreboard-title { font-size: 0.75rem; letter-spacing: 1.2px; margin-bottom: 2px; text-align: center; margin-left: 0; }
+            .player-card { width: 100%; padding: 8px 12px; font-size: 0.8rem; gap: 8px; border-radius: 12px; }
+            .player-card .rank { min-width: 20px; font-size: 0.82rem; }
+            .player-card .score { padding: 3px 8px; font-size: 0.7rem; }
+            .remove-btn { font-size: 0.78rem; }
+            
+            .actual-cell .pred-logo, .actual-cell .pred-logo-empty { width: 26px; height: 26px; }
+            .actual-cell input.score-in.actual-in { width: 50px; }
             .lmv-score-num { font-size: 1.8rem; }
             .lmv-team-badge { width: 38px; height: 38px; }
         }
+
         @media (min-width: 768px) {
             h1 { font-size: 2.4rem; } body { padding: 20px 10px; } .main-container { padding: 28px; }
             .controls-section { display: grid; grid-template-columns: 280px 1fr; gap: 18px; align-items: stretch; }
@@ -285,6 +302,7 @@
             .controls-section button.action-submit-btn { width: auto; white-space: nowrap; }
             .mobile-cards-container { display: none; } .table-wrapper { display: block; }
         }
+
         .goal-overlay { position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center; background: radial-gradient(ellipse at center, rgba(212,163,46,0.2), rgba(5,22,19,0.95)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
         .goal-overlay.show { display: flex; animation: goalOverlayFadeIn 0.3s ease-out; }
         .goal-overlay-content { text-align: center; animation: goalOverlayPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 40px 50px; background: linear-gradient(160deg, rgba(11,45,39,0.96), rgba(8,34,30,0.96)); border: 2px solid var(--gold-accent); border-radius: 28px; box-shadow: 0 0 0 1px rgba(212,163,46,0.2), 0 0 60px rgba(212,163,46,0.4), 0 30px 80px rgba(0,0,0,0.7); position: relative; overflow: hidden; max-width: 90vw; }
@@ -364,9 +382,7 @@
             </div>
         </div>
     </header>
-    <div class="scoreboard" id="playersBar">
-        <div class="scoreboard-title">:🏆 דירוג מנחשים</div>
-    </div>
+    <div class="scoreboard" id="playersBar"></div>
     <div class="filter-bar" id="filterBar">
         <button class="filter-btn active" data-filter="all" onclick="setMatchFilter('all')">הכל</button>
         <button class="filter-btn" data-filter="upcoming" onclick="setMatchFilter('upcoming')">קרובים</button>
@@ -425,7 +441,7 @@
     let endedNotifInitialized = false;
 
     /* ============================================================
-       THE SPORTS DB — FREE API
+       THE SPORTS DB — FREE API (Real Madrid team id = 133738)
        ============================================================ */
     const TSDB_KEY = "123";
     const REAL_MADRID_ID = "133738";
@@ -439,6 +455,13 @@
     const MAX_BACKOFF_MS = 60000;
     let liveFetchTimer = null, consecutiveFailures = 0, lastFetchOk = true, lastFetchTime = null;
 
+    /* ---- קישורים יציבים וקבועים לסמלים שלא יעלמו (כולל תיקון פ.ס.וו איינדהובן עם כתובת PNG ישירה ויציבה) ---- */
+    const FIXED_BADGES = {
+        "inter": "https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg",
+        "psv eindhoven": "https://thumb.wikimedia.org/wikipedia/he/thumb/0/05/PSV_Eindhoven.svg/1280px-PSV_Eindhoven.svg.png?utm_source=he.wikipedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+    };
+
+    /* ---- Team name canonicalization ---- */
     const TEAM_ALIASES = {
         "real madrid": ["ריאל", "ריאל מדריד", "ריאל מדריד (h)", "ריאל מדריד (a)"],
         "barcelona": ["ברצלונה", "ברצה", "בארסה"],
@@ -452,17 +475,17 @@
         "getafe": ["חטאפה", "גטאפה", "חטפה"],
         "osasuna": ["אוססונה"],
         "girona": ["חירונה", "ג'ירונה", "ז'ירונה"],
-        "rayo vallecano": ["ראיו", "ראיו ויאקנו", "ראיו ולקאנו", "ראיו ואייקאנו"],
+        "rayo vallecano": ["ראיו", "ראיו ויאקנו", "ראיו ולקאנו"],
         "celta vigo": ["סלטה", "סלטה ויגו"],
         "mallorca": ["מיורקה", "מאיורקה"],
         "alaves": ["אלאבס", "אלבס", "דפורטיבו אלאבס"],
         "espanyol": ["אספניול", "ספרדי"],
         "levante": ["לבנטה", "לבאנטה"],
         "elche": ["אלצ'ה"],
-        "racing santander": ["ראסינג", "ראסינג סנטנדר", "ראסינג סנטאנדר", "ראסינג דה סנטנדר"],
+        "racing santander": ["ראסינג", "ראסינג סנטנדר"],
         "real oviedo": ["אוביידו", "ריאל אוביידו"],
         "malaga": ["מאלגה", "מלאגה", "מלגה"],
-        "las palmas": ["לאס פאלמס", "לאס פלמס", "פאלמס"],
+        "las palmas": ["לאס פאלמס", "לאס פלמס"],
         "cadiz": ["קדיס", "קאדיס", "קדיז"],
         "granada": ["גרנדה", "גרנאדה"],
         "almeria": ["אלמריה"],
@@ -470,122 +493,24 @@
         "valladolid": ["ואיאדוליד", "ואלאדוליד"],
         "huesca": ["ואסקה", "הואסקה"],
         "eibar": ["אייבר", "איבר"],
-        "numancia": ["נומנסיה"],
-        "tenerife": ["טנריפה"],
-        "deportivo la coruna": ["דפורטיבו", "דפורטיבו לה קורוניה", "לה קורוניה"],
         "liverpool": ["ליברפול"],
         "arsenal": ["ארסנל"],
-        "manchester city": ["מנצ'סטר סיטי", "מן סיטי", "מאנצ'סטר סיטי", "סיטי"],
-        "manchester united": ["מנצ'סטר יונייטד", "מאנצ'סטר יונייטד", "יונייטד", "מנצ'סטר"],
+        "manchester city": ["מנצ'סטר סיטי", "מן סיטי", "סיטי"],
+        "manchester united": ["מנצ'סטר יונייטד", "יונייטד"],
         "chelsea": ["צ'לסי"],
         "tottenham": ["טוטנהאם", "טוטנהם", "ספרס"],
-        "newcastle": ["ניוקאסל", "ניוקאסל יונייטד"],
-        "aston villa": ["אסטון וילה"],
-        "brighton": ["ברייטון"],
-        "west ham": ["וסט האם", "וסטהאם"],
-        "everton": ["אברטון"],
-        "leicester": ["לסטר", "לסטר סיטי"],
-        "wolves": ["וולבס", "וולברהמפטון"],
-        "crystal palace": ["קריסטל פאלאס"],
-        "brentford": ["ברנטפורד"],
-        "fulham": ["פולהאם"],
-        "nottingham forest": ["נוטינגהאם", "נוטינגהם פורסט", "פורסט"],
-        "bournemouth": ["בורנמות'", "בורנמות"],
-        "burnley": ["ברנלי"],
-        "luton": ["לוטון", "לוטון טאון"],
-        "sheffield united": ["שפילד", "שפילד יונייטד"],
-        "leeds": ["לידס", "לידס יונייטד"],
-        "southampton": ["סאות'המפטון", "סאותהמפטון"],
-        "ipswich": ["איפסוויץ'", "איפסוויץ"],
-        "bayern munich": ["בייארן", "באיירן", "בייארן מינכן", "באיירן מינכן"],
-        "borussia dortmund": ["דורטמונד", "בורוסיה דורטמונד", "בורוסיה"],
-        "rb leipzig": ["לייפציג", "ר.ב. לייפציג", "רב לייפציג"],
-        "bayer leverkusen": ["לברקוזן", "באייר לברקוזן"],
-        "eintracht frankfurt": ["פרנקפורט", "איינטרכט פרנקפורט"],
-        "vfb stuttgart": ["שטוטגרט", "שטוטגארט"],
-        "wolfsburg": ["וולפסבורג"],
-        "borussia monchengladbach": ["מנשנגלדבך", "גלדבך", "מנשנגלאדבך"],
-        "werder bremen": ["ברמן", "ורדר ברמן"],
-        "hoffenheim": ["הופנהיים"],
-        "union berlin": ["אוניון ברלין"],
-        "freiburg": ["פרייבורג"],
-        "mainz": ["מיינץ"],
-        "augsburg": ["אאוגסבורג", "אוגסבורג"],
-        "bochum": ["בוכום"],
-        "darmstadt": ["דארמשטאדט"],
+        "bayern munich": ["בייארן", "באיירן", "בייארן מינכן"],
+        "borussia dortmund": ["דורטמונד", "בורוסיה דורטמונד"],
         "juventus": ["יובנטוס", "יובה"],
-        "inter milan": ["אינטר", "אינטר מילאנו", "אינטרנציונלה"],
+        "inter": ["אינטר", "אינטר מילאנו", "אינטר מילאן", "fc internazionale milano", "internazionale"],
         "ac milan": ["מילאן"],
-        "napoli": ["נאפולי"],
-        "roma": ["רומא"],
-        "lazio": ["לאציו"],
-        "atalanta": ["אטאלנטה"],
-        "fiorentina": ["פיורנטינה"],
-        "bologna": ["בולוניה"],
-        "torino": ["טורינו"],
-        "udinese": ["אודינזה"],
-        "sassuolo": ["ססואולו", "סאסואולו"],
-        "monza": ["מונצה", "מונזה"],
-        "genoa": ["ג'נובה", "גנואה"],
-        "lecce": ["לצ'ה"],
-        "salernitana": ["סלרניטנה"],
-        "cagliari": ["קליארי"],
-        "hellas verona": ["ורונה", "הלאס ורונה"],
-        "empoli": ["אמפולי"],
-        "frosinone": ["פרוזינונה"],
-        "cremonese": ["קרמונזה"],
-        "como": ["קומו"],
-        "parma": ["פארמה"],
-        "venezia": ["ונציה"],
-        "paris sg": ["פריז", "פ.ס.ז'", "פ.ס.ז", "פריז סן ז'רמן", "פסז", "psg"],
-        "marseille": ["מרסיי"],
-        "monaco": ["מונקו"],
-        "lyon": ["ליון"],
-        "lille": ["ליל"],
-        "nice": ["ניס"],
-        "rennes": ["רן", "רנס"],
-        "lens": ["לאנס"],
-        "nantes": ["נאנט"],
-        "strasbourg": ["סטרסבורג"],
-        "brest": ["ברסט"],
-        "toulouse": ["טולוז"],
-        "montpellier": ["מונפלייה"],
-        "reims": ["ריימס"],
-        "le havre": ["לה האבר"],
-        "metz": ["מץ"],
-        "lorient": ["לוריאן"],
-        "clermont": ["קלרמון"],
-        "angers": ["אנז'ה"],
-        "auxerre": ["אוסר"],
-        "troyes": ["טרואה"],
-        "benfica": ["בנפיקה"],
-        "porto": ["פורטו"],
-        "sporting cp": ["ספורטינג", "ספורטינג ליסבון"],
-        "braga": ["בראגה"],
-        "ajax": ["איאקס"],
-        "psv": ["פ.ס.ו", "פסו", "איינדהובן"],
-        "feyenoord": ["פיינורד"],
-        "az alkmaar": ["אלקמאר", "א.ז. אלקמאר"],
-        "twente": ["טוונטה"],
-        "celtic": ["סלטיק"],
-        "rangers": ["ריינג'רס"],
-        "shakhtar donetsk": ["שחטאר", "שחטאר דונצק"],
-        "dinamo zagreb": ["דינמו זאגרב"],
-        "red star belgrade": ["כוכב אדום", "כוכב אדום בלגרד"],
-        "young boys": ["יאנג בויז"],
-        "salzburg": ["זלצבורג", "רד בול זלצבורג"],
-        "galatasaray": ["גלאטסראיי", "גלטסראיי"],
-        "fenerbahce": ["פנרבחצ'ה"],
-        "besiktas": ["בשיקטאש"],
-        "olympiacos": ["אולימפיאקוס"],
-        "panathinaikos": ["פנאתינאיקוס"],
-        "fc copenhagen": ["קופנהגן"],
-        "fc basel": ["בזל"],
-        "aek athens": ["א.א.ק אתונה", "א.א.ק.", "aek"],
-        "lask": ["לאסק", "לאסק לינץ"],
-        "al nassr": ["אל נאסר", "אל-נאסר"],
-        "al hilal": ["אל הילאל", "אל-הילאל"],
-        "al ittihad": ["אל איתיחאד", "אל-איתיחאד"]
+        "paris sg": ["פריז", "פ.ס.ז'", "פ.ס.ז", "פסז", "psg"],
+        "deportivo la coruna": ["דפורטיבו", "לה קורוניה", "דפורטיבו לה קורוניה"],
+        "roma": ["רומא", "אס רומא"],
+        "lask linz": ["לאסק", "לאסק לינץ"],
+        "shakhtar donetsk": ["שחטאר", "שחטאר דונייצק"],
+        "aek athens": ["אאק אתונה", "א.א.ק", "א.א.ק אתונה"],
+        "psv eindhoven": ["פסו", "פדסו", "פסו איינדהובן", "פדסו איינדהובן", "פ.ס.וו איינדהובן", "פ.ס.וו", "פ.ס.ו איינדהובן", "פ.ס.ו", "psv"]
     };
     function normTeam(str) {
         return String(str || "").toLowerCase().replace(/\b(fc|cf|sc|ud|cd|club|de|the)\b/g, " ").replace(/[^a-z\u0590-\u05ff ]/g, " ").replace(/\s+/g, " ").trim();
@@ -621,15 +546,27 @@
         };
     }
 
-    const teamBadgeCache = (() => { try { return JSON.parse(localStorage.getItem("teamBadges2") || "{}"); } catch (e) { return {}; } })();
+    const teamBadgeCache = (() => { 
+        try { 
+            let cache = JSON.parse(localStorage.getItem("teamBadges2") || "{}"); 
+            Object.assign(cache, FIXED_BADGES);
+            return cache;
+        } catch (e) { 
+            return { ...FIXED_BADGES }; 
+        } 
+    })();
     function saveTeamBadges() { try { localStorage.setItem("teamBadges2", JSON.stringify(teamBadgeCache)); } catch (e) {} }
     function registerEventBadges(ev) {
         if (!ev) return;
-        if (ev.strHomeTeamBadge) teamBadgeCache[canonicalTeam(ev.strHomeTeam)] = ev.strHomeTeamBadge;
-        if (ev.strAwayTeamBadge) teamBadgeCache[canonicalTeam(ev.strAwayTeam)] = ev.strAwayTeamBadge;
+        const h = canonicalTeam(ev.strHomeTeam);
+        const a = canonicalTeam(ev.strAwayTeam);
+        if (ev.strHomeTeamBadge && !FIXED_BADGES[h]) teamBadgeCache[h] = ev.strHomeTeamBadge;
+        if (ev.strAwayTeamBadge && !FIXED_BADGES[a]) teamBadgeCache[a] = ev.strAwayTeamBadge;
     }
     function teamBadge(name) {
-        const url = teamBadgeCache[canonicalTeam(name)];
+        const canon = canonicalTeam(name);
+        if (FIXED_BADGES[canon]) return FIXED_BADGES[canon];
+        const url = teamBadgeCache[canon];
         return url && url !== "none" ? url : "";
     }
     function matchBadges(m) {
@@ -960,7 +897,7 @@
         }
         playGoalSound();
     }
-    
+
     let floatingBtnMode = "next";
     function updateFloatingBtn() {
         const btn = document.getElementById("floatingScrollBtn");
@@ -1016,6 +953,7 @@
         saveToCloud();
         return true;
     }
+
     function applyAutoScores() {
         if (!autoScoreEnabled) return;
         let changed = false;
@@ -1040,6 +978,7 @@
                 }
             }
             if (!info.score) return;
+            if (currentData[`manualActual_${m.id}`]) return;
             if (!evLive && !evFinished) return;
             if (currentData[`actual_${m.id}`] !== info.score) {
                 currentData[`actual_${m.id}`] = info.score;
@@ -1052,6 +991,7 @@
         if (dedupeDuplicateMatches()) { sortMatches(); syncAutoWinners(); renderUI(); }
         checkMatchEndedNotifications();
     }
+
     function syncLiveScoresToRows() {
         if (!autoScoreEnabled || !apiEvents.length) return;
         let changed = false;
@@ -1059,6 +999,7 @@
             if (!m) return;
             const info = apiScoreForMatch(m);
             if (!info || !info.score || !isEventLive(info.event)) return;
+            if (currentData[`manualActual_${m.id}`]) return;
             if (currentData[`actual_${m.id}`] === info.score) return;
             currentData[`actual_${m.id}`] = info.score;
             db.ref(`league_data/predictions/actual_${m.id}`).set(info.score);
@@ -1526,6 +1467,32 @@
         if (key.startsWith('date_')) sortMatches();
         syncAutoWinners(); renderUI();
     }
+    const RESULT_EDIT_CODE = "9086";
+    let unlockedActualMatches = new Set();
+    function isActualEditable(matchId) { return unlockedActualMatches.has(matchId); }
+    function requestActualEdit(matchId) {
+        if (isActualEditable(matchId)) return;
+        const code = prompt("הזן קוד כדי לערוך את התוצאה הסופית:");
+        if (code === null) return;
+        if (String(code).trim() !== RESULT_EDIT_CODE) { alert("קוד שגוי — התוצאה לא נפתחה לעריכה"); return; }
+        unlockedActualMatches.add(matchId);
+        renderUI();
+    }
+    function onActualSave(matchId, value) {
+        const score = normalizeScoreStr(value) || String(value || "").trim();
+        currentData[`actual_${matchId}`] = score;
+        currentData[`manualActual_${matchId}`] = true;
+        db.ref(`league_data/predictions/actual_${matchId}`).set(score);
+        db.ref(`league_data/predictions/manualActual_${matchId}`).set(true);
+        unlockedActualMatches.delete(matchId);
+        syncAutoWinners(); renderUI();
+    }
+    function actualInputHTML(matchId, savedActual) {
+        if (isActualEditable(matchId)) {
+            return `<input type="text" class="score-in actual-in editable" value="${savedActual}" placeholder="-" onchange="onActualSave('${matchId}', this.value)" title="ערוך את התוצאה ולחץ מחוץ לתיבה לשמירה">`;
+        }
+        return `<input type="text" class="score-in actual-in ro" value="${savedActual}" placeholder="-" readonly onclick="requestActualEdit('${matchId}')" title="מתעדכן אוטומטית • לחיצה + קוד לעריכה">`;
+    }
     function setVenueType(matchId, val) {
         const label = (val === 'H' || val === 'בית') ? 'בית' : 'חוץ';
         currentData[`venueType_${matchId}`] = label;
@@ -1544,6 +1511,9 @@
         renderUI();
     }
 
+    /* ============================================================
+       RENDER UI
+       ============================================================ */
     let renderPending = false;
     function renderUI() {
         const typing = document.activeElement;
@@ -1553,14 +1523,17 @@
         const scores = computeScores();
         const ranked = [...activePlayersList].sort((a, b) => scores[b] - scores[a]);
         const medals = ["🥇", "🥈", "🥉"];
-        document.getElementById("playersBar").innerHTML = `<div class="scoreboard-title">🏆 דירוג מנחשים</div>` + ranked.map((player, i) => `
+        
+        document.getElementById("playersBar").innerHTML = (activePlayersList.length ? `<div class="scoreboard-title">🏆 דירוג מנחשים</div>` : "") + ranked.map((player, i) => `
             <div class="player-card ${i < 3 ? 'top-rank' : ''}">
-                <span class="rank">${i < 3 ? medals[i] : (i + 1)}</span>
-                <button class="remove-btn" onclick="removePlayer('${player}')">×</button>
-                <span>${player}</span>
+                <div class="player-info">
+                    <span class="rank">${i < 3 ? medals[i] : (i + 1)}</span>
+                    <button class="remove-btn" onclick="removePlayer('${player}')">×</button>
+                    <span class="player-name">${player}</span>
+                </div>
                 <span class="score">${scores[player]} נק'</span>
             </div>`).join("");
-            
+
         const filteredMatches = getFilteredMatches();
         const mobileContainer = document.getElementById("mobileCardsContainer");
         if (!filteredMatches.length && currentMatches.length) {
@@ -1626,7 +1599,7 @@
                         </div>
                         <div>
                             <span style="font-weight: 700; font-size: 0.8rem; display: block; color: var(--text-muted); margin-bottom: 4px;">תוצאה:</span>
-                            <div class="pred-cell actual-cell">${badgeHTML(badges.left)}<input type="text" class="score-in actual-in ro" value="${savedActual}" placeholder="-" readonly tabindex="-1" title="מתעדכן אוטומטית">${badgeHTML(badges.right)}</div>
+                            <div class="pred-cell actual-cell">${badgeHTML(badges.left)}${actualInputHTML(m.id, savedActual)}${badgeHTML(badges.right)}</div>
                             <span id="src_mobile_${m.id}">${sourceNote}</span>
                         </div>
                     </div>
@@ -1640,11 +1613,11 @@
         document.getElementById("tableHeaderRow").innerHTML = `
             <th style="text-align: right; padding-right: 12px; width: 15%;">משחק</th>
             <th style="width: 8%;">מסגרת</th>
-            <th style="width: 8%;">בית/חוץ</th>
-            <th style="width: 21%;">תאריך</th>
+            <th style="width: 9%;">בית/חוץ</th>
+            <th style="width: 20%;">תאריך</th>
             <th style="width: 10%;">שעה</th>
-            <th style="width: 21%;">ספירה לאחור</th>
-            <th style="width: 10%;">תוצאה</th>
+            <th style="width: 20%;">ספירה לאחור</th>
+            <th style="width: 11%;">תוצאה</th>
             <th style="width: 15%;">מי צדק?</th>
             ${activePlayersList.map(p => `<th class="player-th" style="width: ${Math.max(6, 18 / activePlayersList.length)}%;">${p}</th>`).join("")}`;
         const tbody = document.getElementById("tableBody");
@@ -1694,13 +1667,16 @@
                     <span id="cd_table_${m.id}" class="${badgeClass}">${st.text}</span>
                     <span class="api-pill ${apiStatus.cls}" id="api_status_table_${m.id}">${apiStatus.label}</span>
                 </td>
-                <td><div class="pred-cell actual-cell">${badgeHTML(badges.left)}<input type="text" class="score-in actual-in ro" value="${savedActual}" placeholder="-" readonly tabindex="-1" title="מתעדכן אוטומטית">${badgeHTML(badges.right)}</div></td>
+                <td><div class="pred-cell actual-cell">${badgeHTML(badges.left)}${actualInputHTML(m.id, savedActual)}${badgeHTML(badges.right)}</div></td>
                 <td><div class="winners-box" style="grid-template-columns: repeat(${Math.min(activePlayersList.length, 3)}, 1fr);">${winnersHTML}${autoWinnersBtnHTML}</div></td>
                 ${predictionsHTML}`;
             tbody.appendChild(tr);
         });
     }
 
+    /* ============================================================
+       INIT
+       ============================================================ */
     fetchLiveScores();
     scheduleNextFetch();
 </script>
