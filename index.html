@@ -242,20 +242,17 @@
             .match-add-card { padding: 14px; }
             .match-add-card .field-date { grid-column: 1 / -1; }
             .control-card { padding: 14px; }
-            /* דירוג המנחשים — שתי עמודות וקומפקטי, כדי שלא צריך לגלול */
             .scoreboard { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px; overflow: visible; }
             .scoreboard-title { grid-column: 1 / -1; font-size: 0.7rem; letter-spacing: 1.2px; margin-bottom: 0; }
             .player-card { width: 100%; justify-content: space-between; flex-shrink: 1; padding: 5px 9px; font-size: 0.74rem; gap: 4px; border-radius: 14px; }
             .player-card .rank { min-width: 20px; font-size: 0.78rem; }
             .player-card .score { padding: 2px 7px; font-size: 0.66rem; }
             .remove-btn { font-size: 0.72rem; }
-            /* טבלת Top 5 צמודה וקומפקטית */
             .mini-tables-section { margin-bottom: 10px; }
             .mini-table-card { padding: 8px 10px; }
             .mini-table th { padding: 3px 4px; font-size: 0.66rem; }
             .mini-table td { padding: 3px 4px; font-size: 0.78rem; }
             .mini-table .rank-cell { width: 24px; font-size: 0.72rem; }
-            /* סמלי הקבוצות בעמודת התוצאה גדולים יותר, בלי לשבור את הרוחב */
             .actual-cell .pred-logo, .actual-cell .pred-logo-empty { width: 26px; height: 26px; }
             .actual-cell input.score-in.actual-in { width: 50px; }
             .lmv-score-num { font-size: 1.8rem; }
@@ -461,17 +458,16 @@
     const REAL_MADRID_ID = "133738";
     const TSDB_NEXT_URL = `https://www.thesportsdb.com/api/v1/json/${TSDB_KEY}/eventsnext.php?id=${REAL_MADRID_ID}`;
     const TSDB_LAST_URL = `https://www.thesportsdb.com/api/v1/json/${TSDB_KEY}/eventslast.php?id=${REAL_MADRID_ID}`;
-    let apiEvents = [];           // merged events from API (upcoming + live + recent results)
+    let apiEvents = [];           
     let autoScoreEnabled = localStorage.getItem("autoScore") !== "off";
     let lastAutoFetchLabel = "";
-    const LIVE_REFRESH_MS = 15000;   // 15s during live matches
-    const IDLE_REFRESH_MS = 120000;  // 2min when no live match
+    const LIVE_REFRESH_MS = 15000;   
+    const IDLE_REFRESH_MS = 120000;  
     const MAX_BACKOFF_MS = 60000;
     let liveFetchTimer = null, consecutiveFailures = 0, lastFetchOk = true, lastFetchTime = null;
 
     /* ---- Team name canonicalization (API ↔ user match names) ---- */
     const TEAM_ALIASES = {
-        // === La Liga 2026/27 (all teams) ===
         "real madrid": ["ריאל", "ריאל מדריד", "ריאל מדריד (h)", "ריאל מדריד (a)"],
         "barcelona": ["ברצלונה", "ברצה", "בארסה", "בארסה"],
         "atletico madrid": ["אתלטיקו", "אתלטיקו מדריד", "אתלטיקה"],
@@ -505,7 +501,6 @@
         "numancia": ["נומנסיה"],
         "tenerife": ["טנריפה", "טנריפה"],
         "deportivo la coruna": ["דפורטיבו", "דפורטיבו לה קורוניה"],
-        // === Premier League ===
         "liverpool": ["ליברפול"],
         "arsenal": ["ארסנל"],
         "manchester city": ["מנצ'סטר סיטי", "מן סיטי", "מאנצ'סטר סיטי", "סיטי"],
@@ -530,7 +525,6 @@
         "leeds": ["לידס", "לידס יונייטד"],
         "southampton": ["סאות'המפטון", "סאותהמפטון"],
         "ipswich": ["איפסוויץ'", "איפסוויץ"],
-        // === Bundesliga ===
         "bayern munich": ["בייארן", "באיירן", "בייארן מינכן", "באיירן מינכן"],
         "borussia dortmund": ["דורטמונד", "בורוסיה דורטמונד", "בורוסיה"],
         "rb leipzig": ["לייפציג", "ר.ב. לייפציג", "רב לייפציג"],
@@ -547,7 +541,6 @@
         "augsburg": ["אאוגסבורג", "אוגסבורג"],
         "bochum": ["בוכום"],
         "darmstadt": ["דארמשטאדט"],
-        // === Serie A ===
         "juventus": ["יובנטוס", "יובה"],
         "inter": ["אינטר", "אינטר מילאנו", "אינטרנציונלה"],
         "ac milan": ["מילאן", "מילאן", "מילאן"],
@@ -572,7 +565,6 @@
         "como": ["קומו"],
         "parma": ["פארמה"],
         "venezia": ["ונציה", "ונציה"],
-        // === Ligue 1 ===
         "paris sg": ["פריז", "פ.ס.ז'", "פ.ס.ז", "פריז סן ז'רמן", "פסז", "psg"],
         "marseille": ["מרסיי", "מרסיי"],
         "monaco": ["מונקו"],
@@ -594,19 +586,15 @@
         "angers": ["אנז'ה"],
         "auxerre": ["אוסר"],
         "troyes": ["טרואה"],
-        "brest": ["ברסט"],
-        // === Primeira Liga / Portugal ===
         "benfica": ["בנפיקה"],
         "porto": ["פורטו"],
         "sporting cp": ["ספורטינג", "ספורטינג ליסבון", "ספורטינג"],
         "braga": ["בראגה"],
-        // === Eredivisie ===
         "ajax": ["איאקס"],
         "psv": ["פ.ס.ו", "פסו", "איינדהובן"],
         "feyenoord": ["פיינורד", "פיינורד"],
         "az alkmaar": ["אלקמאר", "א.ז. אלקמאר"],
         "twente": ["טוונטה"],
-        // === Other European ===
         "celtic": ["סלטיק"],
         "rangers": ["ריינג'רס", "ריינג'רס"],
         "shakhtar donetsk": ["שחטאר", "שחטאר דונצק"],
@@ -614,7 +602,6 @@
         "red star belgrade": ["כוכב אדום", "כוכב אדום בלגרד"],
         "young boys": ["יאנג בויז", "יאנג בויז"],
         "salzburg": ["זלצבורג", "רד בול זלצבורג"],
-        // === Champions League / Europa regulars (extras) ===
         "galatasaray": ["גלאטסראיי", "גלטסראיי"],
         "fenerbahce": ["פנרבחצ'ה", "פנרבחצ'ה"],
         "besiktas": ["בשיקטאש", "בשיקטאש"],
@@ -624,7 +611,6 @@
         "fc basel": ["בזל"],
         "aek athens": ["א.א.ק אתונה", "א.א.ק.", "aek"],
         "lask": ["לאסק", "לאסק לינץ"],
-        // === Saudi / Other (in case) ===
         "al nassr": ["אל נאסר", "אל-נאסר"],
         "al hilal": ["אל הילאל", "אל-הילאל"],
         "al ittihad": ["אל איתיחאד", "אל-איתיחאד"]
@@ -633,8 +619,6 @@
         return String(str || "").toLowerCase().replace(/\b(fc|cf|sc|ud|cd|club|de|the)\b/g, " ").replace(/[^a-z\u0590-\u05ff ]/g, " ").replace(/\s+/g, " ").trim();
     }
     const REAL_MADRID = "real madrid";
-    /* exact alias → canonical team. Exact first, then the LONGEST alias found inside the
-       name — so "ריאל סוסיאדד" can never be swallowed by the short alias "ריאל". */
     const ALIAS_INDEX = (() => {
         const idx = new Map();
         const add = (name, canon) => { const k = normTeam(name); if (k && !idx.has(k)) idx.set(k, canon); };
@@ -642,7 +626,7 @@
         return idx;
     })();
     function canonicalTeam(name) {
-        let n = normTeam(name).replace(/\s+[ha]$/, ""); // drop a trailing (H)/(A) venue marker
+        let n = normTeam(name).replace(/\s+[ha]$/, ""); 
         if (!n) return "";
         if (ALIAS_INDEX.has(n)) return ALIAS_INDEX.get(n);
         let best = "", bestLen = 0;
@@ -651,7 +635,6 @@
         });
         return best || n;
     }
-    /* every row is read real madrid first — live widget, result and prediction columns */
     function matchSides(m) {
         const parts = String((m && m.match) || "").split("-");
         const home = (parts[0] || "").trim(), away = (parts[1] || "").trim();
@@ -660,13 +643,12 @@
         return {
             home: home, away: away,
             realFirst: homeIsReal || !awayIsReal,
-            realName: homeIsReal ? home : (awayIsReal ? away : ""),
-            oppName: homeIsReal ? away : (awayIsReal ? home : ""),
+            realName: homeIsReal ? home : (awayIsReal ? away : "ריאל מדריד"),
+            oppName: homeIsReal ? away : (awayIsReal ? home : (home || away)),
             hasReal: homeIsReal || awayIsReal
         };
     }
 
-    /* ---- Team crests, shown on each side of every prediction (first team left, second right) ---- */
     const teamBadgeCache = (() => { try { return JSON.parse(localStorage.getItem("teamBadges2") || "{}"); } catch (e) { return {}; } })();
     function saveTeamBadges() { try { localStorage.setItem("teamBadges2", JSON.stringify(teamBadgeCache)); } catch (e) {} }
     function registerEventBadges(ev) {
@@ -678,11 +660,10 @@
         const url = teamBadgeCache[canonicalTeam(name)];
         return url && url !== "none" ? url : "";
     }
-    /* real madrid on the left, the opponent on the right — same order as the live widget */
     function matchBadges(m) {
         const s = matchSides(m);
-        let left = teamBadge(s.realName || s.home);
-        let right = teamBadge(s.oppName || s.away);
+        let left = teamBadge(s.realName);
+        let right = teamBadge(s.oppName);
         const ev = findApiEvent(m);
         if (ev && (!left || !right)) {
             const evHomeIsReal = canonicalTeam(ev.strHomeTeam) === REAL_MADRID;
@@ -696,7 +677,6 @@
     function badgeHTML(url) {
         return url ? `<img class="pred-logo" src="${url}" alt="" onerror="this.style.visibility='hidden'">` : `<span class="pred-logo-empty"></span>`;
     }
-    /* teams the API hasn't sent us yet — look them up once, then keep them */
     let badgeFetchInFlight = false;
     async function fetchMissingBadges() {
         if (badgeFetchInFlight || !currentMatches.length) return;
@@ -723,7 +703,6 @@
         if (gotNew) renderUI();
     }
 
-    /* ---- Match a user-match to an API event ---- */
     function eventToLocalDate(ev) {
         if (!ev || !ev.dateEvent || !ev.strTime) return null;
         const d = new Date(`${ev.dateEvent}T${ev.strTime}Z`);
@@ -735,7 +714,6 @@
         const h = ev.intHomeScore, a = ev.intAwayScore;
         return h !== null && h !== undefined && h !== "" && a !== null && a !== undefined && a !== "";
     }
-    /* how far along an event is: finished > half time > live (by minute) > not started */
     function eventRank(ev) {
         if (!ev) return -1;
         if (isEventFinished(ev)) return 3000;
@@ -749,7 +727,6 @@
         if (!dateA || !dateB) return null;
         return Math.abs(new Date(`${dateA}T00:00:00`) - new Date(`${dateB}T00:00:00`)) / 86400000;
     }
-    /* pick the event closest to the match date, then the one furthest along */
     function pickEvent(candidates, matchDate) {
         if (!candidates || !candidates.length) return null;
         const dated = candidates.filter(ev => eventToLocalDate(ev));
@@ -761,15 +738,12 @@
         }
         return [...candidates].sort((a, b) => eventRank(b) - eventRank(a))[0];
     }
-    /* the date that belongs to the row — an override far from it is leftover corruption */
     function matchAnchorDate(m) {
         const saved = currentData[`date_${m.id}`];
         if (!saved) return m.date;
         const d = daysBetween(saved, m.date);
         return (d !== null && d > 3) ? m.date : saved;
     }
-    /* the API events that are this very fixture: the same two teams, the same home side first,
-       close enough to the row's date that it cannot be another round (a round can move by days) */
     function sameFixtureEvents(m) {
         if (!apiEvents.length) return [];
         const parts = String(m.match || "").split("-").map(t => canonicalTeam(t));
@@ -781,15 +755,12 @@
             const d = daysBetween(eventToLocalDate(ev), anchor);
             return d !== null && d <= 10;
         });
-        // every row is written host first, so an event that has the host at home is the right one
         const sameSides = samePair.filter(ev => canonicalTeam(ev.strHomeTeam) === parts[0]);
         return sameSides.length ? sameSides : samePair;
     }
-    /* the very same fixture — the row shows its date and time from here */
     function strictPairEvent(m) {
         return pickEvent(sameFixtureEvents(m), matchAnchorDate(m));
     }
-    /* the event that is EXACTLY this fixture (both teams, either side) — the only source of a result */
     function sameTeamsEvent(m) {
         if (!apiEvents.length) return null;
         const parts = String(m.match || "").split("-").map(t => canonicalTeam(t));
@@ -807,7 +778,6 @@
         if (!apiEvents.length) return null;
         const matchDate = matchAnchorDate(match);
         const parts = String(match.match || "").split("-").map(t => canonicalTeam(t));
-        // 1) the same two teams, close in date (so an older meeting is never picked)
         if (parts.length >= 2 && parts[0] && parts[1]) {
             const byTeams = apiEvents.filter(ev => {
                 const h = canonicalTeam(ev.strHomeTeam), a = canonicalTeam(ev.strAwayTeam);
@@ -815,10 +785,8 @@
             });
             const best = pickEvent(sameFixtureEvents(match), matchDate);
             if (best) return best;
-            // only candidate for that pair and it is being played right now — the stored date is just off
             if (byTeams.length === 1 && isEventLive(byTeams[0])) return byTeams[0];
         }
-        // 2) same day, Real Madrid involved (Real Madrid plays at most once per day)
         if (matchDate) {
             const sameDay = apiEvents.filter(ev => {
                 if (eventToLocalDate(ev) !== matchDate) return false;
@@ -828,8 +796,6 @@
             const best = pickEvent(sameDay, matchDate);
             if (best) return best;
         }
-        // 3) safety net: while a game is being played, ONLY the row of that very fixture may pick it up.
-        //    (returning any live event here used to overwrite the results of every other match)
         const live = apiEvents.filter(ev => isEventLive(ev) && (canonicalTeam(ev.strHomeTeam) === "real madrid" || canonicalTeam(ev.strAwayTeam) === "real madrid"));
         const liveForThisRow = live.filter(ev => {
             const h = canonicalTeam(ev.strHomeTeam), a = canonicalTeam(ev.strAwayTeam);
@@ -843,16 +809,24 @@
         }
         return null;
     }
-    /* ---- Score of an event, always real madrid first ("" when the API has no score yet) ---- */
+
     function eventScoreForMatch(match, ev) {
         if (!ev || !hasScore(ev)) return "";
         const home = parseInt(ev.intHomeScore, 10) || 0;
         const away = parseInt(ev.intAwayScore, 10) || 0;
+        const s = matchSides(match);
         const evHomeIsReal = canonicalTeam(ev.strHomeTeam) === REAL_MADRID;
         const evAwayIsReal = canonicalTeam(ev.strAwayTeam) === REAL_MADRID;
-        return (evAwayIsReal && !evHomeIsReal) ? `${away}-${home}` : `${home}-${away}`;
+        const realScore = evHomeIsReal ? home : (evAwayIsReal ? away : home);
+        const oppScore = evHomeIsReal ? away : (evAwayIsReal ? home : away);
+
+        // אם המשחק רשום בתור (קבוצה ראשונה - קבוצה שנייה), נשמור ב-DB בפורמט הרגיל של השורה
+        if (s.realFirst) {
+            return `${realScore}-${oppScore}`;
+        } else {
+            return `${oppScore}-${realScore}`;
+        }
     }
-    /* ---- Extract score + minute from API event ---- */
     function apiScoreForMatch(match) {
         const ev = sameTeamsEvent(match);
         if (!ev) return null;
@@ -866,7 +840,6 @@
         return { score, minute, status: ev.strStatus || "", event: ev };
     }
 
-    /* ---- Auto date/time from the API event of this very fixture (converted to Israel time) ---- */
     function getAutoDateTime(m) {
         const ev = strictPairEvent(m);
         if (!ev || !ev.dateEvent || !ev.strTime) return null;
@@ -877,8 +850,6 @@
             time: d.toLocaleTimeString("en-GB", { timeZone: "Asia/Jerusalem", hour: "2-digit", minute: "2-digit" })
         };
     }
-    /* the date and time the app goes by: the feed's own kickoff when it knows this fixture,
-       otherwise what was stored — so the next match updates itself as soon as the feed has it */
     function matchDateTime(m) {
         const auto = getAutoDateTime(m);
         if (auto) return auto;
@@ -898,11 +869,9 @@
         return `<input type="text" class="time-text-in" value="${savedTime}" placeholder="22:00" onchange="onInputSave('time_${m.id}', this.value)">`;
     }
 
-    /* ---- Fetch live + upcoming from TheSportsDB ---- */
     async function fetchLiveScores() {
         if (!autoScoreEnabled) return;
         try {
-            // Fetch both upcoming/live events AND recent finished results, then merge (dedupe by idEvent)
             const bust = `&_=${Date.now()}`;
             const [nextRes, lastRes] = await Promise.all([
                 fetch(TSDB_NEXT_URL + bust, { cache: "no-store" }).then(r => r.json()).catch(() => ({ events: [] })),
@@ -910,7 +879,6 @@
             ]);
             const nextEvents = (nextRes && nextRes.events) || [];
             const lastEvents = (lastRes && lastRes.results) || [];
-            // merge (dedupe by idEvent) — when both endpoints return the same event, keep the fresher snapshot
             const merged = [];
             const seen = new Map();
             [...nextEvents, ...lastEvents].forEach(e => {
@@ -925,14 +893,12 @@
             saveTeamBadges();
             consecutiveFailures = 0; lastFetchOk = true; lastFetchTime = new Date();
             lastAutoFetchLabel = lastFetchTime.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-            console.log(`[TSDB] OK — ${apiEvents.length} events (next:${nextEvents.length} last:${lastEvents.length}). Live:`, apiEvents.filter(e => isEventLive(e)).map(e => `${e.strHomeTeam} ${e.intHomeScore}-${e.intAwayScore} ${e.strAwayTeam} (${e.strStatus})`));
             applyAutoScores();
             updateLiveMatchWidget();
             renderStatusIndicators();
             fetchMissingBadges();
         } catch (e) {
             consecutiveFailures++; lastFetchOk = false;
-            console.warn("[TSDB] fetch failed (" + consecutiveFailures + ")", e);
             updateLiveMatchWidget(); renderStatusIndicators();
         }
     }
@@ -960,7 +926,6 @@
         scheduleNextFetch(); updateLiveMatchWidget(); renderStatusIndicators(); renderUI();
     }
 
-    /* ---- Browser notifications on score change ---- */
     function ensureNotifyPermission() {
         if (!("Notification" in window)) return;
         if (Notification.permission === "default") Notification.requestPermission().then(() => {});
@@ -1001,7 +966,6 @@
         endedNotifInitialized = true;
     }
 
-    /* ---- Goal overlay + sound ---- */
     let goalAudioCtx = null;
     function playGoalSound() {
         try {
@@ -1037,8 +1001,8 @@
             const prevScorePart = String(prevScoreKey || "").split("_")[1] || "0-0";
             const [pH, pA] = prevScorePart.split("-").map(n => parseInt(n) || 0);
             const nH = parseInt(newHome) || 0, nA = parseInt(newAway) || 0;
-            if (nH > pH) { scorerName = homeIsReal ? realName : oppName; scorerBadge = homeIsReal ? realBadge : oppBadge; }
-            else if (nA > pA) { scorerName = homeIsReal ? oppName : realName; scorerBadge = homeIsReal ? oppBadge : realBadge; }
+            if (nH > pH) { scorerName = ev.strHomeTeam; scorerBadge = ev.strHomeTeamBadge; }
+            else if (nA > pA) { scorerName = ev.strAwayTeam; scorerBadge = ev.strAwayTeamBadge; }
         } catch (e) {}
         const overlay = document.getElementById("goalOverlay");
         if (overlay) {
@@ -1051,7 +1015,6 @@
         }
         playGoalSound();
     }
-    /* ---- Floating scroll button ---- */
     let floatingBtnMode = "next";
     function updateFloatingBtn() {
         const btn = document.getElementById("floatingScrollBtn");
@@ -1077,14 +1040,10 @@
     }
     window.addEventListener('scroll', updateFloatingBtn);
 
-    /* ---- Remove duplicate matches (same teams + same date, any order) ---- */
     function matchTeamPair(m) {
         const parts = String(m.match || "").split("-").map(t => canonicalTeam(t));
         if (parts.length < 2 || !parts[0] || !parts[1]) return null;
         return [parts[0], parts[1]].sort().join("|");
-    }
-    function matchEffDate(m) {
-        return currentData[`date_${m.id}`] !== undefined ? currentData[`date_${m.id}`] : m.date;
     }
     function countPreds(m) {
         return activePlayersList.filter(p => normalizeScoreStr(currentData[`pred_${m.id}_${p}`])).length;
@@ -1093,8 +1052,6 @@
         const groups = new Map();
         currentMatches.forEach(m => {
             if (!m) return;
-            // keyed on the hand-entered fixture date, so a shifted date can never
-            // make two different rounds look like the same match
             const pair = matchTeamPair(m), date = m.date, comp = m.comp || "";
             if (!pair || !date) return;
             const key = pair + "@" + date + "@" + comp;
@@ -1105,7 +1062,6 @@
         groups.forEach(arr => {
             if (arr.length < 2) return;
             arr.sort((a, b) => countPreds(b) - countPreds(a));
-            // never drop a fixture that already holds guesses — only empty leftovers
             arr.slice(1).forEach(m => { if (countPreds(m) === 0) toRemove.push(m.id); });
         });
         if (!toRemove.length) return false;
@@ -1114,7 +1070,6 @@
         saveToCloud();
         return true;
     }
-    /* ---- Apply API scores to user matches that are live ---- */
     function applyAutoScores() {
         if (!autoScoreEnabled) return;
         let changed = false;
@@ -1125,8 +1080,6 @@
             const evLive = isEventLive(info.event);
             const evFinished = isEventFinished(info.event);
             const rowStatus = getMatchStatus(m);
-            // auto-fill date + time only while the game has not been played yet —
-            // a match that is already played keeps the date it was played on
             const autoDT = (evFinished || rowStatus.isEnded) ? null : getAutoDateTime(m);
             if (autoDT) {
                 if (currentData[`date_${m.id}`] !== autoDT.date) {
@@ -1140,11 +1093,9 @@
                     changed = true;
                 }
             }
-            // auto-fill the score as soon as the game is being played (or already finished)
             if (!info.score) return;
-            if (currentData[`manualActual_${m.id}`]) return; // תוצאה שהוזנה בקוד לא נדרסת ע"י ה-API
-            if (!evLive && !evFinished) return; // only a score the server really has
-            // משחק שטרם שוחק לא מקבל תוצאה — גם אם ה-API החזיר אירוע אחר עם אותן קבוצות
+            if (currentData[`manualActual_${m.id}`]) return; 
+            if (!evLive && !evFinished) return; 
             if (!rowStatus.isLive && !rowStatus.isEnded) return;
             if (currentData[`actual_${m.id}`] !== info.score) {
                 currentData[`actual_${m.id}`] = info.score;
@@ -1157,7 +1108,6 @@
         if (dedupeDuplicateMatches()) { sortMatches(); syncAutoWinners(); renderUI(); }
         checkMatchEndedNotifications();
     }
-    /* ---- Keep the result column of the match being played in sync with the live score ---- */
     function syncLiveScoresToRows() {
         if (!autoScoreEnabled || !apiEvents.length) return;
         let changed = false;
@@ -1165,8 +1115,8 @@
             if (!m) return;
             const info = apiScoreForMatch(m);
             if (!info || !info.score || !isEventLive(info.event)) return;
-            if (!getMatchStatus(m).isLive) return; // רק משחק שמתקיים עכשיו
-            if (currentData[`manualActual_${m.id}`]) return; // תוצאה שהוזנה בקוד לא נדרסת ע"י הלייב
+            if (!getMatchStatus(m).isLive) return; 
+            if (currentData[`manualActual_${m.id}`]) return; 
             if (currentData[`actual_${m.id}`] === info.score) return;
             currentData[`actual_${m.id}`] = info.score;
             db.ref(`league_data/predictions/actual_${m.id}`).set(info.score);
@@ -1179,15 +1129,6 @@
     /* ============================================================
        FIREBASE SYNC
        ============================================================ */
-    /* ============================================================
-       DATA REPAIR
-       The old auto-fill copied the date of the game it was watching into
-       every row it matched, which scrambled the whole results list.
-       1) drop those borrowed dates, so every match sits on its real date
-       2) the API keeps a result in Real Madrid's order — put every result
-          back into the row's own order (first team – second team)
-       ============================================================ */
-    /* תוצאה שנשמרה למשחק שעוד לא החל — שארית של סנכרון תקול. מנקים פעם אחת. */
     function repairFutureResults() {
         if (currentData.futureResultsFix) return 0;
         currentData.futureResultsFix = true;
@@ -1224,52 +1165,7 @@
         });
         return fixed;
     }
-    let resultOrderRepairRan = false;
-    function repairResultOrder() {
-        if (resultOrderRepairRan || currentData.resultOrderFix) return 0;
-        resultOrderRepairRan = true;
-        let fixed = 0;
-        currentMatches.forEach(m => {
-            if (!m) return;
-            const actual = normalizeScoreStr(currentData[`actual_${m.id}`]);
-            if (!actual) return;
-            const parts = String(m.match || "").split("-").map(t => canonicalTeam(t));
-            if (parts.length < 2 || parts[0] === "real madrid" || parts[1] !== "real madrid") return;
-            const [home, away] = actual.split("-");
-            const flipped = `${away}-${home}`;
-            currentData[`actual_${m.id}`] = flipped;
-            db.ref(`league_data/predictions/actual_${m.id}`).set(flipped);
-            fixed++;
-        });
-        currentData.resultOrderFix = true;
-        db.ref('league_data/predictions/resultOrderFix').set(true);
-        return fixed;
-    }
-    /* every guess is stored real madrid first too — flip the old home-first guesses once */
-    let predOrderFixRan = false;
-    function repairPredOrder() {
-        if (predOrderFixRan || currentData.predOrderFix) return 0;
-        predOrderFixRan = true;
-        let fixed = 0;
-        currentMatches.forEach(m => {
-            if (!m || matchSides(m).realFirst) return;
-            activePlayersList.forEach(p => {
-                const key = `pred_${m.id}_${p}`;
-                const cur = normalizeScoreStr(currentData[key]);
-                if (!cur) return;
-                const parts = cur.split("-");
-                const swapped = `${parts[1]}-${parts[0]}`;
-                if (currentData[key] === swapped) return;
-                currentData[key] = swapped;
-                db.ref(`league_data/predictions/${key}`).set(swapped);
-                fixed++;
-            });
-        });
-        currentData.predOrderFix = true;
-        db.ref('league_data/predictions/predOrderFix').set(true);
-        return fixed;
-    }
-    /* the six league fixtures that the old duplicate-cleanup deleted — restored once, in their round */
+
     const MISSING_LIGA_FIXTURES = [
         { id: "m4",  match: "ריאל בטיס - ריאל מדריד",    date: "2026-09-06", time: "22:00", comp: "ליגה", isClasico: false, venueType: "חוץ" },
         { id: "m8",  match: "ריאל מדריד - ויאריאל",      date: "2026-10-04", time: "22:00", comp: "ליגה", isClasico: false, venueType: "בית" },
@@ -1289,7 +1185,6 @@
             const s = matchSides(f);
             const key = canonicalTeam(s.oppName) + "@" + (s.realFirst ? "H" : "A");
             if (currentMatches.some(m => m.id === f.id) || have.has(key)) return;
-            // the row the old cleanup deleted left placeholder values behind — results come from the server only
             delete currentData[`actual_${f.id}`];
             db.ref(`league_data/predictions/actual_${f.id}`).remove();
             delete currentData[`manualScore_${f.id}`];
@@ -1309,15 +1204,12 @@
         currentMatches = data.matches || DEFAULT_MATCHES;
         currentData = data.predictions || {};
         repairBorrowedDates();
-        repairResultOrder();
-        repairPredOrder();
         repairFutureResults();
         restoreMissingFixtures();
         dedupeDuplicateMatches();
         sortMatches();
         renderUI(); updateHeaderCountdownWidget(); updateLiveMatchWidget(); renderStatusIndicators();
         fetchMissingBadges();
-        // the feed may have arrived before the rows did — apply its dates and scores now
         if (apiEvents.length) applyAutoScores();
         if (!hasScrolledToNext) { setTimeout(scrollToNextMatch, 400); hasScrolledToNext = true; }
     });
@@ -1329,7 +1221,6 @@
         });
     }
     setInterval(() => { updateCountdowns(); updateHeaderCountdownWidget(); syncLiveScoresToRows(); updateLiveMatchWidget(); checkMatchEndedNotifications(); if (renderPending) renderUI(); }, 1000);
-    // coming back to the tab refreshes the scores right away
     document.addEventListener("visibilitychange", () => { if (!document.hidden && autoScoreEnabled) fetchLiveScores(); });
 
     /* ============================================================
@@ -1462,12 +1353,11 @@
     }
 
     /* ============================================================
-       LIVE MATCH WIDGET (redesigned)
+       LIVE MATCH WIDGET (Real Madrid always Left, Opponent Right)
        ============================================================ */
     function updateLiveMatchWidget() {
         const widget = document.getElementById("liveMatchWidget");
         if (!widget) return;
-        // Show ALL live Real Madrid events from the API directly (even if not in user's match list)
         const liveEvents = apiEvents.filter(isEventLive);
         if (!liveEvents.length) { widget.style.display = "none"; widget.innerHTML = ""; return; }
         widget.style.display = "flex";
@@ -1479,7 +1369,8 @@
             const scoreChanged = prevScore && prevScore !== scoreKey;
             if (scoreChanged) triggerGoalOverlay(ev, homeScore, awayScore, prevScore);
             previousLiveScores[ev.idEvent] = scoreKey;
-            // show Real Madrid first
+            
+            // ALWAYS REAL MADRID LEFT, OPPONENT RIGHT
             const homeIsReal = canonicalTeam(ev.strHomeTeam) === "real madrid";
             const realName = homeIsReal ? ev.strHomeTeam : ev.strAwayTeam;
             const oppName = homeIsReal ? ev.strAwayTeam : ev.strHomeTeam;
@@ -1487,7 +1378,7 @@
             const oppScore = homeIsReal ? awayScore : homeScore;
             const realBadge = homeIsReal ? ev.strHomeTeamBadge : ev.strAwayTeamBadge;
             const oppBadge = homeIsReal ? ev.strAwayTeamBadge : ev.strHomeTeamBadge;
-            // minute from status
+
             const st = (ev.strStatus || "").toUpperCase();
             let minute = "—";
             if (st === "HT") minute = "מחצית";
@@ -1696,7 +1587,7 @@
         if (key.startsWith('date_')) sortMatches();
         syncAutoWinners(); renderUI();
     }
-    /* ---- עריכת התוצאה הסופית בעמודת "תוצאה" — רק אחרי הזנת הקוד ---- */
+
     const RESULT_EDIT_CODE = "9086";
     let unlockedActualMatches = new Set();
     function isActualEditable(matchId) { return unlockedActualMatches.has(matchId); }
@@ -1714,15 +1605,28 @@
         currentData[`manualActual_${matchId}`] = true;
         db.ref(`league_data/predictions/actual_${matchId}`).set(score);
         db.ref(`league_data/predictions/manualActual_${matchId}`).set(true);
-        // אחרי שמירה התוצאה נעולה שוב
         unlockedActualMatches.delete(matchId);
         syncAutoWinners(); renderUI();
     }
-    function actualInputHTML(matchId, savedActual) {
-        if (isActualEditable(matchId)) {
-            return `<input type="text" class="score-in actual-in editable" value="${savedActual}" placeholder="-" onchange="onActualSave('${matchId}', this.value)" title="ערוך את התוצאה ולחץ מחוץ לתיבה לשמירה">`;
+
+    /* ---- תצוגת התוצאה: אם התוצאה השמורה היא של משחק שהיריבה בו ראשונה, נציג אותה הפוכה כדי שריאל תהיה בשמאל ---- */
+    function formatActualDisplayScore(m, savedActual) {
+        const s = normalizeScoreStr(savedActual);
+        if (!s) return savedActual;
+        const sides = matchSides(m);
+        if (!sides.realFirst) {
+            const [h, a] = s.split("-");
+            return `${a}-${h}`;
         }
-        return `<input type="text" class="score-in actual-in ro" value="${savedActual}" placeholder="-" readonly onclick="requestActualEdit('${matchId}')" title="מתעדכן אוטומטית • לחיצה + קוד לעריכה">`;
+        return s;
+    }
+
+    function actualInputHTML(m, savedActual) {
+        const displayVal = formatActualDisplayScore(m, savedActual);
+        if (isActualEditable(m.id)) {
+            return `<input type="text" class="score-in actual-in editable" value="${displayVal}" placeholder="-" onchange="onActualSave('${m.id}', this.value)" title="ערוך את התוצאה ולחץ מחוץ לתיבה לשמירה">`;
+        }
+        return `<input type="text" class="score-in actual-in ro" value="${displayVal}" placeholder="-" readonly onclick="requestActualEdit('${m.id}')" title="מתעדכן אוטומטית • לחיצה + קוד לעריכה">`;
     }
     function setVenueType(matchId, val) {
         const label = (val === 'H' || val === 'בית') ? 'בית' : 'חוץ';
@@ -1747,7 +1651,6 @@
        ============================================================ */
     let renderPending = false;
     function renderUI() {
-        // never rebuild the table under the cursor while a guess is being typed
         const typing = document.activeElement;
         if (typing && typing.tagName === "INPUT" && typing.classList.contains("score-in") && !typing.readOnly) { renderPending = true; return; }
         renderPending = false;
@@ -1790,9 +1693,11 @@
                 return `<button class="winner-btn ${isChecked ? 'active' : ''}" ${winnersDisabled} onclick="onWinnerToggle('${m.id}', '${player}')">${player}</button>`;
             }).join("");
             const badges = matchBadges(m);
+            const sSides = matchSides(m);
             const predictionsMobileHTML = activePlayersList.map(player => {
                 const savedPred = currentData[`pred_${m.id}_${player}`] || "";
-                return `<div class="pred-box-mini"><span>${player}</span><div class="pred-cell">${badgeHTML(badges.left)}<input type="text" class="score-in" value="${savedPred}" placeholder="-" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)">${badgeHTML(badges.right)}</div></div>`;
+                const displayPred = (!sSides.realFirst && normalizeScoreStr(savedPred)) ? formatActualDisplayScore(m, savedPred) : savedPred;
+                return `<div class="pred-box-mini"><span>${player}</span><div class="pred-cell">${badgeHTML(badges.left)}<input type="text" class="score-in" value="${displayPred}" placeholder="-" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)">${badgeHTML(badges.right)}</div></div>`;
             }).join("");
             let badgeClass = "countdown-badge";
             if (st.isLive) badgeClass += " live"; else if (st.isEnded) badgeClass += " ended";
@@ -1828,7 +1733,7 @@
                         </div>
                         <div>
                             <span style="font-weight: 700; font-size: 0.8rem; display: block; color: var(--text-muted); margin-bottom: 4px;">תוצאה:</span>
-                            <div class="pred-cell actual-cell">${badgeHTML(badges.left)}${actualInputHTML(m.id, savedActual)}${badgeHTML(badges.right)}</div>
+                            <div class="pred-cell actual-cell">${badgeHTML(badges.left)}${actualInputHTML(m, savedActual)}${badgeHTML(badges.right)}</div>
                             <span id="src_mobile_${m.id}">${sourceNote}</span>
                         </div>
                     </div>
@@ -1875,9 +1780,11 @@
                 return `<button class="winner-btn ${isChecked ? 'active' : ''}" ${winnersDisabled} onclick="onWinnerToggle('${m.id}', '${player}')">${player}</button>`;
             }).join("");
             const badges = matchBadges(m);
+            const sSides = matchSides(m);
             const predictionsHTML = activePlayersList.map(player => {
                 const savedPred = currentData[`pred_${m.id}_${player}`] || "";
-                return `<td class="pred-td"><div class="pred-cell">${badgeHTML(badges.left)}<input type="text" class="score-in" value="${savedPred}" placeholder="-" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)">${badgeHTML(badges.right)}</div></td>`;
+                const displayPred = (!sSides.realFirst && normalizeScoreStr(savedPred)) ? formatActualDisplayScore(m, savedPred) : savedPred;
+                return `<td class="pred-td"><div class="pred-cell">${badgeHTML(badges.left)}<input type="text" class="score-in" value="${displayPred}" placeholder="-" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)">${badgeHTML(badges.right)}</div></td>`;
             }).join("");
             let badgeClass = "countdown-badge";
             if (st.isLive) badgeClass += " live"; else if (st.isEnded) badgeClass += " ended";
@@ -1896,7 +1803,7 @@
                     <span id="cd_table_${m.id}" class="${badgeClass}">${st.text}</span>
                     <span class="api-pill ${apiStatus.cls}" id="api_status_table_${m.id}">${apiStatus.label}</span>
                 </td>
-                <td><div class="pred-cell actual-cell">${badgeHTML(badges.left)}${actualInputHTML(m.id, savedActual)}${badgeHTML(badges.right)}</div></td>
+                <td><div class="pred-cell actual-cell">${badgeHTML(badges.left)}${actualInputHTML(m, savedActual)}${badgeHTML(badges.right)}</div></td>
                 <td><div class="winners-box" style="grid-template-columns: repeat(${Math.min(activePlayersList.length, 3)}, 1fr);">${winnersHTML}${autoWinnersBtnHTML}</div></td>
                 ${predictionsHTML}`;
             tbody.appendChild(tr);
@@ -1948,7 +1855,6 @@
         if (p.includes("forward") || p.includes("striker") || p.includes("wing") || p.includes("attack")) return "F";
         return "";
     }
-    /* ה-idEvent של המשחק הזה — מהנתונים שכבר ביד, ואם אין, מחיפוש לפי שתי הקבוצות */
     async function lineupEventIdFor(m) {
         const known = findApiEvent(m);
         if (known && known.idEvent) return known.idEvent;
@@ -2008,7 +1914,6 @@
         }
         lineupState.loading = false;
         renderLineupOverlay();
-        // כל עוד ההרכבים פשוט עוד לא פורסמו — ננסה שוב לבד
         const reason = lineupState.data && lineupState.data.reason;
         if (lineupMatchId && !lineupState.error && (reason === "no-lineups" || reason === "no-fixture")) {
             lineupTimer = setTimeout(loadLineups, 120000);
@@ -2076,7 +1981,6 @@
        ============================================================ */
     fetchLiveScores();
     scheduleNextFetch();
-    // expose test helper
     window.testApi = async function() {
         console.log("=== TEST: TheSportsDB eventsnext for Real Madrid ===");
         try {
