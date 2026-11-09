@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="הבלאנקוס">
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="apple-touch-icon" href="https://media.base44.com/images/public/6a91620bb63bd7c1b5a2d9e8/0a36110dd_717f280bed475230e0023ddf508c79d1_tplv-tiktokx-cropcenter_1080_1080-removebg-preview.png">
-    <script src="/notifications.js?v=1"></script>
+    <script src="/notifications.js?v=2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Heebo:wght@400;600;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -1043,13 +1043,19 @@
         });
         return changed;
     }
+    /* במסך טלפון התאריך והשעה לקריאה בלבד — לא ניתן לשנות אותם בטעות */
+    function isMobileView() {
+        return window.innerWidth < 768;
+    }
     function autoDateHTML(m, savedDate) {
         const auto = getAutoDateTime(m);
+        if (isMobileView()) return `<div class="auto-dt"><span>${auto ? "🤖 " : ""}${formatDateDisplay(auto ? auto.date : savedDate)}</span></div>`;
         if (auto) return `<div class="auto-dt"><span>🤖 ${formatDateDisplay(auto.date)}</span><button class="auto-dt-edit" onclick="editDateTime('${m.id}')" title="עריכה ידנית">✎</button></div>`;
         return dateSelectsHTML('date_' + m.id, savedDate);
     }
     function autoTimeHTML(m, savedTime) {
         const auto = getAutoDateTime(m);
+        if (isMobileView()) return `<div class="auto-dt"><span>${auto && auto.time ? "🤖 " + auto.time : savedTime}</span></div>`;
         if (auto && auto.time) return `<div class="auto-dt"><span>🤖 ${auto.time}</span><button class="auto-dt-edit" onclick="editDateTime('${m.id}')" title="עריכה ידנית">✎</button></div>`;
         return `<input type="text" class="time-text-in" value="${savedTime}" placeholder="22:00" onchange="onInputSave('time_${m.id}', this.value); markManualDate('time_${m.id}')">`;
     }
