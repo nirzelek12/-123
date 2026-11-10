@@ -22,11 +22,25 @@
       function loadSettings() { try { return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem(STORE) || "{}")); } catch (e) { return Object.assign({}, DEFAULTS); } }
       function saveSettings() { try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch (e) {} }
       function supported() { return "Notification" in window; }
-      function permission() { return supported() ? Notification.permission : "unsupported"; }
+      function permission() {
+        var own = supported() ? Notification.permission : "unsupported";
+        if (own === "granted") return "granted";
+        try { var b = rootBridge(); if (b && b.permission && b.permission() === "granted") return "granted"; } catch (e) {}
+        return own;
+      }
       function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
       function isStandalone() { return (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true; }
       function rootBridge() { try { if (window.self !== window.top && window.parent && window.parent.BlancosRootNotify) return window.parent.BlancosRootNotify; } catch (e) {} return null; }
-      function registerWorker() { if (!("serviceWorker" in navigator)) return; navigator.serviceWorker.register("/sw.js").then(function (r) { reg = r; renderPanel(); }).catch(function () {}); }
+      function swCandidates() { var list = ["/sw.js"]; try { var b = rootBridge(); if (b && b.swUrl && list.indexOf(b.swUrl) < 0) list.push(b.swUrl); } catch (e) {} return list; }
+      function registerWorker() {
+        if (!("serviceWorker" in navigator)) return;
+        var urls = swCandidates(), i = 0;
+        var next = function () {
+          if (i >= urls.length) return;
+          navigator.serviceWorker.register(urls[i++]).then(function (r) { reg = r; renderPanel(); }).catch(next);
+        };
+        next();
+      }
       function requestPermission() {
         if (!supported()) return Promise.resolve("unsupported");
         if (Notification.permission === "granted") return Promise.resolve("granted");
@@ -40,17 +54,21 @@
       }
       function toast(msg) { var el = document.getElementById("bnToast"); if (!el) { el = document.createElement("div"); el.id = "bnToast"; el.className = "bn-toast"; document.body.appendChild(el); } el.textContent = msg; el.classList.add("show"); clearTimeout(el._bnTimer); el._bnTimer = setTimeout(function () { el.classList.remove("show"); }, 5000); }
       function ensureRegistration() {
-        if (rootBridge()) return Promise.resolve(null);
         if (reg && reg.showNotification) return Promise.resolve(reg);
         if (!("serviceWorker" in navigator)) return Promise.resolve(null);
+        var urls = swCandidates(), i = 0;
         return new Promise(function (resolve) {
           var done = false;
           var finish = function (r) { if (done) return; done = true; if (r) reg = r; resolve(r || null); };
-          setTimeout(function () { finish(null); }, 6000);
-          navigator.serviceWorker.register("/sw.js").then(function (r) {
-            if (r && r.showNotification && r.active) finish(r);
-            navigator.serviceWorker.ready.then(finish).catch(function () { finish(r || null); });
-          }).catch(function () { finish(null); });
+          setTimeout(function () { finish(null); }, 8000);
+          var next = function () {
+            if (i >= urls.length) return finish(null);
+            navigator.serviceWorker.register(urls[i++]).then(function (r) {
+              if (r && r.showNotification && r.active) return finish(r);
+              navigator.serviceWorker.ready.then(finish).catch(function () { finish(r || null); });
+            }).catch(next);
+          };
+          next();
         });
       }
       function show(opts, force) {
@@ -58,13 +76,16 @@
         var tag = opts.tag || "blancos", now = Date.now();
         if (!force && lastTags[tag] && now - lastTags[tag] < 8000) return Promise.resolve(false);
         lastTags[tag] = now;
-        var bridge = rootBridge();
-        if (bridge && bridge.show) return Promise.resolve(bridge.show(opts.title, opts.body, tag)).catch(function () { return false; });
         var options = { body: opts.body || "", icon: ICON, badge: ICON, tag: tag, dir: "rtl", lang: "he", renotify: true, data: { url: location.origin + "/" } };
         if (!opts.silent) options.vibrate = [180, 90, 180];
-        return ensureRegistration().then(function (r) {
-          try { if (r) { r.showNotification(opts.title, options); return true; } var n = new Notification(opts.title, options); n.onclick = function () { try { window.focus(); } catch (e) {} n.close(); }; return true; } catch (e) { return false; }
-        }).catch(function () { return false; });
+        var local = function () {
+          return ensureRegistration().then(function (r) {
+            try { if (r) { r.showNotification(opts.title, options); return true; } var n = new Notification(opts.title, options); n.onclick = function () { try { window.focus(); } catch (e) {} n.close(); }; return true; } catch (e) { return false; }
+          }).catch(function () { return false; });
+        };
+        var bridge = rootBridge();
+        if (bridge && bridge.show) return Promise.resolve(bridge.show(opts.title, opts.body, tag)).then(function (ok) { return ok ? true : local(); }).catch(local);
+        return local();
       }
       function injectStyles() { if (document.getElementById("bnStyles")) return; var el = document.createElement("style"); el.id = "bnStyles"; el.textContent = CSS; document.head.appendChild(el); }
       function inject() {
