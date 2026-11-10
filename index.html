@@ -28,12 +28,12 @@
         try { var b = rootBridge(); if (b && b.permission && b.permission() === "granted") return "granted"; } catch (e) {}
         return own;
       }
-      var BN_VERSION = "23";
+      var BN_VERSION = "24";
       function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
       function isStandalone() { return (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true; }
       function rootBridge() { try { if (window.self !== window.top && window.parent && window.parent.BlancosRootNotify) return window.parent.BlancosRootNotify; } catch (e) {} return null; }
       function swCandidates() {
-        var list = ["/sw.js"];
+        var list = ["/sw.js", "/assets/blancos-sw.js"];
         var add = function (u) { if (u && list.indexOf(u) < 0) list.push(u); };
         try { add(localStorage.getItem("blancosSwUrl")); } catch (e) {}
         try { var b = rootBridge(); if (b) add(b.swUrl); } catch (e) {}
@@ -67,14 +67,15 @@
         return new Promise(function (resolve) {
           var done = false;
           var finish = function (r) { if (done) return; done = true; if (r) reg = r; resolve(r || null); };
-          setTimeout(function () { finish(null); }, 8000);
-          var next = function () {
-            if (i >= urls.length) return finish(null);
-            navigator.serviceWorker.register(urls[i++]).then(function (r) {
-              if (r && r.showNotification && r.active) return finish(r);
-              navigator.serviceWorker.ready.then(finish).catch(function () { finish(r || null); });
-            }).catch(next);
+          setTimeout(function () { finish(reg || null); }, 12000);
+          var waitActive = function (r) {
+            if (!r) return finish(null);
+            if (r.active) return finish(r);
+            var w = r.installing || r.waiting;
+            if (!w) return finish(r);
+            w.addEventListener("statechange", function () { if (w.state === "activated" || r.active) finish(r); });
           };
+          var next = function () { if (i >= urls.length) return finish(null); navigator.serviceWorker.register(urls[i++]).then(waitActive).catch(next); };
           next();
         });
       }
@@ -1281,8 +1282,14 @@
 
     /* ---- Browser notifications on score change ---- */
     document.addEventListener("click", function once() { try { if (!goalAudioCtx) goalAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (goalAudioCtx.state === 'suspended') goalAudioCtx.resume(); } catch (e) {} document.removeEventListener("click", once); });
+    var seenScores = (function () { try { return JSON.parse(sessionStorage.getItem("bnSeenScores") || "{}") || {}; } catch (e) { return {}; } })();
     function notifyScoreChange(match, newScore) {
         if (typeof BlancosNotify === "undefined") return;
+        /* מתריעים רק כשהתוצאה משתנה בזמן שהאפליקציה פתוחה — לא על תוצאה קיימת בכל כניסה/רענון */
+        var key = String(match.id), known = Object.prototype.hasOwnProperty.call(seenScores, key);
+        if (seenScores[key] === newScore) return;
+        seenScores[key] = newScore; try { sessionStorage.setItem("bnSeenScores", JSON.stringify(seenScores)); } catch (e) {}
+        if (!known) return;
         BlancosNotify.show({
             kind: "goals",
             tag: "goal",
