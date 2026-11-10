@@ -28,7 +28,7 @@
         try { var b = rootBridge(); if (b && b.permission && b.permission() === "granted") return "granted"; } catch (e) {}
         return own;
       }
-      var BN_VERSION = "24";
+      var BN_VERSION = "26"; var swError = "";
       function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
       function isStandalone() { return (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true; }
       function rootBridge() { try { if (window.self !== window.top && window.parent && window.parent.BlancosRootNotify) return window.parent.BlancosRootNotify; } catch (e) {} return null; }
@@ -44,7 +44,7 @@
         var urls = swCandidates(), i = 0;
         var next = function () {
           if (i >= urls.length) return;
-          navigator.serviceWorker.register(urls[i++]).then(function (r) { reg = r; renderPanel(); }).catch(next);
+          navigator.serviceWorker.register(urls[i++]).then(function (r) { reg = r; renderPanel(); }).catch(function (e) { swError = String((e && e.message) || e).slice(0, 70); next(); });
         };
         next();
       }
@@ -75,7 +75,7 @@
             if (!w) return finish(r);
             w.addEventListener("statechange", function () { if (w.state === "activated" || r.active) finish(r); });
           };
-          var next = function () { if (i >= urls.length) return finish(null); navigator.serviceWorker.register(urls[i++]).then(waitActive).catch(next); };
+          var next = function () { if (i >= urls.length) return finish(null); navigator.serviceWorker.register(urls[i++]).then(waitActive).catch(function (e) { swError = String((e && e.message) || e).slice(0, 70); next(); }); };
           next();
         });
       }
@@ -84,6 +84,8 @@
         var tag = opts.tag || "blancos", now = Date.now();
         if (!force && lastTags[tag] && now - lastTags[tag] < 8000) return Promise.resolve(false);
         lastTags[tag] = now;
+        var sentLog = (function () { try { return JSON.parse(localStorage.getItem("bnSentLog") || "{}") || {}; } catch (e) { return {}; } })();
+        if (!force) { var nk = tag + "|" + (opts.title || "") + "|" + (opts.body || ""); if (sentLog[nk] && now - sentLog[nk] < 10800000) return Promise.resolve(false); sentLog[nk] = now; Object.keys(sentLog).forEach(function (kk) { if (now - sentLog[kk] > 10800000) delete sentLog[kk]; }); try { localStorage.setItem("bnSentLog", JSON.stringify(sentLog)); } catch (e) {} }
         var options = { body: opts.body || "", icon: ICON, badge: ICON, tag: tag, dir: "rtl", lang: "he", renotify: true, data: { url: location.origin + "/" } };
         if (!opts.silent) options.vibrate = [180, 90, 180];
         var local = function () {
@@ -120,7 +122,7 @@
         html += "<div class='bn-actions'><button class='bn-btn' id='bnTest'>בדוק התראה</button>" + (deferredPrompt ? "<button class='bn-btn' id='bnInstall'>📲 הוסף למסך הבית</button>" : "") + "</div>";
         if (isIOS() && !isStandalone()) html += "<div class='bn-note'>📱 <b>באייפון:</b> כדי לקבל התראות כמו אפליקציה — פתח את האתר ב-Safari, לחץ על כפתור השיתוף ואז ״הוסף למסך הבית״, ופתח משם את האפליקציה.</div>";
         html += "<div class='bn-note'>ההתראות נשלחות כל עוד האפליקציה פתוחה (גם ברקע). לאייקון במסך הבית ההתראות מגיעות כמו אפליקציה רגילה.</div>";
-        html += "<div class='bn-note'>גרסה " + BN_VERSION + " · " + (window.self === window.top ? "עמוד מלא" : "מוטמע") + " · " + (reg ? "השירות רשום" : "השירות לא רשום עדיין") + "</div>";
+        html += "<div class='bn-note'>גרסה " + BN_VERSION + " · " + (window.self === window.top ? "עמוד מלא" : "מוטמע") + " · " + (reg ? "השירות רשום" : "השירות לא רשום" + (swError ? " — " + swError : "")) + "</div>";
         panel.innerHTML = html;
         var closeBtn = document.getElementById("bnClose"); if (closeBtn) closeBtn.addEventListener("click", closePanel);
         var enableBtn = document.getElementById("bnEnable"); if (enableBtn) enableBtn.addEventListener("click", requestPermission);
@@ -131,7 +133,7 @@
         var installBtn = document.getElementById("bnInstall");
         if (installBtn) installBtn.addEventListener("click", function () { if (!deferredPrompt) return; deferredPrompt.prompt(); deferredPrompt = null; closePanel(); });
       }
-      function openPanel() { var panel = document.getElementById("bnPanel"), overlay = document.getElementById("bnOverlay"); if (!panel || !overlay) return; renderPanel(); overlay.classList.add("open"); panel.classList.add("open"); }
+      function openPanel() { var panel = document.getElementById("bnPanel"), overlay = document.getElementById("bnOverlay"); if (!panel || !overlay) return; renderPanel(); if (!reg) ensureRegistration().then(function () { renderPanel(); }); overlay.classList.add("open"); panel.classList.add("open"); }
       function closePanel() { var panel = document.getElementById("bnPanel"), overlay = document.getElementById("bnOverlay"); if (panel) panel.classList.remove("open"); if (overlay) overlay.classList.remove("open"); }
       function sendTest() {
         if (!supported()) return toast("⚠️ הדפדפן לא תומך בהתראות — באייפון יש להוסיף את האתר למסך הבית");
