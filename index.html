@@ -28,6 +28,7 @@
         try { var b = rootBridge(); if (b && b.permission && b.permission() === "granted") return "granted"; } catch (e) {}
         return own;
       }
+      var BN_VERSION = "23";
       function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
       function isStandalone() { return (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true; }
       function rootBridge() { try { if (window.self !== window.top && window.parent && window.parent.BlancosRootNotify) return window.parent.BlancosRootNotify; } catch (e) {} return null; }
@@ -118,6 +119,7 @@
         html += "<div class='bn-actions'><button class='bn-btn' id='bnTest'>בדוק התראה</button>" + (deferredPrompt ? "<button class='bn-btn' id='bnInstall'>📲 הוסף למסך הבית</button>" : "") + "</div>";
         if (isIOS() && !isStandalone()) html += "<div class='bn-note'>📱 <b>באייפון:</b> כדי לקבל התראות כמו אפליקציה — פתח את האתר ב-Safari, לחץ על כפתור השיתוף ואז ״הוסף למסך הבית״, ופתח משם את האפליקציה.</div>";
         html += "<div class='bn-note'>ההתראות נשלחות כל עוד האפליקציה פתוחה (גם ברקע). לאייקון במסך הבית ההתראות מגיעות כמו אפליקציה רגילה.</div>";
+        html += "<div class='bn-note'>גרסה " + BN_VERSION + " · " + (window.self === window.top ? "עמוד מלא" : "מוטמע") + " · " + (reg ? "השירות רשום" : "השירות לא רשום עדיין") + "</div>";
         panel.innerHTML = html;
         var closeBtn = document.getElementById("bnClose"); if (closeBtn) closeBtn.addEventListener("click", closePanel);
         var enableBtn = document.getElementById("bnEnable"); if (enableBtn) enableBtn.addEventListener("click", requestPermission);
