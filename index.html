@@ -115,7 +115,9 @@
       function fireTest() {
         lastTags["test"] = 0;
         show({ kind: "goals", tag: "test", title: "⚽ גול! ריאל מדריד 2 - 1", body: "כך תיראה התראה אמיתית במשחק חי" }, true).then(function (ok) {
-          toast(ok ? "✅ נשלחה התראת בדיקה — בדוק את מרכז ההתראות במכשיר" : "⚠️ שליחת ההתראה נכשלה. באייפון: הוסף את האתר למסך הבית; באנדרואיד: פתח את האפליקציה מהמסך הראשי");
+          if (ok) return toast("✅ נשלחה התראת בדיקה — בדוק את מרכז ההתראות במכשיר");
+          var why = !supported() ? "הדפדפן לא תומך בהתראות" : permission() !== "granted" ? "אין הרשאה (" + permission() + ")" : rootBridge() ? "שליחת ההתראה מהאפליקציה נכשלה" : "שירות ההתראות של האתר לא נטען";
+          toast("⚠️ ההתראה לא נשלחה — " + why);
         });
       }
       window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferredPrompt = e; renderPanel(); });
