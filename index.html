@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ניחושי הבלאנקוס לשנת 26/27</title>
     <meta name="theme-color" content="#0b2d27">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="הבלאנקוס">
     <link rel="manifest" href="/manifest.webmanifest">
-    <link rel="apple-touch-icon" href="https://media.base44.com/images/public/6a91620bb63bd7c1b5a2d9e8/0a36110dd_717f280bed475230e0023ddf508c79d1_tplv-tiktokx-cropcenter_1080_1080-removebg-preview.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
     <script>
     /* מנוע ההתראות מוטמע כאן — הקובץ עצמאי לחלוטין */
     (function () {
@@ -17,7 +19,7 @@
       var ICON = "https://media.base44.com/images/public/6a91620bb63bd7c1b5a2d9e8/0a36110dd_717f280bed475230e0023ddf508c79d1_tplv-tiktokx-cropcenter_1080_1080-removebg-preview.png";
       var STORE = "blancosNotifySettings", DEFAULTS = { goals: true, pre: true, start: true, end: true };
       var ROWS = [["goals", "⚽", "גולים ותוצאה בזמן אמת"], ["pre", "⏰", "תזכורת 15 דקות לפני המשחק"], ["start", "▶️", "המשחק התחיל"], ["end", "🏁", "סיום משחק ותוצאה"]];
-      var CSS = ".bn-bell{position:fixed;bottom:20px;left:14px;z-index:120;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.25rem;cursor:pointer;background:linear-gradient(135deg,var(--crest-blue,#1e3a8a),var(--crest-navy,#0b1e4b));border:1px solid var(--gold-accent,#d4a32e);box-shadow:0 8px 22px rgba(0,0,0,.5);color:#f4d47c;}" + ".bn-bell:active{transform:scale(.95);}" + ".bn-bell .bn-dot{position:absolute;top:-2px;right:-2px;width:12px;height:12px;border-radius:50%;background:#e2464a;border:2px solid #051613;}" + ".bn-bell.bn-active .bn-dot{display:none;}" + ".bn-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;}" + ".bn-overlay.open{display:block;}" + ".bn-panel{position:fixed;z-index:201;left:50%;top:50%;transform:translate(-50%,-50%) scale(.94);opacity:0;pointer-events:none;width:min(94vw,400px);max-height:86vh;overflow-y:auto;background:linear-gradient(165deg,#0b2d27,#051613);border:1px solid var(--gold-accent,#d4a32e);border-radius:20px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.75);transition:opacity .18s,transform .18s;direction:rtl;text-align:right;font-family:var(--font-body,'Assistant',sans-serif);}" + ".bn-panel.open{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto;}" + ".bn-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}" + ".bn-title{font-family:var(--font-display,'Heebo',sans-serif);font-weight:900;font-size:1.05rem;color:#f4d47c;}" + ".bn-x{background:none;border:none;color:#8fa89e;font-size:1.3rem;cursor:pointer;padding:0 4px;}" + ".bn-status{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;font-size:.82rem;font-weight:700;margin-bottom:12px;}" + ".bn-status.on{background:rgba(46,160,88,.15);border:1px solid rgba(72,199,116,.5);color:#8fe3ab;}" + ".bn-status.off{background:rgba(226,70,74,.12);border:1px solid rgba(226,70,74,.45);color:#f0a6a8;}" + ".bn-enable{width:100%;padding:12px;border-radius:12px;border:1px solid var(--gold-accent,#d4a32e);background:linear-gradient(135deg,#d4a32e,#f4d47c);color:#051613;font-weight:900;font-family:inherit;font-size:.9rem;cursor:pointer;margin-bottom:12px;}" + ".bn-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 4px;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer;}" + ".bn-row span{font-size:.84rem;color:#f0ede6;font-weight:600;}" + ".bn-sw{width:42px;height:24px;border-radius:20px;background:#1d3a33;border:1px solid #2c4c44;position:relative;flex:0 0 auto;transition:background .15s;}" + ".bn-sw i{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:#8fa89e;transition:transform .15s,background .15s;}" + ".bn-row.on .bn-sw{background:rgba(212,163,46,.35);border-color:var(--gold-accent,#d4a32e);}" + ".bn-row.on .bn-sw i{transform:translateX(-18px);background:#f4d47c;}" + ".bn-actions{display:flex;gap:8px;margin-top:14px;}" + ".bn-btn{flex:1;padding:10px;border-radius:10px;border:1px solid #2c4c44;background:rgba(255,255,255,.04);color:#f0ede6;font-family:inherit;font-size:.8rem;font-weight:800;cursor:pointer;}" + ".bn-btn:hover{background:rgba(255,255,255,.08);}" + ".bn-note{margin-top:12px;font-size:.72rem;line-height:1.5;color:#8fa89e;}" + ".bn-note b{color:#d4c08a;}" + ".bn-toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(10px);z-index:260;max-width:88vw;padding:11px 16px;border-radius:12px;background:linear-gradient(160deg,#0b2d27,#051613);border:1px solid var(--gold-accent,#d4a32e);color:#f4d47c;font-family:var(--font-body,'Assistant',sans-serif);font-size:.82rem;font-weight:700;text-align:center;line-height:1.45;box-shadow:0 12px 34px rgba(0,0,0,.65);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;direction:rtl;}" + ".bn-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}";
+      var CSS = ".bn-bell{position:fixed;bottom:20px;left:14px;z-index:120;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.25rem;cursor:pointer;background:linear-gradient(135deg,var(--crest-blue,#1e3a8a),var(--crest-navy,#0b1e4b));border:1px solid var(--gold-accent,#d4a32e);box-shadow:0 8px 22px rgba(0,0,0,.5);color:#f4d47c;}" + ".bn-bell:active{transform:scale(.95);}" + ".bn-bell .bn-dot{position:absolute;top:-2px;right:-2px;width:12px;height:12px;border-radius:50%;background:#e2464a;border:2px solid #051613;}" + ".bn-bell.bn-active .bn-dot{display:none;}" + ".bn-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;}" + ".bn-overlay.open{display:block;}" + ".bn-panel{position:fixed;z-index:201;left:50%;top:50%;transform:translate(-50%,-50%) scale(.94);opacity:0;pointer-events:none;width:min(94vw,400px);max-height:86vh;overflow-y:auto;background:linear-gradient(165deg,#0b2d27,#051613);border:1px solid var(--gold-accent,#d4a32e);border-radius:20px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.75);transition:opacity .18s,transform .18s;direction:rtl;text-align:right;font-family:var(--font-body,'Assistant',sans-serif);}" + ".bn-panel.open{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto;}" + ".bn-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}" + ".bn-title{font-family:var(--font-display,'Heebo',sans-serif);font-weight:900;font-size:1.05rem;color:#f4d47c;}" + ".bn-x{background:none;border:none;color:#8fa89e;font-size:1.3rem;cursor:pointer;padding:0 4px;}" + ".bn-status{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;font-size:.82rem;font-weight:700;margin-bottom:12px;}" + ".bn-status.on{background:rgba(46,160,88,.15);border:1px solid rgba(72,199,116,.5);color:#8fe3ab;}" + ".bn-status.off{background:rgba(226,70,74,.12);border:1px solid rgba(226,70,74,.45);color:#f0a6a8;}" + ".bn-enab... (truncated)
       var settings = loadSettings(), reg = null, lastTags = {}, deferredPrompt = null;
       function loadSettings() { try { return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem(STORE) || "{}")); } catch (e) { return Object.assign({}, DEFAULTS); } }
       function saveSettings() { try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch (e) {} }
@@ -28,7 +30,7 @@
         try { var b = rootBridge(); if (b && b.permission && b.permission() === "granted") return "granted"; } catch (e) {}
         return own;
       }
-      var BN_VERSION = "26"; var swError = "";
+      var BN_VERSION = "27"; var swError = "";
       function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
       function isStandalone() { return (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true; }
       function rootBridge() { try { if (window.self !== window.top && window.parent && window.parent.BlancosRootNotify) return window.parent.BlancosRootNotify; } catch (e) {} return null; }
@@ -51,6 +53,10 @@
       function requestPermission() {
         if (!supported()) return Promise.resolve("unsupported");
         if (Notification.permission === "granted") return Promise.resolve("granted");
+        if (isIOS() && !isStandalone()) {
+          toast("באייפון: הוסף את האתר למסך הבית (שיתוף ← הוסף למסך הבית), פתח משם ואז הפעל התראות");
+          return Promise.resolve("ios-install");
+        }
         var bridge = rootBridge();
         var ask = bridge && bridge.request ? bridge.request() : Notification.requestPermission();
         return Promise.resolve(ask).then(function (p) {
@@ -115,13 +121,14 @@
         if (bell) bell.classList.toggle("bn-active", p === "granted");
         var html = "<div class='bn-head'><div class='bn-title'>🔔 התראות</div><button class='bn-x' id='bnClose' aria-label='סגור'>✕</button></div>";
         if (!supported()) html += "<div class='bn-status off'>⚠️ הדפדפן הזה לא תומך בהתראות</div>";
+        else if (isIOS() && !isStandalone()) html += "<div class='bn-status off'>באייפון ההתראות עובדות רק אחרי הוספה למסך הבית — שיתוף ← הוסף למסך הבית, ופתח מהאייקון</div>";
         else if (p === "granted") html += "<div class='bn-status on'>✅ התראות פעילות במכשיר הזה</div>";
         else if (p === "denied") html += "<div class='bn-status off'>🚫 ההתראות חסומות — יש לאשר אותן בהגדרות האתר בדפדפן (סמל המנעול ליד הכתובת)</div>";
         else html += "<button class='bn-enable' id='bnEnable'>הפעל התראות במכשיר</button>";
         ROWS.forEach(function (row) { html += "<div class='bn-row " + (settings[row[0]] !== false ? "on" : "") + "' data-key='" + row[0] + "'><span>" + row[1] + " " + row[2] + "</span><div class='bn-sw'><i></i></div></div>"; });
         html += "<div class='bn-actions'><button class='bn-btn' id='bnTest'>בדוק התראה</button>" + (deferredPrompt ? "<button class='bn-btn' id='bnInstall'>📲 הוסף למסך הבית</button>" : "") + "</div>";
         if (isIOS() && !isStandalone()) html += "<div class='bn-note'>📱 <b>באייפון:</b> כדי לקבל התראות כמו אפליקציה — פתח את האתר ב-Safari, לחץ על כפתור השיתוף ואז ״הוסף למסך הבית״, ופתח משם את האפליקציה.</div>";
-        html += "<div class='bn-note'>ההתראות נשלחות כל עוד האפליקציה פתוחה (גם ברקע). לאייקון במסך הבית ההתראות מגיעות כמו אפליקציה רגילה.</div>";
+        html += "<div class='bn-note'>ההתראות מגיעות בזמן שהאפליקציה פתוחה — גם אחרי מעבר לאפליקציה אחרת — וגם מהאייקון במסך הבית.</div>";
         html += "<div class='bn-note'>גרסה " + BN_VERSION + " · " + (window.self === window.top ? "עמוד מלא" : "מוטמע") + " · " + (reg ? "השירות רשום" : "השירות לא רשום" + (swError ? " — " + swError : "")) + "</div>";
         panel.innerHTML = html;
         var closeBtn = document.getElementById("bnClose"); if (closeBtn) closeBtn.addEventListener("click", closePanel);
@@ -140,6 +147,7 @@
         if (permission() === "denied") { toast("🚫 ההתראות חסומות — אשר אותן בהגדרות האתר (סמל המנעול ליד הכתובת)"); return openPanel(); }
         var ready = permission() === "granted" ? Promise.resolve("granted") : requestPermission();
         ready.then(function (res) {
+          if (res === "ios-install") { openPanel(); return; }
           if (res !== "granted") { toast("🚫 ההתראות לא אושרו — לא ניתן לשלוח התראה"); return openPanel(); }
           return fireTest();
         });
@@ -2496,3 +2504,4 @@
 
 </body>
 </html>
+
