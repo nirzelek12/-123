@@ -28,7 +28,7 @@
         try { var b = rootBridge(); if (b && b.permission && b.permission() === "granted") return "granted"; } catch (e) {}
         return own;
       }
-      var BN_VERSION = "27"; var swError = "";
+      var BN_VERSION = "26"; var swError = "";
       function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
       function isStandalone() { return (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true; }
       function rootBridge() { try { if (window.self !== window.top && window.parent && window.parent.BlancosRootNotify) return window.parent.BlancosRootNotify; } catch (e) {} return null; }
@@ -64,8 +64,7 @@
         if (reg && reg.showNotification) return Promise.resolve(reg);
         if (!("serviceWorker" in navigator)) return Promise.resolve(null);
         var urls = swCandidates(), i = 0;
-        var existing = navigator.serviceWorker.getRegistration ? navigator.serviceWorker.getRegistration().catch(function () { return null; }) : Promise.resolve(null);
-        return existing.then(function (ex) { if (ex && ex.active) { reg = ex; return ex; } return new Promise(function (resolve) {
+        return new Promise(function (resolve) {
           var done = false;
           var finish = function (r) { if (done) return; done = true; if (r) reg = r; resolve(r || null); };
           setTimeout(function () { finish(reg || null); }, 12000);
@@ -78,7 +77,7 @@
           };
           var next = function () { if (i >= urls.length) return finish(null); navigator.serviceWorker.register(urls[i++]).then(waitActive).catch(function (e) { swError = String((e && e.message) || e).slice(0, 70); next(); }); };
           next();
-        }); });
+        });
       }
       function show(opts, force) {
         if (!opts || (!force && settings[opts.kind || "goals"] === false) || permission() !== "granted") return Promise.resolve(false);
@@ -90,16 +89,9 @@
         var options = { body: opts.body || "", icon: ICON, badge: ICON, tag: tag, dir: "rtl", lang: "he", renotify: true, data: { url: location.origin + "/" } };
         if (!opts.silent) options.vibrate = [180, 90, 180];
         var local = function () {
-          var plain = function () {
-            if (isIOS()) return false; /* באייפון אין התראה בלי Service Worker */
-            try { var n = new Notification(opts.title, options); n.onclick = function () { try { window.focus(); } catch (e) {} n.close(); }; return true; }
-            catch (e) { swError = String((e && e.message) || e).slice(0, 70); return false; }
-          };
           return ensureRegistration().then(function (r) {
-            if (!r || !r.showNotification) return plain();
-            return Promise.resolve(r.showNotification(opts.title, options)).then(function () { return true; })
-              .catch(function (e) { swError = String((e && e.message) || e).slice(0, 70); return plain(); });
-          }).catch(function (e) { swError = String((e && e.message) || e).slice(0, 70); return plain(); });
+            try { if (r) { r.showNotification(opts.title, options); return true; } var n = new Notification(opts.title, options); n.onclick = function () { try { window.focus(); } catch (e) {} n.close(); }; return true; } catch (e) { return false; }
+          }).catch(function () { return false; });
         };
         var bridge = rootBridge();
         if (bridge && bridge.show) return Promise.resolve(bridge.show(opts.title, opts.body, tag)).then(function (ok) { return ok ? true : local(); }).catch(local);
@@ -157,7 +149,7 @@
         show({ kind: "goals", tag: "test", title: "⚽ גול! ריאל מדריד 2 - 1", body: "כך תיראה התראה אמיתית במשחק חי" }, true).then(function (ok) {
           if (ok) return toast("✅ נשלחה התראת בדיקה — בדוק את מרכז ההתראות במכשיר");
           var why = !supported() ? "הדפדפן לא תומך בהתראות" : permission() !== "granted" ? "אין הרשאה (" + permission() + ")" : rootBridge() ? "שליחת ההתראה מהאפליקציה נכשלה" : "שירות ההתראות של האתר לא נטען";
-          toast("⚠️ ההתראה לא נשלחה — " + why + (swError ? " (" + swError + ")" : "")); renderPanel();
+          toast("⚠️ ההתראה לא נשלחה — " + why);
         });
       }
       window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferredPrompt = e; renderPanel(); });
