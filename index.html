@@ -160,7 +160,7 @@
           if (ok) {
             if (!reg || !reg.getNotifications) return toast("✅ נשלחה התראת בדיקה — בדוק את מרכז ההתראות במכשיר");
             return new Promise(function (r) { setTimeout(r, 800); }).then(function () { return reg.getNotifications({ tag: testTag }); }).then(function (list) {
-              if (list && list.length) return toast("✅ ההתראה מוצגת במכשיר — אם לא ראית אותה, ההתראות של הדפדפן מושתקות בהגדרות הטלפון");
+              if (list && list.length) return toast("✅ !ההתראה מוצגת במכשיר — אם לא ראית אותה, ההתראות של הדפדפן מושתקות בהגדרות הטלפון או שאין לך את האפליקציה");
               toast("⚠️ הטלפון חסם את ההתראה — הגדרות ← אפליקציות ← Chrome ← התראות: לאשר, ולוודא שהאתר לא מושתק ושמצב 'נא לא להפריע' כבוי");
             }).catch(function () { toast("✅ נשלחה התראת בדיקה — בדוק את מרכז ההתראות במכשיר"); });
           }
