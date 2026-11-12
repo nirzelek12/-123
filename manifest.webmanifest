@@ -1,11 +1,12 @@
-/* Service Worker להתראות הבלאנקוס — לשים באותה תיקייה של index.html ב-GitHub */
-self.addEventListener("install", function () { self.skipWaiting(); });
-self.addEventListener("activate", function (e) { e.waitUntil(self.clients.claim()); });
-self.addEventListener("notificationclick", function (event) {
-  event.notification.close();
-  var url = (event.notification.data && event.notification.data.url) || self.registration.scope;
-  event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(function (list) {
-    for (var i = 0; i < list.length; i++) { if ("focus" in list[i]) return list[i].focus(); }
-    return self.clients.openWindow ? self.clients.openWindow(url) : null;
-  }));
-});
+{
+  "name": "ניחושי הבלאנקוס 26/27",
+  "short_name": "הבלאנקוס",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "dir": "rtl",
+  "lang": "he",
+  "background_color": "#051613",
+  "theme_color": "#0b2d27",
+  "icons": [{ "src": "https://media.base44.com/images/public/6a91620bb63bd7c1b5a2d9e8/0a36110dd_717f280bed475230e0023ddf508c79d1_tplv-tiktokx-cropcenter_1080_1080-removebg-preview.png", "sizes": "1080x1080", "type": "image/png", "purpose": "any" }]
+}
