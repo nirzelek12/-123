@@ -15,8 +15,8 @@
     (function () {
       "use strict";
       var ICON = "https://media.base44.com/images/public/6a91620bb63bd7c1b5a2d9e8/0a36110dd_717f280bed475230e0023ddf508c79d1_tplv-tiktokx-cropcenter_1080_1080-removebg-preview.png";
-      var STORE = "blancosNotifySettings", DEFAULTS = { goals: true, pre: true, start: true, end: true };
-      var ROWS = [["goals", "⚽", "גולים ותוצאה בזמן אמת"], ["pre", "⏰", "תזכורת 15 דקות לפני המשחק"], ["start", "▶️", "המשחק התחיל"], ["end", "🏁", "סיום משחק ותוצאה"]];
+      var STORE = "blancosNotifySettings", DEFAULTS = { goals: true, pre: true, start: true, end: true, lineup: true, deadline: true };
+      var ROWS = [["goals", "⚽", "גולים ותוצאה בזמן אמת"], ["pre", "⏰", "תזכורת 15 דקות לפני המשחק"], ["start", "▶️", "המשחק התחיל"], ["end", "🏁", "סיום משחק ותוצאה"], ["lineup", "📋", "ההרכב יצא"], ["deadline", "⏳", "סגירת ניחושים (למי שעוד לא ניחש)"]];
       var CSS = ".bn-bell{position:fixed;bottom:20px;left:14px;z-index:120;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.25rem;cursor:pointer;background:linear-gradient(135deg,var(--crest-blue,#1e3a8a),var(--crest-navy,#0b1e4b));border:1px solid var(--gold-accent,#d4a32e);box-shadow:0 8px 22px rgba(0,0,0,.5);color:#f4d47c;}" + ".bn-bell:active{transform:scale(.95);}" + ".bn-bell .bn-dot{position:absolute;top:-2px;right:-2px;width:12px;height:12px;border-radius:50%;background:#e2464a;border:2px solid #051613;}" + ".bn-bell.bn-active .bn-dot{display:none;}" + ".bn-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;}" + ".bn-overlay.open{display:block;}" + ".bn-panel{position:fixed;z-index:201;left:50%;top:50%;transform:translate(-50%,-50%) scale(.94);opacity:0;pointer-events:none;width:min(94vw,400px);max-height:86vh;overflow-y:auto;background:linear-gradient(165deg,#0b2d27,#051613);border:1px solid var(--gold-accent,#d4a32e);border-radius:20px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.75);transition:opacity .18s,transform .18s;direction:rtl;text-align:right;font-family:var(--font-body,'Assistant',sans-serif);}" + ".bn-panel.open{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto;}" + ".bn-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}" + ".bn-title{font-family:var(--font-display,'Heebo',sans-serif);font-weight:900;font-size:1.05rem;color:#f4d47c;}" + ".bn-x{background:none;border:none;color:#8fa89e;font-size:1.3rem;cursor:pointer;padding:0 4px;}" + ".bn-status{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;font-size:.82rem;font-weight:700;margin-bottom:12px;}" + ".bn-status.on{background:rgba(46,160,88,.15);border:1px solid rgba(72,199,116,.5);color:#8fe3ab;}" + ".bn-status.off{background:rgba(226,70,74,.12);border:1px solid rgba(226,70,74,.45);color:#f0a6a8;}" + ".bn-enable{width:100%;padding:12px;border-radius:12px;border:1px solid var(--gold-accent,#d4a32e);background:linear-gradient(135deg,#d4a32e,#f4d47c);color:#051613;font-weight:900;font-family:inherit;font-size:.9rem;cursor:pointer;margin-bottom:12px;}" + ".bn-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 4px;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer;}" + ".bn-row span{font-size:.84rem;color:#f0ede6;font-weight:600;}" + ".bn-sw{width:42px;height:24px;border-radius:20px;background:#1d3a33;border:1px solid #2c4c44;position:relative;flex:0 0 auto;transition:background .15s;}" + ".bn-sw i{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:#8fa89e;transition:transform .15s,background .15s;}" + ".bn-row.on .bn-sw{background:rgba(212,163,46,.35);border-color:var(--gold-accent,#d4a32e);}" + ".bn-row.on .bn-sw i{transform:translateX(-18px);background:#f4d47c;}" + ".bn-actions{display:flex;gap:8px;margin-top:14px;}" + ".bn-btn{flex:1;padding:10px;border-radius:10px;border:1px solid #2c4c44;background:rgba(255,255,255,.04);color:#f0ede6;font-family:inherit;font-size:.8rem;font-weight:800;cursor:pointer;}" + ".bn-btn:hover{background:rgba(255,255,255,.08);}" + ".bn-note{margin-top:12px;font-size:.72rem;line-height:1.5;color:#8fa89e;}" + ".bn-note b{color:#d4c08a;}" + ".bn-toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%) translateY(10px);z-index:260;max-width:88vw;padding:11px 16px;border-radius:12px;background:linear-gradient(160deg,#0b2d27,#051613);border:1px solid var(--gold-accent,#d4a32e);color:#f4d47c;font-family:var(--font-body,'Assistant',sans-serif);font-size:.82rem;font-weight:700;text-align:center;line-height:1.45;box-shadow:0 12px 34px rgba(0,0,0,.65);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;direction:rtl;}" + ".bn-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}";
       var settings = loadSettings(), reg = null, lastTags = {}, deferredPrompt = null;
       function loadSettings() { try { return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem(STORE) || "{}")); } catch (e) { return Object.assign({}, DEFAULTS); } }
@@ -160,7 +160,7 @@
           if (ok) {
             if (!reg || !reg.getNotifications) return toast("✅ נשלחה התראת בדיקה — בדוק את מרכז ההתראות במכשיר");
             return new Promise(function (r) { setTimeout(r, 800); }).then(function () { return reg.getNotifications({ tag: testTag }); }).then(function (list) {
-              if (list && list.length) return toast("✅ !ההתראה מוצגת במכשיר — אם לא ראית אותה, ההתראות של הדפדפן מושתקות בהגדרות הטלפון או שאין לך את האפליקציה");
+              if (list && list.length) return toast("✅ ההתראה מוצגת במכשיר — אם לא ראית אותה, ההתראות של הדפדפן מושתקות בהגדרות הטלפון");
               toast("⚠️ הטלפון חסם את ההתראה — הגדרות ← אפליקציות ← Chrome ← התראות: לאשר, ולוודא שהאתר לא מושתק ושמצב 'נא לא להפריע' כבוי");
             }).catch(function () { toast("✅ נשלחה התראת בדיקה — בדוק את מרכז ההתראות במכשיר"); });
           }
@@ -229,7 +229,7 @@
             "<li><span class='ai-num'>3</span><span>לחץ <b>״הוסף״</b> ופתח את האפליקציה מהאייקון החדש</span></li>" +
             "</ul><button class='ai-btn' id='aiOk'>הבנתי</button>";
         } else {
-          html += "<div class='ai-sub'>אפשרות להיכנס לאתר בשנייה בטלפון ולהתעדכן על כל מהלכי המשחק! (זהירות ספויילר⚠️⚠️).</div>" +
+          html += "<div class='ai-sub'>כניסה בלחיצה אחת מהמסך הבית, כמו אפליקציה אמיתית — וגם התראות על גולים.</div>" +
             "<button class='ai-btn' id='aiInstall'>הורד את האפליקציה</button>";
         }
         html += "<div class='ai-links'><button class='ai-link' id='aiLater'>אולי אחר כך</button><button class='ai-link' id='aiNever'>אל תציג שוב</button></div></div>";
@@ -2597,5 +2597,168 @@
     window.testApi();
 </script>
 
+<script>
+/* ===== תוספות: סרגל סגירת ניחושים · התראת "ההרכב יצא" · פס משחק חי עם ניחושי כולם וציר זמן ===== */
+(function () {
+  "use strict";
+  var LOCK_AFTER_MS = 15 * 60000;              /* הניחושים נסגרים 15 דק׳ אחרי השריקה (כמו isPredictionLocked) */
+  var CSS = ".xa-bar{margin:10px 12px;padding:10px 14px;border-radius:14px;border:1px solid var(--gold-accent,#d4a32e);background:rgba(11,45,39,.92);color:var(--text-main,#f0ede6);cursor:pointer;direction:rtl;text-align:right;font-family:var(--font-body,'Assistant',sans-serif);}" +
+    ".xa-bar.xa-urgent{border-color:#e2464a;background:rgba(60,18,20,.92);}" +
+    ".xa-bar b{color:#f4d47c;} .xa-bar .xa-t{font-family:'JetBrains Mono',monospace;font-weight:800;color:#f4d47c;}" +
+    ".xa-bar .xa-sub{font-size:.82rem;color:var(--text-muted,#8fa89e);margin-top:4px;line-height:1.5;}" +
+    ".xa-live{margin:10px 12px;direction:rtl;font-family:var(--font-body,'Assistant',sans-serif);}" +
+    ".xa-card{border:1px solid var(--border-color,#123830);background:rgba(11,45,39,.92);border-radius:16px;padding:12px;margin-bottom:10px;color:var(--text-main,#f0ede6);}" +
+    ".xa-h{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:800;margin-bottom:8px;}" +
+    ".xa-score{font-family:'JetBrains Mono',monospace;color:#f4d47c;font-size:1.1rem;}" +
+    ".xa-chips{display:flex;flex-wrap:wrap;gap:6px;}" +
+    ".xa-chip{display:inline-flex;gap:6px;align-items:center;padding:5px 10px;border-radius:999px;background:rgba(5,22,19,.9);border:1px solid var(--border-color,#123830);font-size:.85rem;}" +
+    ".xa-chip i{font-style:normal;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--text-muted,#8fa89e);}" +
+    ".xa-chip.xa-ok{border-color:#2fb36b;background:rgba(20,70,45,.85);} .xa-chip.xa-ok i{color:#7dffb0;}" +
+    ".xa-note{font-size:.78rem;color:var(--text-muted,#8fa89e);margin-top:8px;}" +
+    ".xa-btn{margin-top:10px;width:100%;border:1px solid var(--gold-accent,#d4a32e);background:none;color:#f4d47c;border-radius:10px;padding:8px;font-weight:700;cursor:pointer;font-family:inherit;}" +
+    ".xa-ev{margin-top:10px;border-top:1px solid var(--border-color,#123830);padding-top:8px;}" +
+    ".xa-ev div{display:flex;gap:8px;align-items:baseline;padding:4px 0;font-size:.88rem;}" +
+    ".xa-ev .xa-min{flex:0 0 42px;font-family:'JetBrains Mono',monospace;color:#f4d47c;font-weight:700;}";
+  var openEvents = {}, evCache = {}, evBusy = {}, lastLive = "", lastBar = "";
+  function esc(x) { return String(x == null ? "" : x).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function ready() { return typeof currentMatches !== "undefined" && typeof currentData !== "undefined" && typeof activePlayersList !== "undefined" && Array.isArray(currentMatches) && currentMatches.length; }
+  function pad(n) { return String(n).padStart(2, "0"); }
+  function clock(ms) { var t = Math.max(0, Math.floor(ms / 1000)), d = Math.floor(t / 86400), h = Math.floor((t % 86400) / 3600), m = Math.floor((t % 3600) / 60), s = t % 60; return (d ? d + " ימים " : "") + pad(h) + ":" + pad(m) + ":" + pad(s); }
+  function guess(m, p) { return normalizeScoreStr(currentData["pred_" + m.id + "_" + p]); }
+  function ensureStyle() { if (document.getElementById("xaStyle")) return; var st = document.createElement("style"); st.id = "xaStyle"; st.textContent = CSS; document.head.appendChild(st); }
+  function slot(id, afterEl, beforeEl) {
+    var el = document.getElementById(id); if (el) return el;
+    el = document.createElement("div"); el.id = id;
+    if (afterEl && afterEl.parentNode) afterEl.parentNode.insertBefore(el, afterEl.nextSibling);
+    else if (beforeEl && beforeEl.parentNode) beforeEl.parentNode.insertBefore(el, beforeEl);
+    else return null;
+    return el;
+  }
+
+  /* ---- 1. סרגל "הניחושים נסגרים בעוד…" ---- */
+  function nextDeadline() {
+    var now = Date.now(), best = null;
+    currentMatches.forEach(function (m) {
+      if (!m) return;
+      var ko = matchKickoff(m); if (!ko) return;
+      var lock = ko + LOCK_AFTER_MS;
+      if (lock <= now || lock - now > 72 * 3600000) return;
+      if (isPredictionLocked(m) || getMatchStatus(m).isEnded) return;
+      if (!best || lock < best.lock) best = { m: m, lock: lock };
+    });
+    return best;
+  }
+  function missingFor(m) { return activePlayersList.filter(function (p) { return !guess(m, p); }); }
+  function renderBar() {
+    var el = slot("xaBar", null, document.getElementById("filterBar")); if (!el) return;
+    var d = nextDeadline();
+    if (!d) { if (lastBar !== "") { el.innerHTML = ""; lastBar = ""; } return; }
+    var left = d.lock - Date.now(), miss = missingFor(d.m);
+    var html = "<div class='xa-bar " + (left < 3600000 ? "xa-urgent" : "") + "' data-id='" + esc(d.m.id) + "'>⏳ הניחושים ל<b>" + esc(d.m.match) + "</b> נסגרים בעוד <span class='xa-t'>" + clock(left) + "</span>" +
+      "<div class='xa-sub'>" + (miss.length ? "עוד לא ניחשו: " + miss.map(esc).join(", ") : "✅ כולם כבר ניחשו") + "</div></div>";
+    if (html !== lastBar) {
+      el.innerHTML = html; lastBar = html;
+      var bar = el.firstChild;
+      bar.addEventListener("click", function () { try { scrollToMatch(bar.getAttribute("data-id")); } catch (e) {} });
+    }
+  }
+  function notifyDeadline() {
+    if (typeof BlancosNotify === "undefined" || typeof notifiedPhases === "undefined") return;
+    var d = nextDeadline(); if (!d) return;
+    var left = d.lock - Date.now(), key = "deadline_" + d.m.id;
+    if (left > 30 * 60000 || notifiedPhases.has(key)) return;
+    var miss = missingFor(d.m); if (!miss.length) return;
+    notifiedPhases.add(key); saveNotifiedPhases();
+    BlancosNotify.show({ kind: "deadline", tag: key, title: "⏳ הניחושים נסגרים בקרוב", body: d.m.match + " — עוד לא ניחשו: " + miss.join(", ") });
+  }
+
+  /* ---- 2. התראה "ההרכב יצא" ---- */
+  function notifyLineups() {
+    if (typeof BlancosNotify === "undefined" || typeof notifiedPhases === "undefined" || typeof lineupCache === "undefined") return;
+    var now = Date.now();
+    currentMatches.forEach(function (m) {
+      if (!m) return;
+      var ko = matchKickoff(m); if (!ko) return;
+      if (ko - now > LINEUP_WINDOW_MS || now - ko > 3 * 3600000) return;
+      var c = lineupCache[m.id], key = "lineup_" + m.id;
+      if (!(c && c.data && c.data.available) || notifiedPhases.has(key)) return;
+      notifiedPhases.add(key); saveNotifiedPhases();
+      BlancosNotify.show({ kind: "lineup", tag: key, title: "📋 ההרכב יצא!", body: m.match + " — לחץ על ״הרכבים״ כדי לראות מי פותח" });
+    });
+  }
+
+  /* ---- 3. פס משחק חי: ניחושי כולם (ירוק = צודק כרגע) + ציר זמן ---- */
+  function liveMatches() { return currentMatches.filter(function (m) { return m && getMatchStatus(m).isLive; }); }
+  function eventIcon(e) {
+    var t = String(e.type || "").toLowerCase(), c = String(e.card || e.cardType || "").toLowerCase();
+    if (t.indexOf("goal") >= 0) return "⚽";
+    if (t.indexOf("card") >= 0) return c.indexOf("red") >= 0 ? "🟥" : "🟨";
+    if (t.indexOf("sub") >= 0) return "🔄";
+    if (t.indexOf("var") >= 0) return "📺";
+    return "";
+  }
+  function eventsHTML(id) {
+    var list = evCache[id];
+    if (list === undefined) return "<div class='xa-ev'><div>⏳ טוען ציר זמן…</div></div>";
+    if (!list.length) return "<div class='xa-ev'><div>עדיין אין אירועים (גולים, כרטיסים, חילופים) — מתעדכן אוטומטית</div></div>";
+    return "<div class='xa-ev'>" + list.map(function (e) { return "<div><span class='xa-min'>" + esc(e.min) + "</span><span>" + e.icon + " " + esc(e.text) + "</span></div>"; }).join("") + "</div>";
+  }
+  function loadEvents(m) {
+    if (evBusy[m.id]) return; evBusy[m.id] = true;
+    var f = null; try { f = findFotmobFixture(m); } catch (e) {}
+    Promise.resolve(fotmobMatchId(f && f.id ? f.id : null, matchDateStr(m))).then(function (fid) {
+      if (!fid) throw new Error("no id");
+      return fetch(FOTMOB_MATCH_URL + fid, { cache: "no-store" });
+    }).then(function (r) { if (!r.ok) throw new Error("http"); return r.json(); }).then(function (j) {
+      var ev = j && j.content && j.content.matchFacts && j.content.matchFacts.events && j.content.matchFacts.events.events;
+      evCache[m.id] = (Array.isArray(ev) ? ev : []).map(function (e) {
+        var icon = eventIcon(e); if (!icon) return null;
+        var name = e.nameStr || (e.player && e.player.name) || e.fullName || "";
+        var min = (e.timeStr != null ? e.timeStr : e.time);
+        if (e.overloadTime) min = min + "+" + e.overloadTime;
+        var text = name;
+        if (icon === "🔄" && e.swap && e.swap[0] && e.swap[1]) text = (e.swap[0].name || "") + " ⟵ " + (e.swap[1].name || "");
+        if (icon === "⚽" && e.homeScore != null && e.awayScore != null) text += " (" + e.homeScore + "-" + e.awayScore + ")";
+        return { min: min + "′", icon: icon, text: text };
+      }).filter(Boolean).reverse();
+    }).catch(function () { if (evCache[m.id] === undefined) evCache[m.id] = []; }).then(function () { evBusy[m.id] = false; renderLive(true); });
+  }
+  function renderLive(force) {
+    var el = slot("xaLive", document.getElementById("liveMatchWidget"), document.getElementById("playersBar")); if (!el) return;
+    el.className = "xa-live";
+    var ms = liveMatches();
+    var html = ms.map(function (m) {
+      var actual = normalizeScoreStr(currentData["actual_" + m.id]);
+      var chips = activePlayersList.map(function (p) {
+        var g = guess(m, p), ok = actual && g === actual;
+        return "<span class='xa-chip " + (ok ? "xa-ok" : "") + "'>" + (ok ? "✅ " : "") + esc(p) + " <i>" + (g || "—") + "</i></span>";
+      }).join("");
+      var right = actual ? activePlayersList.filter(function (p) { return guess(m, p) === actual; }) : [];
+      var note = actual ? (right.length ? "צודקים כרגע: " + right.map(esc).join(", ") : "אף אחד לא צודק כרגע") : "";
+      var open = !!openEvents[m.id];
+      return "<div class='xa-card'><div class='xa-h'><span>📊 מה כולם ניחשו — " + esc(m.match) + "</span><span class='xa-score'>" + (actual || "") + "</span></div>" +
+        "<div class='xa-chips'>" + chips + "</div><div class='xa-note'>" + note + " · ריאל משמאל, יריבה מימין</div>" +
+        "<button class='xa-btn' data-ev='" + esc(m.id) + "'>" + (open ? "🔽 הסתר ציר זמן" : "📜 ציר זמן של המשחק") + "</button>" + (open ? eventsHTML(m.id) : "") + "</div>";
+    }).join("");
+    if (!force && html === lastLive) return;
+    lastLive = html; el.innerHTML = html;
+    Array.prototype.forEach.call(el.querySelectorAll("[data-ev]"), function (b) {
+      b.addEventListener("click", function () {
+        var id = b.getAttribute("data-ev"); openEvents[id] = !openEvents[id];
+        if (openEvents[id]) { var m = currentMatches.filter(function (x) { return x && String(x.id) === id; })[0]; if (m) loadEvents(m); }
+        renderLive(true);
+      });
+    });
+  }
+  function refreshOpenEvents() { liveMatches().forEach(function (m) { if (openEvents[m.id]) loadEvents(m); }); }
+
+  function tick() { try { if (!ready()) return; ensureStyle(); renderBar(); renderLive(false); } catch (e) { /* לא מפילים את האתר */ } }
+  function slow() { try { if (!ready()) return; notifyLineups(); notifyDeadline(); } catch (e) {} }
+  setInterval(tick, 1000);
+  setInterval(slow, 30000);
+  setInterval(function () { try { if (ready()) refreshOpenEvents(); } catch (e) {} }, 30000);
+  setTimeout(slow, 4000);
+})();
+</script>
 </body>
 </html>
