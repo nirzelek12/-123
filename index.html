@@ -641,6 +641,7 @@
         .p-photo-wrap { position: relative; width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--gold-accent); background: #0b2d27; box-shadow: 0 3px 10px rgba(0,0,0,0.45); }
         .p-photo { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: top center; display: block; }
         .p-badge { position: absolute; bottom: -4px; left: -4px; min-width: 17px; height: 17px; display: flex; align-items: center; justify-content: center; background: #051613; color: var(--gold-bright); border: 1px solid var(--gold-accent); border-radius: 50%; font-family: var(--font-mono); font-size: 0.6rem; font-weight: 800; padding: 0 2px; }
+        .p-nophoto::after { content: attr(data-ini); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--gold-bright); font-family: var(--font-display); font-weight: 800; font-size: 0.8rem; letter-spacing: 0.5px; pointer-events: none; }
         .p-name { font-size: 0.63rem; font-weight: 700; color: var(--text-main); text-align: center; line-height: 1.2; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         @media (max-width: 560px) { .p-photo-wrap { width: 38px; height: 38px; } .p-name { font-size: 0.6rem; } }
         @media (max-width: 560px) { .lineup-teams { grid-template-columns: 1fr; } }
@@ -2284,20 +2285,155 @@
     function photoKey(name) {
         return String(name || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
     }
+    /* התאמת תמונה לפי שם גם כשהכתיב שונה בין המקורות (Vinícius Júnior / Vinicius Jr, שם מלא מול שם משפחה) —
+       מחזירה תמונה רק כשיש התאמה אחת חד-משמעית, כדי לא להציג פנים של שחקן אחר */
+    function photoTokens(n) { return photoKey(n).replace(/[.'’`]/g, "").split(/[\s\-]+/).filter(Boolean).map(t => t === "jr" ? "junior" : t === "sr" ? "senior" : t); }
+    function photoLookup(name, pool) {
+        pool = pool || playerPhotos;
+        const key = photoKey(name);
+        if (!key) return "";
+        if (pool[key]) return pool[key];
+        const tk = photoTokens(name);
+        if (!tk.length) return "";
+        const hits = new Set();
+        for (const k in pool) {
+            const kt = photoTokens(k);
+            if (!kt.length) continue;
+            const [sh, lg] = tk.length <= kt.length ? [tk, kt] : [kt, tk];
+            const subset = sh.every(t => lg.includes(t)) && (sh.length > 1 || sh[0].length >= 4);
+            const sameLast = tk.length > 1 && kt.length > 1 && tk[tk.length - 1] === kt[kt.length - 1] && tk[0][0] === kt[0][0];
+            if (subset || sameLast) hits.add(pool[k]);
+        }
+        return hits.size === 1 ? [...hits][0] : "";
+    }
+    function photoInitials(name) {
+        const t = String(name || "").trim().split(/\s+/).filter(Boolean);
+        if (!t.length) return "";
+        return (t.length > 1 ? t[0][0] + t[t.length - 1][0] : t[0].slice(0, 2)).toUpperCase();
+    }
+    /* תמונה שנכשלה בטעינה: ניסיון אחד לתמונה חלופית, ואם אין — עיגול עם ראשי תיבות במקום עיגול ריק */
+    function photoFail(img) {
+        const wrap = img.parentNode, nm = img.dataset.nm || "";
+        if (!img.dataset.retry) {
+            img.dataset.retry = "1";
+            const alt = photoLookup(nm);
+            if (alt && alt !== img.getAttribute("src")) { img.src = alt; return; }
+        }
+        img.style.opacity = 0;
+        if (wrap && wrap.classList) wrap.classList.add("p-nophoto");
+        if (!img.dataset.deep) {
+            img.dataset.deep = "1";
+            deepPhotoFor(nm, img.dataset.team || "").then(u => {
+                if (!u) return;
+                playerPhotos[photoKey(nm)] = u; savePhotoCache(); patchPlayerPhoto(nm);
+            }).catch(() => {});
+        }
+    }
+    /* ---- גיבוי למקורות תמונות: אם ההרכב/‏FotMob לא נותנים תמונה לשחקן, מחפשים ב-TheSportsDB ואז בוויקיפדיה.
+       כל תוצאה נבדקת שהיא באמת נטענת, נשמרת במטמון, ובסוף — אם אין בשום מקום — ראשי תיבות במקום עיגול ריק. ---- */
+    const PHOTO_MISS_KEY = "playerPhotoMiss_v1";
+    const deepMiss = (() => { try { return JSON.parse(localStorage.getItem(PHOTO_MISS_KEY) || "{}") || {}; } catch (e) { return {}; } })();
+    const deepBusy = {};
+    let tsdbChain = Promise.resolve();
+    function tsdbGate() { const p = tsdbChain.then(() => new Promise(r => setTimeout(r, 650))); tsdbChain = p; return p; }
+    function imgOk(url) {
+        return new Promise(res => {
+            let done = false; const fin = v => { if (!done) { done = true; res(v); } };
+            const im = new Image();
+            im.onload = () => fin(true); im.onerror = () => fin(false);
+            setTimeout(() => fin(false), 7000);
+            im.src = url;
+        });
+    }
+    async function tsdbSearch(q) {
+        await tsdbGate();
+        const res = await fetch(`https://www.thesportsdb.com/api/v1/json/${TSDB_KEY}/searchplayers.php?p=${encodeURIComponent(q)}`);
+        if (!res.ok) throw new Error("http " + res.status);
+        const j = await res.json();
+        return ((j && j.player) || []).filter(x => x && (!x.strSport || x.strSport === "Soccer"));
+    }
+    async function tsdbPhoto(name, team) {
+        const tt = photoTokens(team || "");
+        const teamOk = x => { const xt = photoTokens(x.strTeam || ""); return tt.length && xt.length && (tt.some(t => t.length > 3 && xt.includes(t)) || xt.some(t => t.length > 3 && tt.includes(t))); };
+        let list = await tsdbSearch(String(name).trim());
+        let pick = list.find(teamOk) || (list.length === 1 ? list[0] : null);
+        if (!pick) {
+            const toks = photoTokens(name).filter(t => t.length > 3).sort((a, b) => b.length - a.length);
+            if (toks.length && photoTokens(name).length > 1) {
+                list = await tsdbSearch(toks[0]);
+                pick = list.find(teamOk) || null;
+            }
+        }
+        if (!pick) return "";
+        for (const raw of [pick.strCutout, pick.strThumb, pick.strRender]) {
+            if (!raw) continue;
+            for (const u of [raw + "/small", raw]) { if (await imgOk(u)) return u; }
+        }
+        return "";
+    }
+    async function wikiPhoto(name) {
+        const q = encodeURIComponent(String(name).trim() + " footballer");
+        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${q}&gsrlimit=3&prop=pageimages&piprop=thumbnail&pithumbsize=200`);
+        if (!res.ok) throw new Error("http " + res.status);
+        const j = await res.json();
+        const pages = Object.values((j && j.query && j.query.pages) || {}).sort((a, b) => (a.index || 99) - (b.index || 99));
+        const key = photoTokens(name).filter(t => t.length > 2).sort((a, b) => b.length - a.length)[0];
+        if (!key) return "";
+        for (const pg of pages) {
+            if (!pg.thumbnail || !pg.thumbnail.source) continue;
+            if (!photoTokens(pg.title).includes(key)) continue;
+            if (await imgOk(pg.thumbnail.source)) return pg.thumbnail.source;
+        }
+        return "";
+    }
+    function deepPhotoFor(name, team) {
+        const key = photoKey(name);
+        if (!key) return Promise.resolve("");
+        if (deepMiss[key] && Date.now() - deepMiss[key] < 6 * 3600000) return Promise.resolve("");
+        if (deepBusy[key]) return deepBusy[key];
+        deepBusy[key] = (async () => {
+            let url = "", failed = false;
+            try { url = await tsdbPhoto(name, team); } catch (e) { failed = true; }
+            if (!url) { try { url = await wikiPhoto(name); } catch (e) { failed = true; } }
+            if (!url && !failed) { deepMiss[key] = Date.now(); try { localStorage.setItem(PHOTO_MISS_KEY, JSON.stringify(deepMiss)); } catch (e) {} }
+            return url;
+        })();
+        const done = () => { delete deepBusy[key]; };
+        deepBusy[key].then(done, done);
+        return deepBusy[key];
+    }
+    async function deepFillPlayers(list) {
+        const queue = list.slice();
+        const worker = async () => {
+            while (queue.length) {
+                const p = queue.shift();
+                if (!p || p.photo) continue;
+                const url = await deepPhotoFor(p.name, p.__team);
+                if (!url) continue;
+                p.photo = url;
+                playerPhotos[photoKey(p.name)] = url;
+                savePhotoCache();
+                patchPlayerPhoto(p.name);
+            }
+        };
+        await Promise.all([worker(), worker(), worker()]);
+    }
     function patchPlayerPhoto(name) {
         const key = photoKey(name);
-        const url = playerPhotos[key];
+        const url = photoLookup(name);
         if (!url) return;
         document.querySelectorAll("[data-wr]").forEach(wrap => {
             if (wrap.dataset.wr !== key) return;
             const img = wrap.querySelector("img.p-photo");
-            if (img) { img.src = url; img.style.opacity = 1; return; }
+            wrap.classList.remove("p-nophoto");
+            if (img) { img.dataset.nm = name; img.dataset.retry = ""; img.src = url; img.style.opacity = 1; return; }
             const el = document.createElement("img");
             el.className = "p-photo";
             el.dataset.ph = key;
             el.alt = "";
             el.src = url;
-            el.onerror = () => { el.style.opacity = 0; };
+            el.dataset.nm = name;
+            el.onerror = () => photoFail(el);
             wrap.insertBefore(el, wrap.firstChild);
         });
     }
@@ -2363,24 +2499,48 @@
             (t.startXI || []).forEach(p => p && pending.push(p));
             (t.subs || []).forEach(p => p && pending.push(p));
         });
+        [data.home, data.away].forEach(t => {
+            if (!t) return;
+            [].concat(...(t.lines || []).map(l => l.players || []), t.startXI || [], t.subs || []).forEach(p => { if (p && !p.__team) p.__team = t.name || ""; });
+        });
         photoFillBusy.add(m.id);
         try {
-            const needFetch = pending.some(p => !p.photo && !playerPhotos[photoKey(p.name)]);
-            if (needFetch) {
+            const missing = () => pending.filter(p => !p.photo && !photoLookup(p.name));
+            const resolve = pool => pending.forEach(p => {
+                if (p.photo) return;
+                const url = photoLookup(p.name, pool) || photoLookup(p.name);
+                if (url) { p.photo = url; playerPhotos[photoKey(p.name)] = url; }
+            });
+            if (missing().length) {
                 const kickoffMs = data.kickoff ? Date.parse(data.kickoff) : matchKickoff(m);
                 const kickoffDay = Number.isFinite(kickoffMs) ? new Date(kickoffMs).toISOString().slice(0, 10) : "";
-                const knownId = data.matchId || (findFotmobFixture(m) || {}).id || null;
-                const matchId = await fotmobMatchId(knownId, kickoffDay);
-                const map = await fotmobPhotoMap(matchId);
-                if (Object.keys(map).length) {
+                /* מנסים כל מזהה משחק אפשרי עד שכל השחקנים (משתי הקבוצות) מקבלים תמונה:
+                   המזהה של לוח המשחקים, המזהה מהשרת, ולבסוף חיפוש לפי תאריך */
+                const ids = [];
+                const addId = x => { x = x ? String(x) : ""; if (x && !ids.includes(x)) ids.push(x); };
+                addId((findFotmobFixture(m) || {}).id);
+                addId(data.matchId);
+                const absorb = map => {
+                    if (!map || !Object.keys(map).length) return;
                     playerPhotos = { ...playerPhotos, ...map };
-                    savePhotoCache();
+                    resolve(map);
+                };
+                for (const id of ids) {
+                    absorb(await fotmobPhotoMap(id));
+                    if (!missing().length) break;
                 }
+                if (missing().length) {
+                    const byDate = await fotmobMatchId(null, kickoffDay);
+                    if (byDate && !ids.includes(String(byDate))) absorb(await fotmobPhotoMap(byDate));
+                }
+                savePhotoCache();
             }
             pending.forEach(p => {
-                if (!p.photo && playerPhotos[photoKey(p.name)]) p.photo = playerPhotos[photoKey(p.name)];
+                if (!p.photo) { const u = photoLookup(p.name); if (u) p.photo = u; }
                 if (p.photo) patchPlayerPhoto(p.name);
             });
+            const still = pending.filter(p => !p.photo && !photoLookup(p.name));
+            if (still.length) deepFillPlayers(still).catch(() => {});
         } finally { photoFillBusy.delete(m.id); }
     }
 
@@ -2425,10 +2585,11 @@
     }
     function playerChipHTML(p) {
         const key = photoKey(p.name);
-        const src = p.photo || playerPhotos[key] || "";
-        return `<div class="p-card" title="${p.name}">
-            <div class="p-photo-wrap" data-wr="${key}">
-                ${src ? `<img class="p-photo" data-ph="${key}" src="${src}" alt="" loading="lazy" onerror="this.style.opacity=0">` : ""}
+        const src = p.photo || photoLookup(p.name) || "";
+        const nm = String(p.name || "").replace(/"/g, "&quot;");
+        return `<div class="p-card" title="${nm}">
+            <div class="p-photo-wrap ${src ? "" : "p-nophoto"}" data-wr="${key}" data-ini="${photoInitials(p.name)}">
+                ${src ? `<img class="p-photo" data-ph="${key}" data-nm="${nm}" data-team="${String(p.__team || "").replace(/"/g, "&quot;")}" src="${src}" alt="" loading="lazy" onerror="photoFail(this)">` : ""}
                 ${p.number ? `<span class="p-badge">${p.number}</span>` : ""}
             </div>
             <span class="p-name">${shortName(p.name)}</span>
