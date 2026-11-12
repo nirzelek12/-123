@@ -1275,7 +1275,7 @@
     }
     /* כותב את התאריך והשעה הנכונים לכל משחק שהפיד מזהה — ללא קשר לסטטוס המשחק */
     function syncAutoDateTimes() {
-        if (!autoScoreEnabled) return false;
+        /* מתעדכן תמיד, גם אם עדכון התוצאות האוטומטי כבוי במכשיר (כמו שההערה ב-loadFixtureBadges מתארת) */
         let changed = false;
         currentMatches.forEach(m => {
             if (!m) return;
