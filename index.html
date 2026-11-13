@@ -986,6 +986,13 @@
                 </div>
                 <button class="action-submit-btn" onclick="addNewMatch()">+ הוסף משחק ללוח המשחקים</button>
             </div>
+            <div class="control-card">
+                <span class="section-label"><span class="sl-ico">💾</span> גיבוי וייצוא</span>
+                <div class="form-group" style="gap:8px">
+                    <button class="action-submit-btn" onclick="exportBackupJSON()">⬇️ גיבוי מלא (JSON)</button>
+                    <button class="action-submit-btn" onclick="exportResultsCSV()">📊 ייצוא לאקסל (CSV)</button>
+                </div>
+            </div>
         </div>
         </details>
     </header>
@@ -2663,6 +2670,38 @@
     }
     /* מעבר בין מחשב לנייד (שינוי גודל חלון) — בונים מחדש רק את התצוגה הגלויה */
     try { window.matchMedia("(min-width: 1024px)").addEventListener("change", () => { try { renderUI(); } catch (e) {} }); } catch (e) {}
+    /* ---- גיבוי וייצוא ---- */
+    function downloadFile(name, text, mime) {
+        const blob = new Blob([text], { type: mime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = name;
+        document.body.appendChild(a); a.click();
+        setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500);
+    }
+    function exportStamp() { return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jerusalem" }); }
+    function exportBackupJSON() {
+        db.ref("league_data").once("value").then(snap => {
+            const payload = { app: "blancos-predictions", exportedAt: new Date().toISOString(), data: snap.val() || {} };
+            downloadFile(`blancos-backup-${exportStamp()}.json`, JSON.stringify(payload, null, 2), "application/json");
+        }).catch(() => alert("הגיבוי נכשל — בדוק חיבור לאינטרנט ונסה שוב"));
+    }
+    function exportResultsCSV() {
+        const q = v => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
+        /* תוצאות בפורמט ="2-1" כדי שאקסל לא יהפוך אותן לתאריך */
+        const sc = v => { const n = normalizeScoreStr(v); return n ? `"=""${n}"""` : q(""); };
+        const header = ["תאריך", "שעה", "מסגרת", "משחק (ריאל משמאל)", "תוצאה (ריאל-יריבה)", ...activePlayersList.map(p => "ניחוש " + p), "מי צדק"].map(q).join(",");
+        const rows = currentMatches.filter(Boolean).map(m => {
+            const date = currentData[`date_${m.id}`] !== undefined ? currentData[`date_${m.id}`] : m.date;
+            const time = currentData[`time_${m.id}`] !== undefined ? currentData[`time_${m.id}`] : (m.time || "");
+            const actual = currentData[`actual_${m.id}`] !== undefined ? currentData[`actual_${m.id}`] : (m.defaultActual || "");
+            const t = splitMatchTeams(m);
+            const winners = (currentData[`winners_${m.id}`] || []).join(" / ");
+            return [q(date), q(time), q(m.comp || ""), q(t ? `${t[0]} - ${t[1]}` : m.match), sc(actual),
+                ...activePlayersList.map(p => sc(currentData[`pred_${m.id}_${p}`])), q(winners)].join(",");
+        });
+        downloadFile(`blancos-results-${exportStamp()}.csv`, "\uFEFF" + [header, ...rows].join("\r\n"), "text/csv;charset=utf-8");
+    }
     function resetAllData() {
         if (confirm("איפוס כל הנתונים?")) db.ref('league_data').remove();
     }
