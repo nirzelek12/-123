@@ -201,90 +201,100 @@
     })();
     </script>
     <script>
-    /* הצעת הוספה למסך הבית — חלון קופץ שחוזר בכל כניסה עד שמתקינים (או שבוחרים ״אל תציג שוב״) */
+    /* חלון פתיחה: אזהרת ספוילר + הפעלת התראות + הורדת האפליקציה — מופיע בכל כניסה לאתר (פעם אחת לכל פתיחה) */
     (function () {
       "use strict";
-      var NEVER = "blancosInstallNever2";
-      var LATER = "blancosInstallLater2";
+      var SEEN = "blancosWelcomeSeen";
       var ICON = "https://media.base44.com/images/public/6a91620bb63bd7c1b5a2d9e8/0a36110dd_717f280bed475230e0023ddf508c79d1_tplv-tiktokx-cropcenter_1080_1080-removebg-preview.png";
-      var deferred = null, shown = false;
+      var deferred = null;
       function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); }
       function isStandalone() { return (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true; }
-      function inFrame() { try { return window.self !== window.top; } catch (e) { return true; } }
-      function getL(k) { try { return localStorage.getItem(k) === "1"; } catch (e) { return false; } }
-      function setL(k) { try { localStorage.setItem(k, "1"); } catch (e) {} }
-      function getS(k) { try { return sessionStorage.getItem(k) === "1"; } catch (e) { return false; } }
-      function setS(k) { try { sessionStorage.setItem(k, "1"); } catch (e) {} }
-      function blocked() { return getL(NEVER) || getS(LATER); }
-      var CSS = ".ai-ov{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;opacity:0;transition:opacity .25s;direction:rtl;}" +
-        ".ai-ov.open{opacity:1;}" +
-        ".ai-sheet{position:relative;width:min(100%,400px);max-height:92vh;overflow-y:auto;box-sizing:border-box;background:linear-gradient(165deg,#0b2d27,#051613);border:1px solid #d4a32e;border-radius:22px;padding:26px 20px 18px;text-align:center;color:#f0ede6;font-family:'Assistant',sans-serif;box-shadow:0 24px 70px rgba(0,0,0,.8);transform:translateY(24px) scale(.95);transition:transform .3s cubic-bezier(.2,.8,.2,1);}" +
-        ".ai-ov.open .ai-sheet{transform:translateY(0) scale(1);}" +
-        ".ai-x{position:absolute;top:10px;left:10px;width:34px;height:34px;border-radius:50%;border:1px solid #123830;background:rgba(11,45,39,.9);color:#f0ede6;font-size:1rem;cursor:pointer;line-height:1;}" +
-        ".ai-icon{width:68px;height:68px;border-radius:16px;margin:0 auto 12px;display:block;background:#0b2d27;border:1px solid rgba(212,163,46,.5);object-fit:contain;}" +
-        ".ai-title{font-family:'Heebo',sans-serif;font-weight:900;font-size:1.15rem;color:#f4d47c;margin-bottom:6px;}" +
-        ".ai-sub{font-size:.95rem;color:#8fa89e;line-height:1.5;margin-bottom:16px;}" +
-        ".ai-steps{list-style:none;margin:0 0 16px;padding:0;text-align:right;}" +
-        ".ai-steps li{display:flex;align-items:center;gap:10px;background:rgba(11,45,39,.9);border:1px solid #123830;border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:.95rem;line-height:1.4;}" +
-        ".ai-num{flex:0 0 26px;height:26px;border-radius:50%;background:#d4a32e;color:#051613;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.9rem;}" +
-        ".ai-steps svg{vertical-align:middle;margin:0 2px;}" +
-        ".ai-btn{display:block;width:100%;border:none;border-radius:14px;padding:14px;font-family:'Heebo',sans-serif;font-weight:800;font-size:1.05rem;cursor:pointer;background:linear-gradient(135deg,#f3c65d,#b3891a);color:#051613;}" +
-        ".ai-btn:active{transform:scale(.98);}" +
-        ".ai-links{display:flex;justify-content:center;gap:18px;padding-top:12px;}" +
-        ".ai-link{background:none;border:none;color:#8fa89e;font-family:'Assistant',sans-serif;font-size:.9rem;padding:6px 0;cursor:pointer;}";
-      var SHARE = "<svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='#f4d47c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 15V3M8 7l4-4 4 4'/><path d='M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1'/></svg>";
+      function seen() { try { return sessionStorage.getItem(SEEN) === "1"; } catch (e) { return false; } }
+      function markSeen() { try { sessionStorage.setItem(SEEN, "1"); } catch (e) {} }
+      window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferred = e; renderInstall(); });
+      window.addEventListener("appinstalled", function () { deferred = null; renderInstall(); });
+      var CSS = ".wl-ov{position:fixed;inset:0;z-index:400;background:rgba(2,10,8,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;opacity:0;transition:opacity .25s;direction:rtl;}" +
+        ".wl-ov.open{opacity:1;}" +
+        ".wl-sheet{position:relative;width:min(100%,420px);max-height:92vh;overflow-y:auto;box-sizing:border-box;background:radial-gradient(120% 80% at 50% 0%,rgba(212,163,46,.16),transparent 60%),linear-gradient(165deg,#0b2d27,#051613);border:1px solid rgba(212,163,46,.55);border-radius:24px;padding:24px 18px 16px;color:#f0ede6;font-family:'Assistant',sans-serif;box-shadow:0 30px 80px rgba(0,0,0,.8);transform:translateY(24px) scale(.96);transition:transform .35s cubic-bezier(.2,.8,.2,1);}" +
+        ".wl-ov.open .wl-sheet{transform:none;}" +
+        ".wl-x{position:absolute;top:12px;left:12px;width:34px;height:34px;border-radius:50%;border:1px solid #123830;background:rgba(5,22,19,.8);color:#f0ede6;cursor:pointer;font-size:.95rem;}" +
+        ".wl-icon{width:64px;height:64px;display:block;margin:0 auto 8px;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5));}" +
+        ".wl-title{text-align:center;font-family:'Heebo',sans-serif;font-weight:900;font-size:1.3rem;color:#f4d47c;}" +
+        ".wl-sub{text-align:center;font-size:.9rem;color:#8fa89e;margin:2px 0 14px;}" +
+        ".wl-spoil{display:flex;gap:10px;align-items:flex-start;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.45);border-radius:14px;padding:12px;margin-bottom:10px;}" +
+        ".wl-spoil b{display:block;color:#fca5a5;font-size:.98rem;margin-bottom:2px;font-family:'Heebo',sans-serif;}" +
+        ".wl-spoil span{font-size:.86rem;line-height:1.45;color:#f0ede6;}" +
+        ".wl-ico{font-size:1.5rem;line-height:1;flex:0 0 auto;}" +
+        ".wl-card{display:flex;gap:10px;align-items:center;background:rgba(11,45,39,.85);border:1px solid #123830;border-radius:14px;padding:12px;margin-bottom:10px;}" +
+        ".wl-body{flex:1;min-width:0;}" +
+        ".wl-body b{display:block;font-family:'Heebo',sans-serif;font-size:.95rem;}" +
+        ".wl-body small{display:block;color:#8fa89e;font-size:.8rem;line-height:1.4;margin-top:2px;}" +
+        ".wl-act{flex:0 0 auto;border:none;border-radius:11px;padding:9px 13px;font-family:'Heebo',sans-serif;font-weight:800;font-size:.85rem;cursor:pointer;background:linear-gradient(135deg,#f3c65d,#b3891a);color:#051613;}" +
+        ".wl-ok{flex:0 0 auto;color:#4ade80;font-weight:800;font-size:.85rem;}" +
+        ".wl-warn{flex:0 0 auto;color:#fbbf24;font-weight:800;font-size:.8rem;}" +
+        ".wl-steps{margin:6px 0 0;padding:0 16px 0 0;font-size:.8rem;color:#cbd5c9;line-height:1.55;}" +
+        ".wl-go{display:block;width:100%;margin-top:6px;border:none;border-radius:14px;padding:14px;font-family:'Heebo',sans-serif;font-weight:900;font-size:1.05rem;cursor:pointer;background:linear-gradient(135deg,#123d35,#0b2d27);color:#f4d47c;border:1px solid rgba(212,163,46,.55);}" +
+        ".wl-go:active,.wl-act:active{transform:scale(.98);}";
+      function permState() {
+        if (!("Notification" in window) || !("serviceWorker" in navigator)) return isIOS() && !isStandalone() ? "ios-needs-install" : "unsupported";
+        return Notification.permission;
+      }
+      function renderNotify() {
+        var el = document.getElementById("wlNotify"); if (!el) return;
+        var p = permState(), right, sub = "גול, שריקת פתיחה, סיום משחק ותזכורת לפני שהניחושים ננעלים — גם כשהאתר סגור.";
+        if (p === "granted") right = "<span class='wl-ok'>✓ פעילות</span>";
+        else if (p === "denied") { right = "<span class='wl-warn'>חסומות</span>"; sub = "ההתראות נחסמו בדפדפן. אפשר לאשר אותן מחדש בהגדרות האתר בדפדפן."; }
+        else if (p === "ios-needs-install") { right = "<span class='wl-warn'>שלב 1 ⬇</span>"; sub = "באייפון ההתראות עובדות רק אחרי שמוסיפים את האתר למסך הבית (למטה)."; }
+        else if (p === "unsupported") { right = "<span class='wl-warn'>לא נתמך</span>"; sub = "הדפדפן הזה לא תומך בהתראות. נסה בכרום או בספארי."; }
+        else right = "<button class='wl-act' id='wlNotifyBtn'>הפעל</button>";
+        el.innerHTML = "<span class='wl-ico'>🔔</span><div class='wl-body'><b>התראות בזמן אמת</b><small>" + sub + "</small></div>" + right;
+        var btn = document.getElementById("wlNotifyBtn");
+        if (btn) btn.onclick = function () {
+          btn.disabled = true; btn.textContent = "...";
+          var req = window.BlancosNotify && window.BlancosNotify.request ? window.BlancosNotify.request() : Notification.requestPermission();
+          Promise.resolve(req).then(renderNotify, renderNotify);
+        };
+      }
+      function renderInstall() {
+        var el = document.getElementById("wlInstall"); if (!el) return;
+        var right = "", extra = "", sub = "כניסה בלחיצה אחת מהמסך הבית, במסך מלא — כמו אפליקציה אמיתית.";
+        if (isStandalone()) right = "<span class='wl-ok'>✓ מותקנת</span>";
+        else if (deferred) right = "<button class='wl-act' id='wlInstallBtn'>הורד</button>";
+        else if (isIOS()) extra = "<ol class='wl-steps'><li>לחץ על כפתור השיתוף ⬆️ בספארי</li><li>בחר <b>״הוסף למסך הבית״</b></li><li>פתח את האפליקציה מהאייקון החדש</li></ol>";
+        else sub = "בתפריט הדפדפן (⋮) בחר ״התקן אפליקציה״ או ״הוסף למסך הבית״.";
+        el.innerHTML = "<span class='wl-ico'>📲</span><div class='wl-body'><b>הורד את האפליקציה</b><small>" + sub + "</small>" + extra + "</div>" + right;
+        var btn = document.getElementById("wlInstallBtn");
+        if (btn) btn.onclick = function () {
+          var d = deferred; deferred = null;
+          try { d.prompt(); Promise.resolve(d.userChoice).then(renderInstall, renderInstall); } catch (e) { renderInstall(); }
+        };
+      }
       function close() {
-        var ov = document.getElementById("aiOverlay"); if (!ov) return;
+        markSeen();
+        var ov = document.getElementById("wlOverlay"); if (!ov) return;
         ov.classList.remove("open");
         setTimeout(function () { if (ov.parentNode) ov.parentNode.removeChild(ov); }, 300);
       }
-      function later() { setS(LATER); close(); }
-      function never() { setL(NEVER); close(); }
-      function show(mode) {
-        if (shown || blocked() || !document.body) return;
-        shown = true;
+      function show() {
+        if (seen() || !document.body || document.getElementById("wlOverlay")) return;
         var st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st);
-        var ov = document.createElement("div"); ov.className = "ai-ov"; ov.id = "aiOverlay";
-        var html = "<div class='ai-sheet'><button class='ai-x' id='aiX' aria-label='סגור'>✕</button><img class='ai-icon' src='" + ICON + "' alt=''>" +
-          "<div class='ai-title'>📲 הוסף את האפליקציה למסך הבית</div>";
-        if (mode === "ios") {
-          html += "<div class='ai-sub'>3 לחיצות, פעם אחת, ואז נכנסים לניחושים ישר מהאייקון — כמו אפליקציה אמיתית.</div>" +
-            "<ul class='ai-steps'>" +
-            "<li><span class='ai-num'>1</span><span>לחץ על כפתור השיתוף " + SHARE + " בסרגל של Safari (בתחתית המסך, ואם אינו נראה — תחת ⋯)</span></li>" +
-            "<li><span class='ai-num'>2</span><span>גלול למטה ולחץ על <b>״הוסף למסך הבית״</b></span></li>" +
-            "<li><span class='ai-num'>3</span><span>לחץ <b>״הוסף״</b> ופתח את האפליקציה מהאייקון החדש</span></li>" +
-            "</ul><button class='ai-btn' id='aiOk'>הבנתי</button>";
-        } else {
-          html += "<div class='ai-sub'>כניסה בלחיצה אחת מהמסך הבית, כמו אפליקציה אמיתית — וגם התראות על גולים.</div>" +
-            "<button class='ai-btn' id='aiInstall'>הורד את האפליקציה</button>";
-        }
-        html += "<div class='ai-links'><button class='ai-link' id='aiLater'>אולי אחר כך</button><button class='ai-link' id='aiNever'>אל תציג שוב</button></div></div>";
-        ov.innerHTML = html;
+        var ov = document.createElement("div"); ov.className = "wl-ov"; ov.id = "wlOverlay";
+        ov.innerHTML = "<div class='wl-sheet' role='dialog' aria-modal='true'><button class='wl-x' id='wlX' aria-label='סגור'>✕</button>" +
+          "<img class='wl-icon' src='" + ICON + "' alt=''>" +
+          "<div class='wl-title'>ברוך הבא לבלאנקוס ⚪</div><div class='wl-sub'>Hala Madrid y nada más</div>" +
+          "<div class='wl-spoil'><span class='wl-ico'>⚠️</span><div><b>זהירות, ספוילרים!</b><span>האתר מציג תוצאות חיות, גולים והתראות בזמן אמת. רואה את המשחק בהקלטה או בדיליי? אל תגלול למטה ותשתיק את ההתראות עד שתסיים.</span></div></div>" +
+          "<div class='wl-card' id='wlNotify'></div>" +
+          "<div class='wl-card' id='wlInstall'></div>" +
+          "<button class='wl-go' id='wlGo'>יאללה, לניחושים ⚽</button></div>";
         document.body.appendChild(ov);
+        renderNotify(); renderInstall();
         requestAnimationFrame(function () { requestAnimationFrame(function () { ov.classList.add("open"); }); });
-        /* לחיצה על הרקע לא סוגרת — רק הכפתורים */
-        document.getElementById("aiX").addEventListener("click", later);
-        document.getElementById("aiLater").addEventListener("click", later);
-        document.getElementById("aiNever").addEventListener("click", never);
-        var ok = document.getElementById("aiOk"); if (ok) ok.addEventListener("click", later);
-        var inst = document.getElementById("aiInstall");
-        if (inst) inst.addEventListener("click", function () {
-          if (!deferred) return later();
-          var d = deferred; deferred = null;
-          try { d.prompt(); if (d.userChoice) d.userChoice.then(function (c) { if (c && c.outcome === "accepted") setL(NEVER); close(); }, close); else close(); } catch (e) { close(); }
-        });
+        document.getElementById("wlX").onclick = close;
+        document.getElementById("wlGo").onclick = close;
+        ov.addEventListener("click", function (e) { if (e.target === ov) close(); });
       }
-      if (isStandalone() || inFrame() || blocked()) return;
-      window.addEventListener("appinstalled", function () { setL(NEVER); close(); });
-      if (isIOS()) {
-        var go = function () { setTimeout(function () { show("ios"); }, 1200); };
-        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
-      } else {
-        window.addEventListener("beforeinstallprompt", function (e) {
-          e.preventDefault(); deferred = e;
-          setTimeout(function () { show("android"); }, 1200);
-        });
-      }
+      var go = function () { setTimeout(show, 700); };
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
     })();
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Heebo:wght@400;600;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
@@ -700,6 +710,7 @@
         .stats-table td { padding: 8px 6px; text-align: center; overflow: visible; }
         .st-rank, .st-pts { font-family: var(--font-mono); font-weight: 800; color: var(--gold-bright); }
         .st-name { text-align: right !important; font-weight: 800; white-space: nowrap; }
+        .st-sub { font-size: 0.66rem; color: var(--text-muted); margin-top: 2px; white-space: nowrap; }
         .st-badges { font-size: 0.8rem; letter-spacing: 2px; }
         .st-bar { height: 5px; border-radius: 4px; background: rgba(255,255,255,0.08); margin-bottom: 3px; overflow: hidden; }
         .st-bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--gold-deep), var(--gold-bright)); }
@@ -736,7 +747,154 @@
         }
         .lmv-scorers { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 0 16px 10px; font-size: 0.72rem; color: rgba(240,237,230,0.85); direction: ltr; }
         .lmv-scorers div:last-child { text-align: right; }
-            @media (max-width: 640px) {
+    
+
+        /* ---- clean row redesign ---- */
+        @media (min-width: 1024px) {
+            table { border-spacing: 0 8px; }
+            tbody td { border-left: none !important; border-bottom: none !important; background: rgba(10, 32, 27, 0.55); padding-top: 14px; padding-bottom: 14px; }
+            tbody tr td:first-child { border-radius: 0 14px 14px 0; }
+            tbody tr td:last-child { border-radius: 14px 0 0 14px; }
+            tbody tr:nth-child(even) td { background: rgba(10, 32, 27, 0.55); }
+            tbody tr:hover td { background: rgba(18, 52, 44, 0.75); }
+            tbody tr:hover td:first-child { box-shadow: inset -3px 0 0 var(--gold-accent); }
+            td.c-pred { border-right: 1px solid rgba(255,255,255,0.04) !important; }
+            .c-pred input.score-in { width: 52px; height: 40px; border: 1px solid transparent; background: rgba(255,255,255,0.04); font-family: var(--font-mono); font-size: 1rem; letter-spacing: 1px; border-radius: 10px; }
+            .c-pred input.score-in:not(:disabled):hover { border-color: rgba(212,163,46,0.35); }
+            .c-pred input.score-in::placeholder { color: rgba(255,255,255,0.18); }
+            .c-pred input.score-in:disabled { background: transparent; color: var(--text-main); opacity: 1; }
+            .pts-3, .pts-1 { box-shadow: none !important; background: transparent !important; }
+            .pts-3 input.score-in { background: rgba(34,197,94,0.16) !important; border-color: rgba(34,197,94,0.6) !important; }
+            .pts-1 input.score-in { background: rgba(212,163,46,0.14) !important; border-color: rgba(212,163,46,0.5) !important; }
+            .pts-chip { top: 6px; left: 50%; transform: translateX(-50%) translateY(-4px); }
+            .winners-box { gap: 4px; }
+            .winner-btn { background: transparent; border-color: rgba(255,255,255,0.06); font-size: 0.7rem; padding: 5px 4px; opacity: 0.55; }
+            .winner-btn.active { opacity: 1; }
+            .count-stack .api-pill { font-size: 0.68rem; padding: 4px 8px; opacity: 0.8; }
+        }
+
+        @media (min-width: 1024px) {
+            .c-pred .pred-badge { width: 14px; height: 14px; opacity: 0.6; }
+            .c-pred .pred-cell { gap: 4px; }
+            /* date / time column */
+            .date-stack { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+            .date-stack select, .date-stack .date-select, .date-stack .date-sel { background: transparent !important; border: none !important; box-shadow: none !important; color: var(--text-muted) !important; font-size: 0.78rem !important; padding: 0 2px !important; height: auto !important; min-height: 0 !important; }
+            .date-stack > *:first-child { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; min-height: 0 !important; }
+            .date-stack > *:last-child { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; min-height: 0 !important; font-family: var(--font-mono); font-size: 1.35rem !important; font-weight: 800; color: var(--text-main); letter-spacing: 1px; }
+            .date-stack input { background: transparent !important; border: none !important; font-size: 1.35rem !important; font-family: var(--font-mono); text-align: center; color: var(--text-main) !important; }
+            /* countdown column */
+            .count-stack { gap: 6px !important; align-items: center; }
+            .count-stack .countdown-badge { width: auto !important; min-height: 0 !important; padding: 6px 14px !important; font-size: 0.85rem !important; border-radius: 999px !important; }
+            .count-stack .countdown-badge.ended { background: transparent !important; border: 1px solid rgba(255,255,255,0.08) !important; }
+            .count-stack .api-pill { width: auto !important; background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; font-size: 0.68rem !important; color: #4ade80 !important; }
+            .count-stack .api-pill::before { content: "● "; font-size: 0.55rem; }
+            .count-stack .lineup-open-btn { width: auto !important; background: transparent !important; border: none !important; box-shadow: none !important; padding: 2px 6px !important; font-size: 0.72rem !important; color: var(--gold-bright) !important; opacity: 0.75; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+            .count-stack .lineup-open-btn:hover { opacity: 1; }
+        }
+
+        .nmx { max-width: 640px !important; padding: 20px 22px !important; gap: 14px !important; border-right: none !important; border: 1px solid rgba(212,163,46,0.28) !important; background: radial-gradient(120% 140% at 50% 0%, rgba(212,163,46,0.10), transparent 55%), linear-gradient(160deg, var(--bg-card), var(--bg-sub-card)) !important; border-radius: 20px !important; box-shadow: 0 18px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04) !important; }
+        .nmx-top { display: flex; justify-content: space-between; align-items: center; }
+        .nmx-label { display: inline-flex; align-items: center; gap: 8px; font-size: 0.74rem; font-weight: 800; letter-spacing: 2px; color: var(--gold-bright); }
+        .nmx-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--gold-bright); box-shadow: 0 0 0 0 rgba(212,163,46,0.6); animation: nmxp 2s infinite; }
+        @keyframes nmxp { 0% { box-shadow: 0 0 0 0 rgba(212,163,46,0.6); } 70% { box-shadow: 0 0 0 10px rgba(212,163,46,0); } 100% { box-shadow: 0 0 0 0 rgba(212,163,46,0); } }
+        .nmx-teams { display: grid !important; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; }
+        .nmx-team { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .nmx-team img { width: 58px !important; height: 58px !important; opacity: 1 !important; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5)); }
+        .nmx-team b { font-size: 1.05rem; font-weight: 900; color: var(--text-main); text-align: center; }
+        .nmx-vs { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 800; color: var(--text-muted); border: 1px solid var(--border-color); border-radius: 999px; padding: 4px 10px; }
+        .nmx-info { text-align: center; font-size: 0.85rem; color: var(--text-muted); font-weight: 700; }
+        .nmx-timer { display: flex; justify-content: center; gap: 8px; direction: ltr; }
+        .nmx-seg { min-width: 62px; padding: 8px 6px; border-radius: 12px; background: rgba(0,0,0,0.25); border: 1px solid rgba(212,163,46,0.18); display: flex; flex-direction: column; align-items: center; }
+        .nmx-seg b { font-family: var(--font-mono); font-size: 1.6rem; font-weight: 800; color: var(--gold-bright); line-height: 1.1; }
+        .nmx-seg small { font-size: 0.66rem; color: var(--text-muted); font-weight: 700; }
+        .nmx-started { font-weight: 900; color: #f87171; font-size: 1.1rem; }
+        .nmx-actions { display: flex; gap: 8px; justify-content: center; }
+        .nmx-cta { flex: 1; max-width: 260px; padding: 11px 16px; border-radius: 12px; border: none; cursor: pointer; font-weight: 900; font-family: var(--font-display); font-size: 0.95rem; color: #1a1205; background: linear-gradient(135deg, var(--gold-bright), var(--gold-accent)); box-shadow: 0 8px 20px rgba(212,163,46,0.25); transition: transform .15s, filter .15s; }
+        .nmx-cta:hover { transform: translateY(-1px); filter: brightness(1.08); }
+        .nmx-ghost { padding: 10px 14px; border-radius: 12px; cursor: pointer; background: transparent; color: var(--text-muted); border: 1px solid var(--border-color); font-weight: 800; font-size: 0.82rem; transition: color .15s, border-color .15s; }
+        .nmx-ghost:hover { color: var(--gold-bright); border-color: var(--gold-accent); }
+        @media (max-width: 640px) {
+            .nmx { padding: 16px 14px !important; }
+            .nmx-team img { width: 44px !important; height: 44px !important; }
+            .nmx-team b { font-size: 0.92rem; }
+            .nmx-seg { min-width: 0; flex: 1; }
+            .nmx-seg b { font-size: 1.25rem; }
+        }
+
+        /* ---- leaderboard redesign ---- */
+        #playersBar { display: block !important; }
+        #playersBar .scoreboard-title { margin-bottom: 18px; }
+        .lb-wrap { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 22px; align-items: end; width: 100%; }
+        .lb-podium { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; align-items: end; }
+        .lb-pod { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .lb-medal { font-size: 1.8rem; line-height: 1; }
+        .lb-pname { font-weight: 900; font-size: 1rem; color: var(--text-main); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .lb-badges { font-size: 0.72rem; letter-spacing: 1px; opacity: 0.9; }
+        .lb-step { width: 100%; margin-top: 6px; border-radius: 14px 14px 6px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid rgba(212,163,46,0.3); background: linear-gradient(180deg, rgba(212,163,46,0.18), rgba(212,163,46,0.03)); }
+        .lb-step b { font-family: var(--font-mono); font-size: 1.7rem; font-weight: 800; color: var(--gold-bright); line-height: 1.1; }
+        .lb-step span { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; }
+        .lb-pod-1 .lb-step { height: 110px; border-color: var(--gold-accent); box-shadow: 0 0 24px rgba(212,163,46,0.25); background: linear-gradient(180deg, rgba(212,163,46,0.32), rgba(212,163,46,0.05)); }
+        .lb-pod-1 .lb-medal { font-size: 2.3rem; }
+        .lb-pod-2 .lb-step { height: 84px; border-color: rgba(203,213,225,0.35); background: linear-gradient(180deg, rgba(203,213,225,0.16), rgba(203,213,225,0.02)); }
+        .lb-pod-3 .lb-step { height: 66px; border-color: rgba(205,127,50,0.4); background: linear-gradient(180deg, rgba(205,127,50,0.18), rgba(205,127,50,0.02)); }
+        .lb-list { display: flex; flex-direction: column; gap: 6px; }
+        .lb-row { position: relative; display: grid; grid-template-columns: 26px minmax(0, 1fr) minmax(50px, 1.2fr) 34px; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 12px; background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.04); }
+        .lb-num { font-family: var(--font-mono); font-weight: 800; color: var(--text-muted); text-align: center; }
+        .lb-rname { font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lb-rname .lb-badges { margin-inline-start: 6px; }
+        .lb-bar { height: 6px; border-radius: 99px; background: rgba(255,255,255,0.06); overflow: hidden; }
+        .lb-bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--gold-accent), var(--gold-bright)); margin-inline-start: auto; }
+        .lb-pts { font-family: var(--font-mono); font-weight: 800; color: var(--gold-bright); text-align: left; }
+        .lb-rm { position: absolute !important; top: 2px; left: 4px; opacity: 0; transition: opacity .2s; }
+        .lb-pod:hover .lb-rm, .lb-row:hover .lb-rm { opacity: 1; }
+        @media (max-width: 900px) {
+            .lb-wrap { grid-template-columns: 1fr; gap: 16px; }
+        }
+        @media (max-width: 640px) {
+            .lb-podium { gap: 6px; }
+            .lb-pname { font-size: 0.86rem; }
+            .lb-medal { font-size: 1.5rem; } .lb-pod-1 .lb-medal { font-size: 1.9rem; }
+            .lb-step b { font-size: 1.35rem; }
+            .lb-pod-1 .lb-step { height: 88px; } .lb-pod-2 .lb-step { height: 68px; } .lb-pod-3 .lb-step { height: 54px; }
+            .lb-row { padding: 8px 10px; gap: 8px; grid-template-columns: 22px minmax(0, 1fr) 60px 30px; }
+            .lb-rm { opacity: 0.6; }
+        }
+        /* points coloring + table polish */
+        td.c-pred { position: relative; }
+        .pts-3 { background: linear-gradient(160deg, rgba(34,197,94,0.22), rgba(34,197,94,0.06)) !important; box-shadow: inset 0 0 0 1px rgba(34,197,94,0.55); }
+        .pts-1 { background: linear-gradient(160deg, rgba(212,163,46,0.2), rgba(212,163,46,0.05)) !important; box-shadow: inset 0 0 0 1px rgba(212,163,46,0.45); }
+        .pts-0 .score-in { opacity: 0.45; text-decoration: line-through; }
+        .pts-3 .score-in { border-color: #22c55e !important; color: #bbf7d0 !important; font-weight: 900; }
+        .pts-1 .score-in { border-color: var(--gold-accent) !important; }
+        .pts-chip { position: absolute; top: 3px; left: 4px; font-size: 0.62rem; font-weight: 900; padding: 1px 5px; border-radius: 6px; background: #22c55e; color: #05210f; font-family: var(--font-mono); line-height: 1.4; }
+        .pts-1 .pts-chip { background: var(--gold-accent); color: #1a1205; }
+        .pred-box-mini { position: relative; border-radius: 10px; }
+        .pred-box-mini { gap: 6px; min-width: 0; overflow: visible; }
+        .pred-box-mini .pbm-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pred-box-mini .pred-cell { flex: 0 1 auto; min-width: 0; }
+        .pred-box-mini .pts-chip { position: absolute; top: -7px; right: 8px; left: auto; transform: none; font-size: 0.6rem; padding: 0 5px; z-index: 2; }
+        .match-card-predictions { row-gap: 12px; padding-top: 4px; }
+        .mcx { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+        .mcx-dt, .mcx-res { border-radius: 14px; padding: 12px 10px; background: rgba(0,0,0,0.22); border: 1px solid rgba(212,163,46,0.18); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 0; }
+        .mcx-day { font-size: 0.72rem; color: var(--text-muted); font-weight: 700; }
+        .mcx-date { font-size: 0.95rem; font-weight: 800; color: var(--text-main); font-family: var(--font-mono); }
+        .mcx-time { font-size: 1.6rem; font-weight: 800; color: var(--gold-bright); font-family: var(--font-mono); line-height: 1.15; letter-spacing: 1px; }
+        .mcx-auto { font-size: 0.6rem; color: #4ade80; font-weight: 700; margin-top: 2px; }
+        .mcx-cap { font-size: 0.72rem; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; }
+        .mcx-res .pred-cell { gap: 8px; }
+        .mcx-res .pred-badge { width: 24px !important; height: 24px !important; }
+        .mcx-res input.score-in { width: 64px !important; max-width: none !important; height: 42px !important; font-size: 1.2rem !important; font-family: var(--font-mono); }
+        .mcx-src { font-size: 0.6rem; color: var(--text-muted); margin-top: 4px; text-align: center; }
+        .mcx-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 14px; }
+        .mcx-bar .countdown-badge { padding: 5px 10px !important; font-size: 0.74rem !important; border-radius: 999px !important; width: auto !important; min-height: 0 !important; }
+        .mcx-bar .api-pill { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 4px !important; font-size: 0.66rem !important; color: #4ade80 !important; width: auto !important; }
+        .mcx-bar .api-pill::before { content: "● "; font-size: 0.5rem; }
+        .mcx-venue { margin-inline-start: auto; }
+        .mcx-lineup { background: transparent !important; border: 1px solid rgba(212,163,46,0.3) !important; padding: 5px 10px !important; font-size: 0.72rem !important; border-radius: 999px !important; width: auto !important; }
+        tbody tr:nth-child(even) td { background-color: rgba(255,255,255,0.018); }
+        .score-in { transition: border-color .2s, box-shadow .2s, transform .15s; }
+        .score-in:focus { box-shadow: 0 0 0 3px rgba(212,163,46,0.3); transform: scale(1.05); outline: none; }
+        @media (max-width: 640px) {
             .stats-table { min-width: 0 !important; }
             .stats-table thead { display: none; }
             .stats-table, .stats-table tbody { display: block; }
@@ -765,15 +923,15 @@
             <img class="blancos-banner" src="https://media.base44.com/images/public/6a91620bb63bd7c1b5a2d9e8/0a36110dd_717f280bed475230e0023ddf508c79d1_tplv-tiktokx-cropcenter_1080_1080-removebg-preview.png" alt="הבלאנקוס">
             <h1>ניחושי הבלאנקוס לשנת 26/27</h1>
             <p class="subtitle">עונת 2026/27 • Hala Madrid y nada más</p>
-            <div class="next-match-widget" id="headerNextMatchWidget">
-                <div class="nm-header-label">⏳ המשחק הבא</div>
-                <div class="nm-teams-name" id="hnmTeamsContainer"><span>טוען משחק הבא...</span></div>
-                <div class="nm-details-row">
-                    <span id="hnmInfo">--/-- | --:--</span>
-                    <span class="nm-timer-val" id="hnmTimer">--:--:--</span>
-                    <button class="nm-action-btn" onclick="scrollToHeaderTargetMatch()">🎯 מעבר לניחוש</button>
-                    <button class="nm-demo-btn" onclick="toggleLiveDemo()">👁 תצוגת LIVE</button>
-                    <button class="nm-demo-btn" onclick="BlancosNotify.sendTest()">🔔 בדיקת התראה</button>
+            <div class="next-match-widget nmx" id="headerNextMatchWidget">
+                <div class="nmx-top"><span class="nmx-label"><i class="nmx-pulse"></i>המשחק הבא</span><span id="hnmComp"></span></div>
+                <div class="nm-teams-name nmx-teams" id="hnmTeamsContainer"><span>טוען משחק הבא...</span></div>
+                <div class="nmx-info" id="hnmInfo">--/-- | --:--</div>
+                <div class="nmx-timer" id="hnmTimer"></div>
+                <div class="nmx-actions">
+                    <button class="nmx-cta" onclick="scrollToHeaderTargetMatch()">🎯 לניחוש שלי</button>
+                    <button class="nmx-ghost" onclick="toggleLiveDemo()" title="תצוגת LIVE">👁 LIVE</button>
+                    <button class="nmx-ghost" onclick="BlancosNotify.sendTest()" title="בדיקת התראה">🔔</button>
                 </div>
             </div>
             <div class="live-match-widget" id="liveMatchWidget"></div>
@@ -1535,7 +1693,7 @@
         try { return new Set(JSON.parse(localStorage.getItem("notifiedPhases") || "[]")); } catch (e) { return new Set(); }
     })();
     function saveNotifiedPhases() {
-        try { localStorage.setItem("notifiedPhases", JSON.stringify([...notifiedPhases].slice(-120))); } catch (e) {}
+        try { localStorage.setItem("notifiedPhases", JSON.stringify([...notifiedPhases].slice(-400))); } catch (e) {}
     }
     function checkMatchPhaseNotifications() {
         if (typeof BlancosNotify === "undefined") return;
@@ -1549,7 +1707,7 @@
             const diff = ko - now;
             if (st.isLive && !notifiedPhases.has(startKey)) {
                 notifiedPhases.add(startKey); saveNotifiedPhases();
-                BlancosNotify.show({ kind: "start", tag: startKey, title: "▶️ המשחק התחיל", body: `${m.match} — בהצלחה לניחושים` });
+                if (now - ko < 30 * 60000) BlancosNotify.show({ kind: "start", tag: startKey, title: "▶️ המשחק התחיל", body: `${m.match} — בהצלחה לניחושים` });
             } else if (!st.isLive && !st.isEnded && diff > 0 && diff <= 15 * 60000 && !notifiedPhases.has(preKey)) {
                 notifiedPhases.add(preKey); saveNotifiedPhases();
                 const left = Math.max(1, Math.round(diff / 60000));
@@ -1558,14 +1716,20 @@
         });
     }
     function checkMatchEndedNotifications() {
+        /* לא מתחילים לפני שהנתונים נטענו — אחרת כל המשחקים שכבר נגמרו נחשבים ״חדשים״ */
+        if (!currentMatches.length) return;
+        const now = Date.now();
         currentMatches.forEach(m => {
             if (!m) return;
             const st = getMatchStatus(m);
-            if (st.isEnded && !notifiedEndedMatches.has(m.id)) {
-                if (endedNotifInitialized) notifyMatchEnded(m);
-                notifiedEndedMatches.add(m.id);
-            }
+            if (!st.isEnded || notifiedEndedMatches.has(m.id)) return;
+            notifiedEndedMatches.add(m.id);
+            const key = `end_${m.id}`, ko = matchKickoff(m);
+            const recent = ko && now - ko < 4 * 3600000;
+            if (endedNotifInitialized && recent && !notifiedPhases.has(key)) notifyMatchEnded(m);
+            notifiedPhases.add(key);
         });
+        saveNotifiedPhases();
         endedNotifInitialized = true;
     }
 
@@ -2042,21 +2206,24 @@
         if (!nextMatch) {
             if (containerEl) containerEl.innerHTML = "<span>אין משחקים קרובים כרגע</span>";
             if (infoEl) infoEl.innerText = "--/-- | --:--";
-            if (timerEl) timerEl.innerText = "00:00:00";
+            if (timerEl) timerEl.innerHTML = "";
             targetNextMatchId = ""; return;
         }
         targetNextMatchId = nextMatch.id;
-        if (containerEl) containerEl.innerHTML = `<span>${nextMatch.match}</span>`;
-        if (infoEl) infoEl.innerText = `${formatDateDisplay(currentData[`date_${nextMatch.id}`] !== undefined ? currentData[`date_${nextMatch.id}`] : nextMatch.date)} | ${nextMatch.timeStr}`;
+        const nb = predBadgesHTML(nextMatch), parts = String(nextMatch.match).split(" - ");
+        if (containerEl) containerEl.innerHTML = `<div class="nmx-team">${nb.real}<b>${parts[0] || ""}</b></div><span class="nmx-vs">VS</span><div class="nmx-team">${nb.opp}<b>${parts[1] || ""}</b></div>`;
+        const compEl = document.getElementById("hnmComp"); if (compEl) compEl.innerHTML = getCompBadge(nextMatch.comp);
+        const dStr = currentData[`date_${nextMatch.id}`] !== undefined ? currentData[`date_${nextMatch.id}`] : nextMatch.date;
+        let wd = ""; try { wd = new Date(`${dStr}T12:00`).toLocaleDateString("he-IL", { weekday: "long" }); } catch (e) {}
+        if (infoEl) infoEl.innerText = `${wd} · ${formatDateDisplay(dStr)} · ${nextMatch.timeStr}`;
         const diff = nextMatch.calculatedTime - now;
-        if (diff <= 0) { if (timerEl) timerEl.innerText = "המשחק החל!"; return; }
+        if (diff <= 0) { if (timerEl) timerEl.innerHTML = `<div class="nmx-started">המשחק החל!</div>`; return; }
         const days = Math.floor(diff / 86400000);
         const hours = Math.floor((diff % 86400000) / 3600000);
         const minutes = Math.floor((diff % 3600000) / 60000);
         const seconds = Math.floor((diff % 60000) / 1000);
-        let timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        if (days > 0) timeString = `ימים, ${days} - ` + timeString;
-        if (timerEl) timerEl.innerText = timeString;
+        const seg = (v, l) => `<div class="nmx-seg"><b>${String(v).padStart(2, '0')}</b><small>${l}</small></div>`;
+        if (timerEl) timerEl.innerHTML = seg(days, "ימים") + seg(hours, "שעות") + seg(minutes, "דקות") + seg(seconds, "שניות");
     }
     function scrollToHeaderTargetMatch() { if (targetNextMatchId) scrollToMatch(targetNextMatchId); }
     function scrollToMatch(matchId) {
@@ -2158,6 +2325,13 @@
         if (g === actual) return 3;
         return scoreSign(g) === scoreSign(actual) ? 1 : 0;
     }
+    function ptsClass(m, p) {
+        const done = normalizeScoreStr(currentData[`actual_${m.id}`]) && getMatchStatus(m).isEnded;
+        if (!done || !normalizeScoreStr(currentData[`pred_${m.id}_${p}`])) return ["", ""];
+        const v = pointsFor(m, p);
+        return [v === 3 ? "pts-3" : v === 1 ? "pts-1" : "pts-0", v ? `<b class="pts-chip">+${v}</b>` : ""];
+    }
+    function mcWeekday(d) { try { const x = new Date(`${d}T12:00`); return isNaN(x) ? "" : x.toLocaleDateString("he-IL", { weekday: "long" }); } catch (e) { return ""; } }
     function computeScores() {
         const scores = {};
         activePlayersList.forEach(p => scores[p] = 0);
@@ -2188,7 +2362,7 @@
             if (played && played === done.length && done.length >= 3) badges.push(["🧱", "לא מפספס — ניחש בכל המשחקים"]);
             if (exact >= 5) badges.push(["💎", "נביא — " + exact + " תוצאות מדויקות"]);
             const total = exact * 3 + dir;
-            return { p, exact, dir, played, total, acc: played ? Math.round(((exact + dir) / played) * 100) : 0, streak, form: form.slice(-5), badges };
+            return { p, exact, dir, played, total, acc: done.length ? Math.round(((exact + dir) / done.length) * 100) : 0, games: done.length, streak, form: form.slice(-5), badges };
         }).sort((a, b) => b.total - a.total || b.exact - a.exact);
     }
     let statsOpen = false;
@@ -2201,9 +2375,9 @@
         return `<div class="stats-card">
             <button class="stats-toggle" onclick="toggleStats()">📊 טבלת עונה וסטטיסטיקות ${statsOpen ? "▲" : "▼"}</button>
             ${statsOpen ? `<div class="stats-scroll"><table class="stats-table"><thead><tr><th>#</th><th>מנחש</th><th>נק׳</th><th>🎯 מדויק</th><th>↗ כיוון</th><th>% הצלחה</th><th>כושר</th></tr></thead><tbody>
-            ${rows.map((r, i) => `<tr><td class="st-rank">${i + 1}</td><td class="st-name">${r.p}${r.p === leader ? " 👑" : ""}<div class="st-badges">${r.badges.map(b => `<span title="${b[1]}">${b[0]}</span>`).join("")}</div></td><td class="st-pts">${r.total}</td><td>${r.exact}</td><td>${r.dir}</td><td><div class="st-bar"><span style="width:${r.acc}%"></span></div>${r.acc}%</td><td class="st-form">${formDots(r.form)}</td></tr>`).join("")}
+            ${rows.map((r, i) => `<tr><td class="st-rank">${i + 1}</td><td class="st-name">${r.p}${r.p === leader ? " 👑" : ""}<div class="st-badges">${r.badges.map(b => `<span title="${b[1]}">${b[0]}</span>`).join("")}</div></td><td class="st-pts">${r.total}</td><td>${r.exact}</td><td>${r.dir}</td><td><div class="st-bar"><span style="width:${r.acc}%"></span></div>${r.acc}%<div class="st-sub">${r.exact + r.dir}/${r.games} · ניחש ${r.played}</div></td><td class="st-form">${formDots(r.form)}</td></tr>`).join("")}
             </tbody></table></div>
-            <div class="stats-legend">ניקוד: 3 נק׳ על תוצאה מדויקת · 1 נק׳ על כיוון נכון (ניצחון / תיקו / הפסד). כושר = 5 המשחקים האחרונים. תגים: 🎯 צלף · 📈 עקבי · 🔥 מלך הקלאסיקו · 🧱 לא מפספס · 💎 נביא</div>` : ""}
+            <div class="stats-legend">ניקוד: 3 נק׳ על תוצאה מדויקת · 1 נק׳ על כיוון נכון (ניצחון / תיקו / הפסד). % הצלחה = משחקים שבהם קיבל נקודות מתוך כל המשחקים שהסתיימו (משחק בלי ניחוש נחשב פספוס). כושר = 5 המשחקים האחרונים. תגים: 🎯 צלף · 📈 עקבי · 🔥 מלך הקלאסיקו · 🧱 לא מפספס · 💎 נביא</div>` : ""}
         </div>`;
     }
     function addNewPlayer() {
@@ -2287,13 +2461,23 @@
         const ranked = [...activePlayersList].sort((a, b) => scores[b] - scores[a]);
         const medals = ["🥇", "🥈", "🥉"];
         const badgeMap = {}; seasonStats().forEach(r => badgeMap[r.p] = r.badges.map(b => b[0]).join(""));
-        document.getElementById("playersBar").innerHTML = (activePlayersList.length ? `<div class="scoreboard-title">🏆 דירוג מנחשים</div>` : "") + ranked.map((player, i) => `
-            <div class="player-card ${i < 3 ? 'top-rank' : ''}">
-                <span class="rank">${i < 3 ? medals[i] : (i + 1)}</span>
-                <button class="remove-btn" onclick="removePlayer('${player}')">×</button>
-                <span>${player}${badgeMap[player] ? ` <small>${badgeMap[player]}</small>` : ""}</span>
-                <span class="score">${scores[player]} נק'</span>
+        const top = scores[ranked[0]] || 1;
+        const bdg = p => badgeMap[p] ? `<small class="lb-badges">${badgeMap[p]}</small>` : "";
+        const rm = p => `<button class="remove-btn lb-rm" title="הסר" onclick="removePlayer('${p}')">×</button>`;
+        const pod = [1, 0, 2].filter(i => ranked[i]).map(i => { const p = ranked[i]; return `
+            <div class="lb-pod lb-pod-${i + 1}">${rm(p)}
+                <div class="lb-medal">${medals[i]}</div>
+                <div class="lb-pname">${p}</div>${bdg(p)}
+                <div class="lb-step"><b>${scores[p]}</b><span>נק׳</span></div>
+            </div>`; }).join("");
+        const rest = ranked.slice(3).map((p, j) => `
+            <div class="lb-row">${rm(p)}
+                <span class="lb-num">${j + 4}</span>
+                <span class="lb-rname">${p}${bdg(p)}</span>
+                <span class="lb-bar"><i style="width:${Math.max(4, Math.round(scores[p] / top * 100))}%"></i></span>
+                <span class="lb-pts">${scores[p]}</span>
             </div>`).join("");
+        document.getElementById("playersBar").innerHTML = activePlayersList.length ? `<div class="scoreboard-title">🏆 דירוג מנחשים</div><div class="lb-wrap"><div class="lb-podium">${pod}</div>${rest ? `<div class="lb-list">${rest}</div>` : ""}</div>` : "";
         const statsEl = document.getElementById("statsSection"); if (statsEl) statsEl.innerHTML = statsHTML();
         const filteredMatches = getFilteredMatches();
         const mobileContainer = document.getElementById("mobileCardsContainer");
@@ -2324,9 +2508,10 @@
                 return `<button class="winner-btn ${isChecked ? 'active' : ''}" ${winnersDisabled} onclick="onWinnerToggle('${m.id}', '${player}')">${player}</button>`;
             }).join("");
             const pb = predBadgesHTML(m);
+            const mcAuto = getAutoDateTime(m);
             const predictionsMobileHTML = activePlayersList.map(player => {
                 const savedPred = currentData[`pred_${m.id}_${player}`] || "";
-                return `<div class="pred-box-mini"><span>${player}</span><span class="pred-cell">${pb.real}<input type="text" class="score-in" value="${savedPred}" placeholder="-" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)">${pb.opp}</span></div>`;
+                const pc = ptsClass(m, player); return `<div class="pred-box-mini ${pc[0]}">${pc[1]}<span class="pbm-name">${player}</span><span class="pred-cell">${pb.real}<input type="text" class="score-in" value="${savedPred}" placeholder="-" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)">${pb.opp}</span></div>`;
             }).join("");
             let badgeClass = "countdown-badge";
             if (st.isLive) badgeClass += " live"; else if (st.isEnded) badgeClass += " ended";
@@ -2336,37 +2521,28 @@
                         <div class="match-card-title">${deleteBtnHTML}${lockBtnHTML}${m.isClasico ? '🔥 ' : ''}${matchNameLineHTML(m)}</div>
                         <div>${getCompBadge(m.comp)}</div>
                     </div>
-                    <div class="match-card-info">
-                        <span>📅 ${formatDateDisplay(savedDate)}</span>
+                    <div class="mcx">
+                        <div class="mcx-dt">
+                            <div class="mcx-day">${mcWeekday(savedDate)}</div>
+                            <div class="mcx-date">${formatDateDisplay(mcAuto && mcAuto.date ? mcAuto.date : savedDate)}</div>
+                            <div class="mcx-time">${mcAuto && mcAuto.time ? mcAuto.time : savedTime}</div>
+                            ${mcAuto ? '<div class="mcx-auto">● מתעדכן אוטומטית</div>' : ''}
+                        </div>
+                        <div class="mcx-res">
+                            <div class="mcx-cap">תוצאה${isManualActual ? ' · ✍️ ידני' : ''}</div>
+                            <span class="pred-cell actual-cell ${resultsUnlocked ? '' : 'readonly'}" ${resultsUnlocked ? '' : 'onclick="toggleResultLock()"'}>${pb.real}<input type="text" class="score-in actual-in ${isManualActual ? 'manual-actual' : ''}" value="${savedActual}" placeholder="0-0" ${resultsUnlocked ? '' : 'disabled'} onchange="onInputSave('actual_${m.id}', this.value)">${pb.opp}</span>
+                            ${isManualActual && resultsUnlocked ? `<button class="winner-btn" style="margin-top:4px;font-size:0.7rem;" onclick="resetActualToAuto('${m.id}')">↺ חזור לאוטו</button>` : ''}
+                            <span id="src_mobile_${m.id}" class="mcx-src">${sourceNote}</span>
+                        </div>
+                    </div>
+                    <div class="mcx-bar">
                         <span id="cd_mobile_${m.id}" class="${badgeClass}">${st.text}</span>
-                    </div>
-                    <div class="match-api-status">
                         <span class="api-pill ${apiStatus.cls}" id="api_status_mobile_${m.id}">${apiStatus.label}</span>
-                        <button class="lineup-open-btn" onclick="openLineup('${m.id}')">📋 הרכבים</button>
-                    </div>
-                    <div class="match-card-actual" style="flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 90px;">
-                            <span style="font-weight: 700; font-size: 0.8rem; display: block; color: var(--text-muted); margin-bottom: 4px;">בית/חוץ:</span>
-                            <div class="venue-toggle-group" style="width: 100%;">
-                                <button type="button" class="venue-btn ${isHome ? 'active-h' : ''}" style="flex:1;" onclick="setVenueType('${m.id}', 'בית')">H - בית</button>
-                                <button type="button" class="venue-btn ${!isHome ? 'active-a' : ''}" style="flex:1;" onclick="setVenueType('${m.id}', 'חוץ')">A - חוץ</button>
-                            </div>
+                        <div class="venue-toggle-group mini mcx-venue">
+                            <button type="button" class="venue-btn ${isHome ? 'active-h' : ''}" onclick="setVenueType('${m.id}', 'בית')">בית</button>
+                            <button type="button" class="venue-btn ${!isHome ? 'active-a' : ''}" onclick="setVenueType('${m.id}', 'חוץ')">חוץ</button>
                         </div>
-                        <div style="flex: 1; min-width: 110px;">
-                            <span style="font-weight: 700; font-size: 0.8rem; display: block; color: var(--text-muted); margin-bottom: 4px;">תאריך:</span>
-                            ${autoDateHTML(m, savedDate)}
-                        </div>
-                        <div>
-                            <span style="font-weight: 700; font-size: 0.8rem; display: block; color: var(--text-muted); margin-bottom: 4px;">שעה (24h):</span>
-                            ${autoTimeHTML(m, savedTime)}
-                        </div>
-                        <div>
-                            <span style="font-weight: 700; font-size: 0.8rem; display: block; color: var(--text-muted); margin-bottom: 4px;">תוצאה (ריאל - יריבה):${isManualActual ? ' ✍️ ידני' : ''}</span>
-                            <span class="pred-cell actual-cell ${resultsUnlocked ? '' : 'readonly'}" ${resultsUnlocked ? '' : 'onclick="toggleResultLock()"'} title="${resultsUnlocked ? 'ניתן לעריכה' : 'התוצאה גלויה לקריאה בלבד — הקש לפתיחת עריכה'}">${pb.real}<input type="text" class="score-in actual-in ${isManualActual ? 'manual-actual' : ''}" value="${savedActual}" placeholder="0-0" ${resultsUnlocked ? '' : 'disabled'} onchange="onInputSave('actual_${m.id}', this.value)">${pb.opp}</span>
-                            ${resultsUnlocked ? '' : `<span class="actual-lock-note" onclick="toggleResultLock()">🔒 לקריאה בלבד — הקש לפתיחת עריכה</span>`}
-                            ${isManualActual && resultsUnlocked ? `<button class="winner-btn" style="margin-top:4px;width:100%;font-size:0.7rem;" onclick="resetActualToAuto('${m.id}')">↺ חזור לאוטו</button>` : ''}
-                            <span id="src_mobile_${m.id}">${sourceNote}</span>
-                        </div>
+                        <button class="lineup-open-btn mcx-lineup" onclick="openLineup('${m.id}')">📋 הרכבים</button>
                     </div>
                     <div style="font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: var(--text-muted);">ניחושי שחקנים:</div>
                     <div class="match-card-predictions">${predictionsMobileHTML}</div>
@@ -2411,7 +2587,7 @@
             const pb = predBadgesHTML(m);
             const predictionsHTML = activePlayersList.map(player => {
                 const savedPred = currentData[`pred_${m.id}_${player}`] || "";
-                return `<td class="c-pred"><span class="pred-cell">${pb.real}<input type="text" class="score-in" value="${savedPred}" placeholder="-" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)">${pb.opp}</span></td>`;
+                const pc = ptsClass(m, player); return `<td class="c-pred ${pc[0]}">${pc[1]}<span class="pred-cell">${pb.real}<input type="text" class="score-in" value="${savedPred}" placeholder="·" ${disabledAttr} onchange="onInputSave('pred_${m.id}_${player}', this.value)">${pb.opp}</span></td>`;
             }).join("");
             let badgeClass = "countdown-badge";
             if (st.isLive) badgeClass += " live"; else if (st.isEnded) badgeClass += " ended";
@@ -2925,6 +3101,9 @@
     fetchLiveScores();
     scheduleNextFetch();
     loadFixtureBadges();
+    /* רענון תאריכים ושעות מהפיד כל 20 דקות ובכל חזרה לאתר */
+    setInterval(() => { loadFixtureBadges(); }, 20 * 60 * 1000);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) loadFixtureBadges(); });
     setInterval(loadFixtureBadges, 3 * 60 * 1000);
     setTimeout(prefetchNextLineup, 2500);
     // expose test helper
