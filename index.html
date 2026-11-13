@@ -2116,7 +2116,7 @@
        LIVE MATCH WIDGET — ריאל מדריד תמיד משמאל, היריבה מימין
        ============================================================ */
     let liveDemoOn = false;
-    function toggleLiveDemo() { liveDemoOn = !liveDemoOn; updateLiveMatchWidget(); }
+    function toggleLiveDemo() { liveDemoOn = !liveDemoOn; updateLiveMatchWidget(); try { if (window.xaRefresh) window.xaRefresh(); } catch (e) {} }
     function liveCardHTML(o) {
         return `
             <div class="live-match-card">
@@ -2145,7 +2145,7 @@
                 </div>
                 <div class="lmv-progress"><span style="width:${o.progress}%"></span></div>
                 <div class="lmv-footer">
-                    ${o.demo ? `<span class="lmv-source">כך זה נראה במשחק חי</span>` : `<button class="lmv-btn" onclick="toggleAutoScore()">${o.autoLabel}</button>`}
+                    ${o.demo ? `<button class="lmv-btn" type="button" style="cursor:default">${o.autoLabel}</button>` : `<button class="lmv-btn" onclick="toggleAutoScore()">${o.autoLabel}</button>`}
                     ${o.updatedLabel ? `<span class="lmv-source">📡 ${o.updatedLabel}</span>` : ''}
                 </div>
             </div>`;
@@ -2155,7 +2155,9 @@
             demo: true, comp: "לה ליגה", minute: "67'", progress: 74,
             realName: "ריאל מדריד", oppName: "ברצלונה",
             realBadge: crestFor("real madrid"), oppBadge: crestFor("barcelona"),
-            realScore: "2", oppScore: "1", scoreChanged: false, autoLabel: "", updatedLabel: ""
+            realScore: "2", oppScore: "1", scoreChanged: false,
+            autoLabel: `🔄 אוטומטי • ${new Date().toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`,
+            updatedLabel: `TheSportsDB • עודכן ${new Date().toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`
         });
     }
     function updateLiveMatchWidget() {
@@ -3332,11 +3334,24 @@
       }).filter(Boolean).reverse();
     }).catch(function () { if (evCache[m.id] === undefined) evCache[m.id] = []; }).then(function () { evBusy[m.id] = false; renderLive(true); });
   }
+  /* תצוגה מקדימה של הפס שמתחת לכרטיס הלייב (ניחושי כולם) — באותו מבנה כמו במשחק אמיתי, עם ניחושים לדוגמה */
+  function demoStripHTML() {
+    var sample = ["2-1", "1-0", "3-1", "2-1", "2-0", "1-1", "0-0", "3-0"], actual = "2-1";
+    var chips = activePlayersList.map(function (p, i) {
+      var g = sample[i % sample.length], ok = g === actual;
+      return "<span class='xa-chip " + (ok ? "xa-ok" : "") + "'>" + (ok ? "✅ " : "") + esc(p) + " <i>" + g + "</i></span>";
+    }).join("");
+    var right = activePlayersList.filter(function (p, i) { return sample[i % sample.length] === actual; });
+    var note = right.length ? "צודקים כרגע: " + right.map(esc).join(", ") : "אף אחד לא צודק כרגע";
+    return "<div class='xa-card'><div class='xa-h'><span>📊 מה כולם ניחשו — ריאל מדריד - ברצלונה</span><span class='xa-score'>" + actual + "</span></div>" +
+      "<div class='xa-chips'>" + chips + "</div><div class='xa-note'>" + note + " · ריאל משמאל, יריבה מימין</div>" +
+      "<button class='xa-btn' type='button' style='cursor:default'>📜 ציר זמן של המשחק</button></div>";
+  }
   function renderLive(force) {
     var el = slot("xaLive", document.getElementById("liveMatchWidget"), document.getElementById("playersBar")); if (!el) return;
     el.className = "xa-live";
     var ms = liveMatches();
-    var html = ms.map(function (m) {
+    var html = ((typeof liveDemoOn !== "undefined" && liveDemoOn) ? demoStripHTML() : "") + ms.map(function (m) {
       var actual = normalizeScoreStr(currentData["actual_" + m.id]);
       var chips = activePlayersList.map(function (p) {
         var g = guess(m, p), ok = actual && g === actual;
@@ -3364,6 +3379,7 @@
   function tick() { try { if (!ready()) return; ensureStyle(); renderBar(); renderLive(false); } catch (e) { /* לא מפילים את האתר */ } }
   function slow() { try { if (!ready()) return; notifyLineups(); notifyDeadline(); } catch (e) {} }
   setInterval(tick, 1000);
+  window.xaRefresh = function () { tick(); };
   setInterval(slow, 30000);
   setInterval(function () { try { if (ready()) refreshOpenEvents(); } catch (e) {} }, 30000);
   setTimeout(slow, 4000);
