@@ -333,13 +333,11 @@
         html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
         body { 
             background-color: var(--bg-body); 
-            background-image: linear-gradient(rgba(5, 22, 19, 0.75), rgba(5, 22, 19, 0.85)), url('background.jpg');
-            background-size: cover; background-position: center; background-attachment: fixed;
             color: var(--text-main); padding: 14px 6px; -webkit-tap-highlight-color: transparent; 
             min-height: 100vh; position: relative; overflow-x: hidden; text-rendering: optimizeSpeed;
         }
         body::before { content: ""; position: fixed; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% -5%, rgba(22, 78, 66, 0.28), transparent 60%), radial-gradient(ellipse 50% 40% at 90% 100%, rgba(212, 163, 46, 0.08), transparent 55%); pointer-events: none; z-index: 0; }
-        .main-container { width: 100%; max-width: 98vw; margin: 0 auto; background: rgba(8, 34, 30, 0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 18px; border-radius: 24px; box-shadow: var(--shadow-card); border: 1px solid var(--border-color); position: relative; z-index: 1; }     
+        .main-container { width: 100%; max-width: 98vw; margin: 0 auto; background: rgba(8, 34, 30, 0.15); padding: 18px; border-radius: 24px; box-shadow: var(--shadow-card); border: 1px solid var(--border-color); position: relative; z-index: 1; }     
         header { background: transparent !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; color: var(--text-main); padding: 34px 22px 26px; border-radius: 22px; text-align: center; margin-bottom: 20px; position: relative; box-shadow: none; border: 1px solid var(--border-color); overflow: hidden; }
         header::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--gold-deep), var(--gold-bright), var(--gold-deep)); box-shadow: var(--glow-gold); }
         .header-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 4px; }
@@ -916,6 +914,11 @@
 
         /* perf: האטת אנימציות + דילוג על רינדור של מה שמחוץ למסך */
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; } }
+        /* אותו רקע ואותו טשטוש כמו קודם, אבל כשכבה קבועה שמצויירת פעם אחת — במקום background-attachment:fixed + backdrop-filter שמחושבים מחדש בכל גלילה */
+        html::before { content: ""; position: fixed; inset: -24px; z-index: -1; pointer-events: none;
+            background-image: linear-gradient(rgba(5, 22, 19, 0.75), rgba(5, 22, 19, 0.85)), url('background.jpg');
+            background-size: cover; background-position: center;
+            filter: blur(8px); transform: translateZ(0); }
         .xa-score { direction: ltr; unicode-bidi: isolate; }
         .pts-chip { direction: ltr; unicode-bidi: isolate; white-space: nowrap; }
     </style>
