@@ -1,0 +1,18 @@
+{
+  "crons": [
+    {
+      "path": "/api/push-tick",
+      "schedule": "* * * * *"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/INDEX.HTML"
+    },
+    {
+      "source": "/index.html",
+      "destination": "/INDEX.HTML"
+    }
+  ]
+}
