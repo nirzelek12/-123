@@ -103,7 +103,7 @@
       }
       function show(opts, force) {
         if (!opts || (!force && settings[opts.kind || "goals"] === false) || permission() !== "granted") return Promise.resolve(false);
-        if (!force && pushOn && SERVER_KINDS[opts.kind || "goals"]) { try { zcall("pushTick", { reason: opts.kind }); } catch (e) {} return Promise.resolve(true); }
+        if (!force && pushOn && SERVER_KINDS[opts.kind || "goals"]) { return zcall("pushTick", { reason: opts.kind }).then(function () { return true; }).catch(function () { return show(opts, true); }); }
         var tag = opts.tag || "blancos", now = Date.now();
         if (!force && lastTags[tag] && now - lastTags[tag] < 8000) return Promise.resolve(false);
         lastTags[tag] = now;
@@ -113,7 +113,7 @@
         if (!opts.silent) options.vibrate = [180, 90, 180];
         var local = function () {
           var plain = function () {
-            
+
             try { var n = new Notification(opts.title, options); n.onclick = function () { try { window.focus(); } catch (e) {} n.close(); }; return true; }
             catch (e) { swError = String((e && e.message) || e).slice(0, 70); return false; }
           };
@@ -302,25 +302,25 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
         :root {
-            --bg-body: #051613; 
+            --bg-body: #051613;
             --bg-card: rgba(8, 34, 30, 0.92);
             --bg-header: linear-gradient(160deg, rgba(8, 34, 30, 0.95) 0%, rgba(5, 22, 19, 0.95) 100%);
-            --bg-sub-card: rgba(11, 45, 39, 0.9); 
-            --text-main: #f0ede6; 
+            --bg-sub-card: rgba(11, 45, 39, 0.9);
+            --text-main: #f0ede6;
             --text-muted: #8fa89e;
-            --border-color: #123830; 
-            --th-bg: #03100d; 
+            --border-color: #123830;
+            --th-bg: #03100d;
             --th-player: #0b2d27;
-            --tr-even: rgba(7, 28, 25, 0.85); 
-            --input-bg: #051613; 
+            --tr-even: rgba(7, 28, 25, 0.85);
+            --input-bg: #051613;
             --actual-bg: #0e372f;
-            --actual-text: #f0ede6; 
-            --clasico-bg: #2a1a18; 
+            --actual-text: #f0ede6;
+            --clasico-bg: #2a1a18;
             --clasico-text: #ff8fa8;
-            --gold-deep: #b3891a; 
-            --gold-accent: #d4a32e; 
+            --gold-deep: #b3891a;
+            --gold-accent: #d4a32e;
             --gold-bright: #f3c65d;
-            --crest-navy: #051613; 
+            --crest-navy: #051613;
             --crest-blue: #164e42;
             --font-body: 'Assistant', sans-serif;
             --font-display: 'Heebo', 'Assistant', sans-serif;
@@ -331,13 +331,13 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-body); }
         html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
-        body { 
-            background-color: var(--bg-body); 
-            color: var(--text-main); padding: 14px 6px; -webkit-tap-highlight-color: transparent; 
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main); padding: 14px 6px; -webkit-tap-highlight-color: transparent;
             min-height: 100vh; position: relative; overflow-x: hidden; text-rendering: optimizeSpeed;
         }
         body::before { content: ""; position: fixed; inset: 0; background: radial-gradient(ellipse 70% 50% at 50% -5%, rgba(22, 78, 66, 0.28), transparent 60%), radial-gradient(ellipse 50% 40% at 90% 100%, rgba(212, 163, 46, 0.08), transparent 55%); pointer-events: none; z-index: 0; }
-        .main-container { width: 100%; max-width: 98vw; margin: 0 auto; background: rgba(8, 34, 30, 0.15); padding: 18px; border-radius: 24px; box-shadow: var(--shadow-card); border: 1px solid var(--border-color); position: relative; z-index: 1; }     
+        .main-container { width: 100%; max-width: 98vw; margin: 0 auto; background: rgba(8, 34, 30, 0.15); padding: 18px; border-radius: 24px; box-shadow: var(--shadow-card); border: 1px solid var(--border-color); position: relative; z-index: 1; }
         header { background: transparent !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; color: var(--text-main); padding: 34px 22px 26px; border-radius: 22px; text-align: center; margin-bottom: 20px; position: relative; box-shadow: none; border: 1px solid var(--border-color); overflow: hidden; }
         header::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--gold-deep), var(--gold-bright), var(--gold-deep)); box-shadow: var(--glow-gold); }
         .header-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 4px; }
@@ -745,7 +745,7 @@
         }
         .lmv-scorers { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 0 16px 10px; font-size: 0.72rem; color: rgba(240,237,230,0.85); direction: ltr; }
         .lmv-scorers div:last-child { text-align: right; }
-    
+
 
         /* ---- clean row redesign ---- */
         @media (min-width: 1024px) {
@@ -861,7 +861,7 @@
         td.c-pred { position: relative; }
         .pts-3 { background: linear-gradient(160deg, rgba(34,197,94,0.22), rgba(34,197,94,0.06)) !important; box-shadow: inset 0 0 0 1px rgba(34,197,94,0.55); }
         .pts-1 { background: linear-gradient(160deg, rgba(212,163,46,0.2), rgba(212,163,46,0.05)) !important; box-shadow: inset 0 0 0 1px rgba(212,163,46,0.45); }
-        .pts-0 .score-in { opacity: 0.45; text-decoration: line-through; }
+        .pts-0 { background: #57282c !important; } .pts-0 .score-in { border-color:#de626a !important; } .pts-1 .score-in { background:#794414 !important; }
         .pts-3 .score-in { border-color: #22c55e !important; color: #bbf7d0 !important; font-weight: 900; }
         .pts-1 .score-in { border-color: var(--gold-accent) !important; }
         .pts-chip { position: absolute; top: 3px; left: 4px; font-size: 0.62rem; font-weight: 900; padding: 1px 5px; border-radius: 6px; background: #22c55e; color: #05210f; font-family: var(--font-mono); line-height: 1.4; }
@@ -937,7 +937,7 @@
                 <div class="nmx-timer" id="hnmTimer"></div>
                 <div class="nmx-actions">
                     <button class="nmx-cta" onclick="scrollToHeaderTargetMatch()">🎯 לניחוש שלי</button>
-                    <button class="nmx-ghost" onclick="toggleLiveDemo()" title="תצוגת LIVE">👁 LIVE</button>
+                    <button class="nmx-ghost" onclick="if (targetNextMatchId) openLineup(targetNextMatchId)" title="הרכבים ותוצאה חיה">הרכבים · LIVE</button>
                     <button class="nmx-ghost" onclick="BlancosNotify.sendTest()" title="בדיקת התראה">🔔</button>
                 </div>
             </div>
@@ -1355,7 +1355,7 @@
        the number shown in the live widget. A result somebody typed differently
        on purpose is only replaced when it is empty or mirrored (flipped). */
     function verifyResultsFromFixtures() {
-        if (!fotmobFixtures.length) return;
+        if (!autoScoreEnabled || !fotmobFixtures.length) return;
         let changed = false;
         currentMatches.forEach(m => {
             if (!m) return;
@@ -1365,12 +1365,14 @@
             if (!f.finished && !inPlay) return;
             if (f.realGoals === null || f.realGoals === undefined || f.oppGoals === null || f.oppGoals === undefined) return;
             const realScore = `${f.realGoals}-${f.oppGoals}`;
+            const observedLive = Object.hasOwn(seenScores,String(m.id)) && Math.abs(Date.now()-matchKickoff(m)) < 4*3600000;
             const stored = normalizeScoreStr(currentData[`actual_${m.id}`]);
+            if (inPlay || observedLive) notifyScoreChange(m, realScore);
             if (stored === realScore) return;
             const flipped = stored !== "" && stored === reverseScore(realScore);
             const manual = !!currentData[`manualActual_${m.id}`];
-            if (manual && !flipped) return;                       // ידני תמיד גובר
-            if (!inPlay && stored !== "" && !flipped) return;      // תוצאה סופית שנשמרה נשארת
+            if (manual) return;                       // ידני תמיד גובר
+            if (!inPlay && !observedLive && stored !== "" && !flipped) return;      // תוצאה סופית שנשמרה נשארת
             currentData[`actual_${m.id}`] = realScore;
             db.ref(`league_data/predictions/actual_${m.id}`).set(realScore);
             changed = true;
@@ -1414,8 +1416,10 @@
         }
         throw new Error(networkError ? "אין תקשורת עם השרת — בדוק חיבור לאינטרנט" : ((lastError && lastError.message) || "שגיאה בטעינה"));
     }
-    let fixtureRetryTimer = null;
+    let fixtureRetryTimer = null, fixtureBusy = false;
     async function loadFixtureBadges() {
+        if (fixtureBusy) return;
+        fixtureBusy = true;
         try {
             const data = await callFootballAPI({ fixtures: true });
             if (data && Array.isArray(data.fixtures) && data.fixtures.length) {
@@ -1431,6 +1435,7 @@
                 fixtureRetryTimer = setTimeout(() => { fixtureRetryTimer = null; loadFixtureBadges(); }, 10000);
             }
         }
+        finally { fixtureBusy = false; }
     }
     function findFotmobFixture(m) {
         if (!fotmobFixtures.length) return null;
@@ -1634,16 +1639,23 @@
     }
 
     /* ---- Fetch live + upcoming from TheSportsDB ---- */
+    const tsdbCache = new Map();
+    async function readFeed(url, field) {
+        const response = await fetch(url, {cache:"no-store", signal:AbortSignal.timeout(10000)});
+        if (!response.ok) throw new Error("HTTP "+response.status);
+        const json = await response.json();
+        if (!(field in json)) throw new Error("Missing events");
+        return json[field] || [];
+    }
     async function fetchLiveScores() {
         if (!autoScoreEnabled) return;
         try {
             // Fetch both upcoming/live events AND recent finished results, then merge (dedupe by idEvent)
-            const [nextRes, lastRes] = await Promise.all([
-                fetch(TSDB_NEXT_URL, { cache: "no-store" }).then(r => r.json()).catch(() => ({ events: [] })),
-                fetch(TSDB_LAST_URL, { cache: "no-store" }).then(r => r.json()).catch(() => ({ results: [] }))
-            ]);
-            const nextEvents = (nextRes && nextRes.events) || [];
-            const lastEvents = (lastRes && lastRes.results) || [];
+            const urls = [TSDB_NEXT_URL, TSDB_LAST_URL];
+            const feeds = await Promise.allSettled(urls.map((url,i) => readFeed(url,i ? "results" : "events")));
+            if (feeds.every(result => result.status === "rejected")) throw new Error("שני מקורות התוצאות לא זמינים");
+            feeds.forEach((result,i) => { if (result.status === "fulfilled") tsdbCache.set(urls[i],result.value); });
+            const [nextEvents,lastEvents] = urls.map(url => tsdbCache.get(url) || []);
             // merge: upcoming/live first, then finished (dedupe by idEvent)
             const merged = [];
             const seen = new Set();
@@ -1698,11 +1710,12 @@
         /* מתריעים רק כשהתוצאה משתנה בזמן שהאפליקציה פתוחה — לא על תוצאה קיימת בכל כניסה/רענון */
         var key = String(match.id), known = Object.prototype.hasOwnProperty.call(seenScores, key);
         if (seenScores[key] === newScore) return;
+        var previous = seenScores[key];
         seenScores[key] = newScore; try { sessionStorage.setItem("bnSeenScores", JSON.stringify(seenScores)); } catch (e) {}
-        if (!known) return;
+        if (!known || !newScore.split("-").some((n,i) => +n > +previous.split("-")[i])) return;
         BlancosNotify.show({
             kind: "goals",
-            tag: "goal",
+            tag: "goal_" + key + "_" + newScore,
             title: "⚽ גול! שינוי תוצאה בשידור חי",
             body: realFirstLabel(match, newScore)
         });
@@ -1816,15 +1829,7 @@
             setTimeout(() => overlay.classList.remove("show"), 5000);
         }
         playGoalSound();
-        if (typeof BlancosNotify !== "undefined" && BlancosNotify.tick) BlancosNotify.tick("goal");
-        if (typeof BlancosNotify !== "undefined") {
-            BlancosNotify.show({
-                kind: "goals",
-                tag: "goal",
-                title: `⚽ גול ל${scorerName}!`,
-                body: ltrIso(`${realName}  ${realScore} - ${oppScore}  ${oppName}`)
-            });
-        }
+
     }
     /* ---- Floating scroll button ---- */
     let floatingBtnMode = "next";
@@ -1909,16 +1914,16 @@
             // the fixture feed owns the score of a match being played — a second
             // feed must never overwrite a live score (e.g. with a stale 0-0)
             const fx = findFotmobFixture(m);
-            if (evLive && fx && fx.started && fx.realGoals !== null && fx.realGoals !== undefined) return;
+            if (fx?.started && fx.realGoals != null && (evLive || fx.finished)) return;
             const stored = normalizeScoreStr(currentData[`actual_${m.id}`]);
             const flipped = stored !== "" && stored === reverseScore(info.score);
-            if (currentData[`manualActual_${m.id}`] && !flipped) return; // manual override — don't overwrite
+            if (evLive || (evFinished && playingNow && Object.hasOwn(seenScores,String(m.id)))) notifyScoreChange(m, info.score);
+            if (currentData[`manualActual_${m.id}`]) return; // manual override — don't overwrite
             const hasStored = stored !== "";
             if (hasStored && !playingNow && !flipped) return; // settled and correct — leave it alone
             if (currentData[`actual_${m.id}`] !== info.score) {
                 currentData[`actual_${m.id}`] = info.score;
                 db.ref(`league_data/predictions/actual_${m.id}`).set(info.score);
-                if (evLive) notifyScoreChange(m, info.score);
                 changed = true;
             }
         });
@@ -2049,12 +2054,16 @@
        MATCH STATUS / COUNTDOWN
        ============================================================ */
     function getMatchStatus(match) {
+        const fx = findFotmobFixture(match), ev = findApiEvent(match);
+        if (fx?.finished || (ev && isEventFinished(ev))) return {text:"✓ הסתיים", isLive:false, isEnded:true};
+        if (fx?.started || (ev && isEventLive(ev))) return {text:"⚽ המשחק משוחק כעת!", isLive:true, isEnded:false};
         const timeStr = currentData[`time_${match.id}`] !== undefined ? currentData[`time_${match.id}`] : (match.time || "22:00");
         const dateStr = currentData[`date_${match.id}`] !== undefined ? currentData[`date_${match.id}`] : match.date;
         if (!dateStr || !timeStr) return { text: "שעה לא קיימת", isLive: false, isEnded: false };
         const matchTime = new Date(`${dateStr}T${timeStr}`).getTime();
         const now = new Date().getTime();
         const diff = matchTime - now;
+        if (diff <= 0 && diff > -7200000 && (fx || ev)) return {text:"בהמתנה לשריקת הפתיחה", isLive:false, isEnded:false};
         if (diff <= 0 && diff > -7200000) return { text: "⚽ המשחק משוחק כעת!", isLive: true, isEnded: false };
         if (diff <= -7200000) return { text: "✓ הסתיים", isLive: false, isEnded: true };
         const days = Math.floor(diff / 86400000);
@@ -2081,7 +2090,8 @@
         const st = getMatchStatus(match);
         const info = apiScoreForMatch(match);
         if (!st.isLive && !st.isEnded) return { key: "waiting", label: "ממתין למשחק", cls: "api-waiting" };
-        if (!autoScoreEnabled || currentData[`manualActual_${match.id}`]) return { key: "manual", label: "✍️ תוצאה ידנית", cls: "api-manual" };
+        if (!autoScoreEnabled && !currentData[`manualActual_${match.id}`]) return {key:"paused", label:"עדכון אוטומטי מושהה", cls:"api-waiting"};
+        if (currentData[`manualActual_${match.id}`]) return { key: "manual", label: "✍️ תוצאה ידנית", cls: "api-manual" };
         // the fixture feed delivers the live score too — it decides the pill when
         // the second feed has nothing for this match
         const fx = findFotmobFixture(match);
@@ -2089,11 +2099,14 @@
         if (hasFxScore && fx.started && !fx.finished) return { key: "live", label: "LIVE פעיל", cls: "api-live" };
         if (!lastFetchOk) return { key: "down", label: "API לא זמין", cls: "api-down" };
         if (info && isEventLive(info.event)) return { key: "live", label: "LIVE פעיל", cls: "api-live" };
-        if (st.isEnded && currentData[`actual_${match.id}`]) return { key: "live", label: "תוצאה מ-API", cls: "api-live" };
-        if (info && st.isEnded) return { key: "live", label: "תוצאה מ-API", cls: "api-live" };
+        if (st.isEnded && hasFxScore && fx.finished) return { key: "live", label: "תוצאה מ-API", cls: "api-live" };
+        if (info && isEventFinished(info.event)) return { key: "live", label: "תוצאה מ-API", cls: "api-live" };
         return { key: "searching", label: "מחפש שידור…", cls: "api-searching" };
     }
     function getMatchSourceNote(match) {
+        const fx = findFotmobFixture(match);
+        if (currentData[`manualActual_${match.id}`]) return "";
+        if (fx?.started && fx.realGoals != null) return '<span class="actual-source">📡 FotMob</span>';
         const info = apiScoreForMatch(match);
         if (!info && lastFetchOk) return "";
         const t = lastFetchTime ? lastFetchTime.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" }) : "";
@@ -2164,7 +2177,7 @@
         const widget = document.getElementById("liveMatchWidget");
         if (!widget) return;
         // Show ALL live Real Madrid events from the API directly (even if not in user's match list)
-        const liveEvents = apiEvents.filter(isEventLive);
+        const liveEvents = apiEvents.filter(ev => isEventLive(ev) && !currentMatches.some(m => findApiEvent(m) === ev && findFotmobFixture(m)?.started && findFotmobFixture(m)?.realGoals != null));
         const cards = liveEvents.map(ev => {
             const homeScore = String(ev.intHomeScore ?? "0");
             const awayScore = String(ev.intAwayScore ?? "0");
@@ -2199,7 +2212,7 @@
                 updatedLabel: (autoScoreEnabled && lastFetchOk && lastAutoFetchLabel) ? `TheSportsDB • עודכן ${lastAutoFetchLabel}` : ""
             });
         });
-        if (!cards.length && fotmobFixtures.length) {
+        if (fotmobFixtures.length) {
             fotmobFixtures.filter(f => f && f.started && !f.finished && f.realGoals != null && f.oppGoals != null).forEach(f => {
                 const homeIsReal = canonicalTeam(f.home && f.home.name) === "real madrid";
                 const oppT = homeIsReal ? f.away : f.home, realT = homeIsReal ? f.home : f.away;
@@ -2209,7 +2222,7 @@
                 const key = `fx_${f.id}`, scoreKey = `${key}_${f.realGoals}-${f.oppGoals}`;
                 const changed = previousLiveScores[key] && previousLiveScores[key] !== scoreKey;
                 previousLiveScores[key] = scoreKey;
-                if (changed) { playGoalSound(); if (typeof BlancosNotify !== "undefined") BlancosNotify.tick("goal"); }
+                if (changed) playGoalSound();
                 cards.push(liveCardHTML({
                     realName: (realT && realT.name) || "ריאל מדריד", oppName: (oppT && oppT.name) || "",
                     realBadge: crestFor("real madrid") || (realT && realT.logo), oppBadge: crestFor(oppT && oppT.name) || (oppT && oppT.logo),
@@ -2237,7 +2250,7 @@
             const timeStr = currentData[`time_${m.id}`] !== undefined ? currentData[`time_${m.id}`] : (m.time || "22:00");
             if (!dateStr) continue;
             const matchTime = new Date(`${dateStr}T${timeStr}`).getTime();
-            if (matchTime > now) { nextMatch = { ...m, calculatedTime: matchTime, timeStr }; break; }
+            if (getMatchStatus(m).isLive || matchTime > now) { nextMatch = { ...m, calculatedTime: matchTime, timeStr }; break; }
         }
         const containerEl = document.getElementById("hnmTeamsContainer");
         const infoEl = document.getElementById("hnmInfo");
@@ -2355,9 +2368,10 @@
     }
     /* ניקוד מדורג: 3 נק׳ על תוצאה מדויקת (או סימון ידני ב״מי צדק״), 1 נק׳ על כיוון נכון (ניצחון/תיקו/הפסד) */
     function scoreSign(s) { const p = s.split("-").map(Number); return Math.sign(p[0] - p[1]); }
+    function predictionPoints(actual, guess) { return actual === guess ? 3 : scoreSign(actual) === scoreSign(guess) ? 1 : 0; }
     function pointsFor(m, player) {
         const actual = normalizeScoreStr(currentData[`actual_${m.id}`]);
-        if ((currentData[`winners_${m.id}`] || []).includes(player)) return 3;
+        if (!getMatchStatus(m).isLive && (currentData[`winners_${m.id}`] || []).includes(player)) return 3;
         if (!actual) return 0;
         const g = normalizeScoreStr(currentData[`pred_${m.id}_${player}`]);
         if (!g) return 0;
@@ -2365,9 +2379,10 @@
         return scoreSign(g) === scoreSign(actual) ? 1 : 0;
     }
     function ptsClass(m, p) {
-        const done = normalizeScoreStr(currentData[`actual_${m.id}`]) && getMatchStatus(m).isEnded;
+        const status = getMatchStatus(m);
+        const done = normalizeScoreStr(currentData[`actual_${m.id}`]) && (status.isEnded || status.isLive);
         if (!done || !normalizeScoreStr(currentData[`pred_${m.id}_${p}`])) return ["", ""];
-        const v = pointsFor(m, p);
+        const v = status.isLive ? predictionPoints(normalizeScoreStr(currentData[`actual_${m.id}`]), normalizeScoreStr(currentData[`pred_${m.id}_${p}`])) : pointsFor(m,p);
         return [v === 3 ? "pts-3" : v === 1 ? "pts-1" : "pts-0", v ? `<b class="pts-chip">+${v}</b>` : ""];
     }
     function mcWeekday(d) { try { const x = new Date(`${d}T12:00`); return isNaN(x) ? "" : x.toLocaleDateString("he-IL", { weekday: "long" }); } catch (e) { return ""; } }
@@ -2468,7 +2483,7 @@
     function resetActualToAuto(matchId) {
         currentData[`manualActual_${matchId}`] = false;
         db.ref(`league_data/predictions/manualActual_${matchId}`).set(false);
-        applyAutoScores(); renderUI();
+        verifyResultsFromFixtures(); applyAutoScores(); renderUI();
     }
     function setVenueType(matchId, val) {
         const label = (val === 'H' || val === 'בית') ? 'בית' : 'חוץ';
@@ -2713,6 +2728,8 @@
        ============================================================ */
     const LINEUP_WINDOW_MS = 90 * 60 * 1000;
     const lineupCache = {};
+    const openedOfficial = new Set(JSON.parse(sessionStorage.getItem("bnOfficialOpened") || "[]"));
+    const pitchUpdates = new Map();
     let lineupOpenMatchId = "";
     let lineupPollTimer = null;
     let lastLineupAutoCheck = 0;
@@ -2884,7 +2901,7 @@
     const photoFillBusy = new Set();
     /* תמונות השחקנים מגיעות ישירות ממקור ההרכבים (בקשה אחת לכל משחק),
        כדי שגם הרכב שמגיע מהשרת בלי שדה תמונה יקבל פנים בעיגול. */
-    const FOTMOB_MATCH_URL = "https://www.fotmob.com/api/data/matchDetails?matchId=";
+    const FOTMOB_MATCH_URL = "./api/match-details?matchId=";
     const FOTMOB_DAY_URL = "https://www.fotmob.com/api/data/matches?date=";
     const shiftDay = (day, diff) => {
         const t = Date.parse(`${day}T00:00:00Z`);
@@ -3005,7 +3022,7 @@
         return `עוד ${mins} דק׳`;
     }
     async function loadLineups(m) {
-        if (!matchKickoff(m)) return;
+        if (!matchKickoff(m) || lineupCache[m.id]?.loading) return;
         lineupCache[m.id] = { ...(lineupCache[m.id] || {}), loading: true };
         if (lineupOpenMatchId === m.id) renderLineupBody(m);
         try {
@@ -3013,10 +3030,16 @@
             // to guess the game from a date, which is what kept it too slow
             const f = findFotmobFixture(m);
             const data = await callFootballAPI({ date: matchDateStr(m), matchId: f && f.id ? f.id : null });
+            if (data.confirmed === false || data.predicted) data.available = false;
+            if (data.available && data.confirmed !== false && !data.predicted && Math.abs(matchKickoff(m)-Date.now()) <= LINEUP_WINDOW_MS && !openedOfficial.has(m.id)) {
+                openedOfficial.add(m.id);
+                sessionStorage.setItem("bnOfficialOpened", JSON.stringify([...openedOfficial]));
+                openLineup(m.id);
+            }
             lineupCache[m.id] = { fetchedAt: Date.now(), data, loading: false };
-            await fillMissingPhotos(m);          // תמונות מצורפות לפני הציור — בלי עיגולים ריקים
+            fillMissingPhotos(m).catch(() => {});          // תמונות מצורפות לפני הציור — בלי עיגולים ריקים
         } catch (e) {
-            lineupCache[m.id] = { error: (e && e.message) || "שגיאה", loading: false };
+            lineupCache[m.id] = { ...lineupCache[m.id], error: (e && e.message) || "שגיאה", loading: false };
         }
         if (lineupOpenMatchId === m.id) renderLineupBody(m);
     }
@@ -3026,36 +3049,37 @@
         if (parts.length < 2 || str.length <= 12) return str;
         return `${parts[0][0]}. ${parts[parts.length - 1]}`;
     }
+    function lineupText(value) { return String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
     function playerChipHTML(p) {
         const key = photoKey(p.name);
         const src = p.photo || photoLookup(p.name) || "";
         const nm = String(p.name || "").replace(/"/g, "&quot;");
         return `<div class="p-card" title="${nm}">
-            <div class="p-photo-wrap ${src ? "" : "p-nophoto"}" data-wr="${key}" data-ini="${photoInitials(p.name)}">
-                ${src ? `<img class="p-photo" data-ph="${key}" data-nm="${nm}" data-team="${String(p.__team || "").replace(/"/g, "&quot;")}" src="${src}" alt="" loading="lazy" onerror="photoFail(this)">` : ""}
-                ${p.number ? `<span class="p-badge">${p.number}</span>` : ""}
+            <div class="p-photo-wrap ${src ? "" : "p-nophoto"}" data-wr="${lineupText(key)}" data-ini="${lineupText(photoInitials(p.name))}">
+                ${src ? `<img class="p-photo" data-ph="${lineupText(key)}" data-nm="${nm}" data-team="${String(p.__team || "").replace(/"/g, "&quot;")}" src="${lineupText(src)}" alt="" loading="lazy" onerror="photoFail(this)">` : ""}
+                ${p.number ? `<span class="p-badge">${lineupText(p.number)}</span>` : ""}
             </div>
-            <span class="p-name">${shortName(p.name)}</span>
+            <span class="p-name">${lineupText(shortName(p.name))}${p.incoming ? " ↗" : ""}</span>${p.rating ? `<small>⭐ ${lineupText(p.rating)}</small>` : ""}
         </div>`;
     }
     function lineupTeamHTML(t) {
         if (!t) return "";
         const lines = (t.lines || []).map(l => `<div class="pitch-line">${(l.players || []).map(playerChipHTML).join("")}</div>`).join("");
-        const subs = (t.subs || []).map(p => `<div class="lineup-player"><span class="lineup-num">${p.number || "-"}</span><span>${p.name}</span></div>`).join("");
+        const subs = (t.subs || []).map(p => `<div class="lineup-player"><span class="lineup-num">${p.number || "-"}</span><span>${lineupText(p.name)}</span></div>`).join("");
         return `<div class="lineup-team-card">
             <div class="lineup-team-head">
-                ${t.logo ? `<img class="lineup-team-logo" src="${t.logo}" alt="" onerror="this.style.display='none'">` : ""}
-                <span class="lineup-team-name">${t.name}</span>
-                ${t.formation ? `<span class="lineup-formation">${t.formation}</span>` : ""}
+                ${t.logo ? `<img class="lineup-team-logo" src="${lineupText(t.logo)}" alt="" onerror="this.style.display='none'">` : ""}
+                <span class="lineup-team-name">${lineupText(t.name)}</span>
+                ${t.formation ? `<span class="lineup-formation">${lineupText(t.formation)}</span>` : ""}
             </div>
             <div class="pitch">${lines}</div>
-            <div class="lineup-label">מחליפים</div>
-            ${subs || '<div class="lineup-player">—</div>'}
+            <details><summary class="lineup-label">מחליפים</summary>
+            ${subs || '<div class="lineup-player">—</div>'}</details>
         </div>`;
     }
     /* התשובה עשויה להגיע בשני מבנים: lines (השרת הנוכחי) או startXI (גרסה קודמת) —
        כך ההרכב מוצג תמיד, גם לפני פרסום מחדש של השרת. */
-    function normalizeLineupTeam(t) {
+    function normalizeLineupTeam(t, m) {
         if (!t) return null;
         let lines = (t.lines || []).filter(l => l && (l.players || []).length);
         if (!lines.length && Array.isArray(t.startXI) && t.startXI.length) {
@@ -3069,23 +3093,38 @@
                 lines = [{ role: "XI", players }];
             }
         }
-        return { name: t.name, logo: t.logo, formation: t.formation, lines, subs: t.subs || [] };
+        const updates = pitchUpdates.get(m.id);
+        function currentPlayer(starter) {
+            if (!updates) return starter;
+            let p = starter, incoming = false;
+            for (const [on,off] of updates.swaps) {
+                if (photoKey(off.name || "") === photoKey(p.name) || (off.id && String(off.id) === String(p.id))) {
+                    p = {...on, photo: on.id ? "https://images.fotmob.com/image_resources/playerimages/"+Number(on.id)+".png" : ""};
+                    incoming = true;
+                }
+            }
+            const rating = updates.ratings.get(photoKey(p.name)) || (Number(p.rating) > 0 ? Number(p.rating).toFixed(1) : "");
+            return {...p, incoming, rating};
+        }
+        return { name: t.name, logo: t.logo, formation: t.formation,
+            lines: lines.map(l => ({...l, players:l.players.map(currentPlayer)})), subs: t.subs || [] };
     }
     function renderLineupBody(m) {
         const body = document.getElementById("lineupBody");
         if (!body) return;
         const ko = matchKickoff(m);
+        const preview = `<div class="lineup-status"><b>המשחק הבא</b><br>${lineupText(m.match)}<br>${ko ? new Date(ko).toLocaleString("he-IL") : ""}</div>`;
         const cache = lineupCache[m.id];
         const hasData = cache && cache.data && cache.data.available;
         if (!hasData && ko && (ko - LINEUP_WINDOW_MS) > Date.now()) {
-            body.innerHTML = `<div class="lineup-status">🔒 ההרכבים ייחשפו 90 דקות לפני השריקה<br><span class="lineup-lock-timer" id="lineupLockText">${lineupLockText(m)}</span></div>`;
+            body.innerHTML = preview + `<div class="lineup-status">🔒 ההרכבים ייחשפו 90 דקות לפני השריקה<br><span class="lineup-lock-timer" id="lineupLockText">${lineupLockText(m)}</span></div>`;
             return;
         }
-        if (!cache || cache.loading) {
+        if (!cache || (!hasData && cache.loading)) {
             body.innerHTML = `<div class="lineup-status">⏳ טוען הרכבים…</div>`;
             return;
         }
-        if (cache.error) {
+        if (!hasData && cache.error) {
             body.innerHTML = `<div class="lineup-status">⚠️ לא הצלחתי לטעון הרכבים<br><span style="font-size:0.72rem;opacity:0.85;">${cache.error}</span></div>`;
             return;
         }
@@ -3094,16 +3133,20 @@
             const msg = d.reason === "no_fixture"
                 ? "לא נמצא משחק תואם לתאריך הזה"
                 : "ההרכבים טרם פורסמו — העמוד מתעדכן אוטומטית";
-            body.innerHTML = `<div class="lineup-status">⏳ ${msg}</div>`;
+            body.innerHTML = preview + `<div class="lineup-status">⏳ ${msg}</div>`;
             return;
         }
         /* Real Madrid always on the left, exactly like everywhere else in the app */
-        const orderedTeams = [normalizeLineupTeam(d.home), normalizeLineupTeam(d.away)].filter(Boolean)
+        const orderedTeams = [normalizeLineupTeam(d.home,m), normalizeLineupTeam(d.away,m)].filter(Boolean)
             .sort((a, b) => (canonicalTeam(a.name) === "real madrid" ? -1 : canonicalTeam(b.name) === "real madrid" ? 1 : 0));
-        const scoreLine = (d.realGoals !== null && d.realGoals !== undefined && d.oppGoals !== null && d.oppGoals !== undefined)
-            ? `<div class="lineup-score">${d.realGoals} - ${d.oppGoals} <span>תוצאה סופית</span></div>` : "";
-        body.innerHTML = `${scoreLine}<div class="lineup-teams">${orderedTeams.map(lineupTeamHTML).join("")}</div>
-            <div class="lmv-source">📡 עדכון אוטומטי • ${new Date(cache.fetchedAt).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })}</div>`;
+        const st = getMatchStatus(m);
+        const fx = findFotmobFixture(m);
+        const actual = normalizeScoreStr(currentData[`actual_${m.id}`]) || (fx?.realGoals != null ? fx.realGoals+"-"+fx.oppGoals : "");
+        const scoreLine = st.isLive || st.isEnded ? `<div class="lineup-score"><b dir="ltr">${actual || "—"}</b> · ${st.isEnded ? "סיום" : "שידור חי"}</div>` : '<div class="lineup-score">בהמתנה לשריקת הפתיחה</div>';
+        const expanded = body.dataset.match === String(m.id) ? [...body.querySelectorAll("details")].map(el => el.open) : [];
+        body.dataset.match = m.id;
+        setHTML(body, scoreLine + '<div class="lineup-teams">'+orderedTeams.map(lineupTeamHTML).join("")+'</div>' + (st.isLive && window.matchLivePanel ? window.matchLivePanel(m) : ""));
+        body.querySelectorAll("details").forEach((el,i) => el.open = !!expanded[i]);
         fillMissingPhotos(m);
     }
     function openLineup(matchId) {
@@ -3134,11 +3177,17 @@
         document.getElementById("lineupOverlay").classList.remove("show");
         if (lineupPollTimer) { clearInterval(lineupPollTimer); lineupPollTimer = null; }
     }
+    let lastOverlayScore = "";
     function tickLineupOverlay() {
         if (!lineupOpenMatchId) return;
         const m = currentMatches.find(x => x.id === lineupOpenMatchId);
         const el = document.getElementById("lineupLockText");
         if (m && el) el.innerText = lineupLockText(m);
+        if (m && lineupCache[m.id]?.data?.available) {
+            const status = getMatchStatus(m);
+            const key = JSON.stringify([m.id,status.isLive,status.isEnded,currentData["actual_"+m.id],activePlayersList.map(p => currentData["pred_"+m.id+"_"+p])]);
+            if (key !== lastOverlayScore) { lastOverlayScore = key; renderLineupBody(m); }
+        }
     }
     /* טעינה מקדימה של ההרכב הקרוב — כדי שפתיחת ההרכב תהיה מיידית עם כל התמונות */
     async function prefetchNextLineup() {
@@ -3158,11 +3207,11 @@
     }
     function autoCheckLineups() {
         const now = Date.now();
-        if (now - lastLineupAutoCheck < 300000) return;
+        if (!currentMatches.length || now - lastLineupAutoCheck < 30000) return;
         lastLineupAutoCheck = now;
         currentMatches.forEach(m => {
             const ko = matchKickoff(m);
-            if (!ko) return;
+            if (!ko || getMatchStatus(m).isEnded) return;
             const delta = ko - now;
             if (delta > LINEUP_WINDOW_MS || delta < -3 * 3600000) return;
             const c = lineupCache[m.id];
@@ -3178,9 +3227,12 @@
     scheduleNextFetch();
     loadFixtureBadges();
     /* רענון תאריכים ושעות מהפיד כל 20 דקות ובכל חזרה לאתר */
-    setInterval(() => { loadFixtureBadges(); }, 20 * 60 * 1000);
+
     document.addEventListener("visibilitychange", () => { if (!document.hidden) loadFixtureBadges(); });
-    setInterval(loadFixtureBadges, 3 * 60 * 1000);
+    (function refreshFixtures() {
+        const near = currentMatches.some(m => Math.abs(matchKickoff(m) - Date.now()) < 4 * 3600000);
+        setTimeout(async () => { if (!document.hidden) await loadFixtureBadges(); refreshFixtures(); }, near || !currentMatches.length ? 15000 : 180000);
+    })();
     setTimeout(prefetchNextLineup, 2500);
     // expose test helper
     window.testApi = async function() {
@@ -3219,13 +3271,14 @@
     ".xa-score{font-family:'JetBrains Mono',monospace;color:#f4d47c;font-size:1.1rem;}" +
     ".xa-chips{display:flex;flex-wrap:wrap;gap:6px;}" +
     ".xa-chip{display:inline-flex;gap:6px;align-items:center;padding:5px 10px;border-radius:999px;background:rgba(5,22,19,.9);border:1px solid var(--border-color,#123830);font-size:.85rem;}" +
-    ".xa-chip i{font-style:normal;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--text-muted,#8fa89e);}" +
+    ".xa-chip i,.xa-score{white-space:nowrap;direction:ltr;unicode-bidi:isolate}.xa-chip.xa-direction{background:#80450e}.xa-chip.xa-miss{background:#70292d}.xa-chip i{font-style:normal;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--text-muted,#8fa89e);}" +
     ".xa-chip.xa-ok{border-color:#2fb36b;background:rgba(20,70,45,.85);} .xa-chip.xa-ok i{color:#7dffb0;}" +
     ".xa-note{font-size:.78rem;color:var(--text-muted,#8fa89e);margin-top:8px;}" +
     ".xa-btn{margin-top:10px;width:100%;border:1px solid var(--gold-accent,#d4a32e);background:none;color:#f4d47c;border-radius:10px;padding:8px;font-weight:700;cursor:pointer;font-family:inherit;}" +
     ".xa-ev{margin-top:10px;border-top:1px solid var(--border-color,#123830);padding-top:8px;}" +
     ".xa-ev div{display:flex;gap:8px;align-items:baseline;padding:4px 0;font-size:.88rem;}" +
     ".xa-ev .xa-min{flex:0 0 42px;font-family:'JetBrains Mono',monospace;color:#f4d47c;font-weight:700;}";
+  var timelineFailures = new Set();
   var openEvents = {}, evCache = {}, evBusy = {}, lastLive = "", lastBar = "";
   function esc(x) { return String(x == null ? "" : x).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function ready() { return typeof currentMatches !== "undefined" && typeof currentData !== "undefined" && typeof activePlayersList !== "undefined" && Array.isArray(currentMatches) && currentMatches.length; }
@@ -3304,8 +3357,17 @@
     if (t.indexOf("var") >= 0) return "📺";
     return "";
   }
+  function chipsHTML(m,actual) {
+    return "<div class='xa-chips'>" + activePlayersList.map(p => {
+      const g = guess(m,p), pts = g && actual ? predictionPoints(actual,g) : null;
+      const cls = pts === 3 ? "xa-ok" : pts === 1 ? "xa-direction" : pts === 0 ? "xa-miss" : "";
+      return "<span class='xa-chip "+cls+"'>"+esc(p)+" <i>"+esc(g || "—")+"</i>"+(pts === null ? "" : " · "+pts)+"</span>";
+    }).join("") + "</div>";
+  }
+  window.matchLivePanel = m => chipsHTML(m,normalizeScoreStr(currentData["actual_"+m.id])) + eventsHTML(m.id);
   function eventsHTML(id) {
     var list = evCache[id];
+    if (!list && timelineFailures.has(id)) return "ציר הזמן אינו זמין — מנסה שוב";
     if (list === undefined) return "<div class='xa-ev'><div>⏳ טוען ציר זמן…</div></div>";
     if (!list.length) return "<div class='xa-ev'><div>עדיין אין אירועים (גולים, כרטיסים, חילופים) — מתעדכן אוטומטית</div></div>";
     return "<div class='xa-ev'>" + list.map(function (e) { return "<div><span class='xa-min'>" + esc(e.min) + "</span><span>" + e.icon + " " + esc(e.text) + "</span></div>"; }).join("") + "</div>";
@@ -3318,6 +3380,17 @@
       return fetch(FOTMOB_MATCH_URL + fid, { cache: "no-store" });
     }).then(function (r) { if (!r.ok) throw new Error("http"); return r.json(); }).then(function (j) {
       var ev = j && j.content && j.content.matchFacts && j.content.matchFacts.events && j.content.matchFacts.events.events;
+
+      const ratings = new Map();
+      for (const team of [j.content.lineup?.homeTeam, j.content.lineup?.awayTeam]) {
+        for (const player of [...(team?.starters || []), ...(team?.subs || [])]) {
+          const value = Number(player.performance?.rating ?? player.rating?.num ?? player.rating);
+          if (value > 0 && value <= 10) ratings.set(photoKey(player.name), value.toFixed(1));
+        }
+      }
+      if (!Array.isArray(ev)) throw new Error("missing events");
+      timelineFailures.delete(m.id);
+      pitchUpdates.set(m.id, {ratings, swaps: ev.filter(e => eventIcon(e) === "🔄" && e.swap?.[0] && e.swap?.[1]).slice().sort((a,b)=>a.time-b.time).map(e=>e.swap)});
       evCache[m.id] = (Array.isArray(ev) ? ev : []).map(function (e) {
         var icon = eventIcon(e); if (!icon) return null;
         var name = e.nameStr || (e.player && e.player.name) || e.fullName || "";
@@ -3332,7 +3405,7 @@
         }
         return { min: min + "′", icon: icon, text: text };
       }).filter(Boolean).reverse();
-    }).catch(function () { if (evCache[m.id] === undefined) evCache[m.id] = []; }).then(function () { evBusy[m.id] = false; renderLive(true); });
+    }).catch(function () { timelineFailures.add(m.id); }).then(function () { evBusy[m.id] = false; renderLive(true); if (lineupOpenMatchId === m.id) renderLineupBody(m); });
   }
   /* תצוגה מקדימה של הפס שמתחת לכרטיס הלייב (ניחושי כולם) — באותו מבנה כמו במשחק אמיתי, עם ניחושים לדוגמה */
   function demoStripHTML() {
@@ -3352,16 +3425,14 @@
     el.className = "xa-live";
     var ms = liveMatches();
     var html = ((typeof liveDemoOn !== "undefined" && liveDemoOn) ? demoStripHTML() : "") + ms.map(function (m) {
+      if (evCache[m.id] === undefined && !timelineFailures.has(m.id)) loadEvents(m);
       var actual = normalizeScoreStr(currentData["actual_" + m.id]);
-      var chips = activePlayersList.map(function (p) {
-        var g = guess(m, p), ok = actual && g === actual;
-        return "<span class='xa-chip " + (ok ? "xa-ok" : "") + "'>" + (ok ? "✅ " : "") + esc(p) + " <i>" + (g || "—") + "</i></span>";
-      }).join("");
+      var chips = chipsHTML(m,actual);
       var right = actual ? activePlayersList.filter(function (p) { return guess(m, p) === actual; }) : [];
       var note = actual ? (right.length ? "צודקים כרגע: " + right.map(esc).join(", ") : "אף אחד לא צודק כרגע") : "";
       var open = !!openEvents[m.id];
       return "<div class='xa-card'><div class='xa-h'><span>📊 מה כולם ניחשו — " + esc(m.match) + "</span><span class='xa-score'>" + (actual || "") + "</span></div>" +
-        "<div class='xa-chips'>" + chips + "</div><div class='xa-note'>" + note + " · ריאל משמאל, יריבה מימין</div>" +
+        chips + "<div class='xa-note'>" + note + " · ריאל משמאל, יריבה מימין</div>" +
         "<button class='xa-btn' data-ev='" + esc(m.id) + "'>" + (open ? "🔽 הסתר ציר זמן" : "📜 ציר זמן של המשחק") + "</button>" + (open ? eventsHTML(m.id) : "") + "</div>";
     }).join("");
     if (!force && html === lastLive) return;
@@ -3374,7 +3445,7 @@
       });
     });
   }
-  function refreshOpenEvents() { liveMatches().forEach(function (m) { if (openEvents[m.id]) loadEvents(m); }); }
+  function refreshOpenEvents() { if (document.hidden) return; liveMatches().forEach(function (m) { loadEvents(m); }); }
 
   function tick() { try { if (!ready()) return; ensureStyle(); renderBar(); renderLive(false); } catch (e) { /* לא מפילים את האתר */ } }
   function slow() { try { if (!ready()) return; notifyLineups(); notifyDeadline(); } catch (e) {} }
