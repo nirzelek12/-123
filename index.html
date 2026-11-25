@@ -392,6 +392,11 @@
         .lmv-btn:hover { background: rgba(212,163,46,0.22); }
         .lmv-source { font-size: 0.66rem; color: rgba(214,228,223,0.62); font-family: var(--font-mono); direction: ltr; }
         .lmv-error { position: relative; z-index: 2; background: linear-gradient(135deg, rgba(239,68,68,0.22), rgba(220,38,38,0.12)); border-bottom: 1px solid rgba(239,68,68,0.5); color: #ffb4b4; padding: 7px 12px; font-size: 0.72rem; font-weight: 700; text-align: center; }
+        .lmv-demo-ribbon { position: absolute; top: 10px; right: 10px; z-index: 6; display: flex; align-items: center; gap: 6px; }
+        .lmv-demo-tag { font-family: var(--font-mono); font-size: 0.6rem; font-weight: 800; letter-spacing: 1.5px; color: #051613; background: var(--gold-bright); border-radius: 6px; padding: 3px 8px; }
+        .lmv-demo-x { background: none; border: 1px solid rgba(212,163,46,0.5); color: var(--gold-bright); border-radius: 6px; font-size: 0.7rem; line-height: 1; padding: 4px 7px; cursor: pointer; }
+        .nm-demo-btn { background: transparent; border: 1px solid rgba(212,163,46,0.45); color: var(--gold-bright); padding: 6px 12px; border-radius: 9px; font-weight: 800; cursor: pointer; font-size: 0.75rem; font-family: var(--font-body); white-space: nowrap; transition: background 0.2s; }
+        .nm-demo-btn:hover { background: rgba(212,163,46,0.18); }
         .controls-section { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; width: 100%; }
         .control-card { background: var(--bg-sub-card); padding: 16px; border-radius: 14px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px; text-align: right; box-shadow: var(--shadow-soft); }
         .section-label { font-size: 0.85rem; font-weight: 800; color: var(--gold-bright); display: flex; align-items: center; gap: 6px; }
@@ -932,6 +937,7 @@
                 <div class="nmx-timer" id="hnmTimer"></div>
                 <div class="nmx-actions">
                     <button class="nmx-cta" onclick="scrollToHeaderTargetMatch()">🎯 לניחוש שלי</button>
+                    <button class="nmx-ghost" onclick="if (targetNextMatchId) openLineup(targetNextMatchId)" title="הרכבים ותוצאה חיה">הרכבים · LIVE</button>
                     <button class="nmx-ghost" onclick="BlancosNotify.sendTest()" title="בדיקת התראה">🔔</button>
                 </div>
             </div>
@@ -1415,12 +1421,9 @@
         if (fixtureBusy) return;
         fixtureBusy = true;
         try {
-            const res = await fetch("./api/fixtures", {cache:"no-store", signal:AbortSignal.timeout(12000)});
-            if (!res.ok) throw new Error("Fixture feed unavailable");
-            const data = await res.json();
-            if (data && Array.isArray(data.fixtures)) {
+            const data = await callFootballAPI({ fixtures: true });
+            if (data && Array.isArray(data.fixtures) && data.fixtures.length) {
                 fotmobFixtures = data.fixtures;
-                updateLiveMatchWidget();
                 verifyResultsFromFixtures();
                 syncAutoDateTimes(); // תאריכים ושעות מתעדכנים מהפיד גם אם עדכון התוצאות כבוי
                 applyAutoScores();
@@ -1677,7 +1680,7 @@
     }
     function isEventLive(ev) {
         const st = (ev.strStatus || "").toUpperCase();
-        return /^(1H|2H|HT|ET|BT|P|PEN_LIVE|LIVE|IN PLAY|IN PROGRESS|FIRST HALF|SECOND HALF|HALF TIME|EXTRA TIME)$/i.test(st.trim());
+        return st && st !== "FT" && st !== "MATCH FINISHED" && st !== "FINISHED" && st !== "NS" && st !== "POSTPONED" && st !== "NOT STARTED";
     }
     function isEventFinished(ev) {
         const st = (ev.strStatus || "").toUpperCase();
@@ -1686,7 +1689,7 @@
     function hasLiveMatch() { return apiEvents.some(isEventLive); }
     function currentRefreshDelay() {
         if (consecutiveFailures > 0) return Math.min(MAX_BACKOFF_MS, 2000 * Math.pow(2, consecutiveFailures - 1));
-        return hasLiveMatch() || currentMatches.some(m => Math.abs(matchKickoff(m)-Date.now()) < 4 * 3600000) ? LIVE_REFRESH_MS : IDLE_REFRESH_MS;
+        return hasLiveMatch() ? LIVE_REFRESH_MS : IDLE_REFRESH_MS;
     }
     function scheduleNextFetch() {
         if (liveFetchTimer) clearTimeout(liveFetchTimer);
@@ -2125,9 +2128,12 @@
     /* ============================================================
        LIVE MATCH WIDGET — ריאל מדריד תמיד משמאל, היריבה מימין
        ============================================================ */
+    let liveDemoOn = false;
+    function toggleLiveDemo() { liveDemoOn = !liveDemoOn; updateLiveMatchWidget(); try { if (window.xaRefresh) window.xaRefresh(); } catch (e) {} }
     function liveCardHTML(o) {
         return `
             <div class="live-match-card">
+                ${o.demo ? `<div class="lmv-demo-ribbon"><span class="lmv-demo-tag">תצוגה מקדימה</span><button class="lmv-demo-x" onclick="toggleLiveDemo()">✕</button></div>` : ''}
                 ${o.scoreChanged ? `<div class="lmv-goal-banner">⚽ שער!</div>` : ''}
                 ${o.errorBanner || ''}
                 <div class="lmv-top-bar">
@@ -2152,18 +2158,26 @@
                 </div>
                 <div class="lmv-progress"><span style="width:${o.progress}%"></span></div>
                 <div class="lmv-footer">
-                    <button class="lmv-btn" onclick="toggleAutoScore()">${o.autoLabel}</button>
+                    ${o.demo ? `<button class="lmv-btn" type="button" style="cursor:default">${o.autoLabel}</button>` : `<button class="lmv-btn" onclick="toggleAutoScore()">${o.autoLabel}</button>`}
                     ${o.updatedLabel ? `<span class="lmv-source">📡 ${o.updatedLabel}</span>` : ''}
                 </div>
             </div>`;
+    }
+    function demoLiveCardHTML() {
+        return liveCardHTML({
+            demo: true, comp: "לה ליגה", minute: "67'", progress: 74,
+            realName: "ריאל מדריד", oppName: "ברצלונה",
+            realBadge: crestFor("real madrid"), oppBadge: crestFor("barcelona"),
+            realScore: "2", oppScore: "1", scoreChanged: false,
+            autoLabel: `🔄 אוטומטי • ${new Date().toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`,
+            updatedLabel: `TheSportsDB • עודכן ${new Date().toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`
+        });
     }
     function updateLiveMatchWidget() {
         const widget = document.getElementById("liveMatchWidget");
         if (!widget) return;
         // Show ALL live Real Madrid events from the API directly (even if not in user's match list)
-        const liveEvents = apiEvents.filter(ev => isEventLive(ev) && !fotmobFixtures.some(f =>
-            (f.started || f.finished) && f.date && Math.abs(Date.parse(f.date)-Date.parse(ev.dateEvent)) <= 86400000 &&
-            canonicalTeam(f.home.name) === canonicalTeam(ev.strHomeTeam) && canonicalTeam(f.away.name) === canonicalTeam(ev.strAwayTeam)));
+        const liveEvents = apiEvents.filter(ev => isEventLive(ev) && !currentMatches.some(m => findApiEvent(m) === ev && findFotmobFixture(m)?.started && findFotmobFixture(m)?.realGoals != null));
         const cards = liveEvents.map(ev => {
             const homeScore = String(ev.intHomeScore ?? "0");
             const awayScore = String(ev.intAwayScore ?? "0");
@@ -2199,26 +2213,26 @@
             });
         });
         if (fotmobFixtures.length) {
-            fotmobFixtures.filter(f => f && f.started && !f.finished).forEach(f => {
+            fotmobFixtures.filter(f => f && f.started && !f.finished && f.realGoals != null && f.oppGoals != null).forEach(f => {
                 const homeIsReal = canonicalTeam(f.home && f.home.name) === "real madrid";
                 const oppT = homeIsReal ? f.away : f.home, realT = homeIsReal ? f.home : f.away;
                 const ko = f.kickoff ? Date.parse(f.kickoff) : NaN;
                 let mins = isNaN(ko) ? 0 : Math.floor((Date.now() - ko) / 60000);
                 if (mins > 45 && mins < 60) mins = -1; else if (mins >= 60) mins -= 15;
                 const key = `fx_${f.id}`, scoreKey = `${key}_${f.realGoals}-${f.oppGoals}`;
-                const scored = f.realGoals != null && f.oppGoals != null;
-                const changed = scored && previousLiveScores[key] && previousLiveScores[key] !== scoreKey;
-                if (scored) previousLiveScores[key] = scoreKey;
+                const changed = previousLiveScores[key] && previousLiveScores[key] !== scoreKey;
+                previousLiveScores[key] = scoreKey;
                 if (changed) playGoalSound();
                 cards.push(liveCardHTML({
                     realName: (realT && realT.name) || "ריאל מדריד", oppName: (oppT && oppT.name) || "",
                     realBadge: crestFor("real madrid") || (realT && realT.logo), oppBadge: crestFor(oppT && oppT.name) || (oppT && oppT.logo),
-                    realScore: String(f.realGoals ?? "—"), oppScore: String(f.oppGoals ?? "—"), comp: f.league || f.tournament || "LIVE",
+                    realScore: String(f.realGoals), oppScore: String(f.oppGoals), comp: f.league || f.tournament || "LIVE",
                     minute: mins === -1 ? "מחצית" : (mins > 0 ? `${Math.min(mins, 90)}'` : "—"), progress: mins > 0 ? Math.min(100, mins / 90 * 100) : 50,
                     scoreChanged: changed, errorBanner: "", autoLabel: "🔄 אוטומטי", updatedLabel: "FotMob • עדכון חי"
                 }));
             });
         }
+        if (liveDemoOn) cards.unshift(demoLiveCardHTML());
         if (!cards.length) { widget.style.display = "none"; setHTML(widget, ""); return; }
         widget.style.display = "flex";
         setHTML(widget, cards.join(""));
@@ -3216,7 +3230,7 @@
 
     document.addEventListener("visibilitychange", () => { if (!document.hidden) loadFixtureBadges(); });
     (function refreshFixtures() {
-        const near = fotmobFixtures.some(f => !f.finished && (f.started || Math.abs(Date.parse(f.kickoff) - Date.now()) < 4 * 3600000)) || currentMatches.some(m => Math.abs(matchKickoff(m) - Date.now()) < 4 * 3600000);
+        const near = currentMatches.some(m => Math.abs(matchKickoff(m) - Date.now()) < 4 * 3600000);
         setTimeout(async () => { if (!document.hidden) await loadFixtureBadges(); refreshFixtures(); }, near || !currentMatches.length ? 15000 : 180000);
     })();
     setTimeout(prefetchNextLineup, 2500);
@@ -3393,11 +3407,24 @@
       }).filter(Boolean).reverse();
     }).catch(function () { timelineFailures.add(m.id); }).then(function () { evBusy[m.id] = false; renderLive(true); if (lineupOpenMatchId === m.id) renderLineupBody(m); });
   }
+  /* תצוגה מקדימה של הפס שמתחת לכרטיס הלייב (ניחושי כולם) — באותו מבנה כמו במשחק אמיתי, עם ניחושים לדוגמה */
+  function demoStripHTML() {
+    var sample = ["2-1", "1-0", "3-1", "2-1", "2-0", "1-1", "0-0", "3-0"], actual = "2-1";
+    var chips = activePlayersList.map(function (p, i) {
+      var g = sample[i % sample.length], ok = g === actual;
+      return "<span class='xa-chip " + (ok ? "xa-ok" : "") + "'>" + (ok ? "✅ " : "") + esc(p) + " <i>" + g + "</i></span>";
+    }).join("");
+    var right = activePlayersList.filter(function (p, i) { return sample[i % sample.length] === actual; });
+    var note = right.length ? "צודקים כרגע: " + right.map(esc).join(", ") : "אף אחד לא צודק כרגע";
+    return "<div class='xa-card'><div class='xa-h'><span>📊 מה כולם ניחשו — ריאל מדריד - ברצלונה</span><span class='xa-score'>" + actual + "</span></div>" +
+      "<div class='xa-chips'>" + chips + "</div><div class='xa-note'>" + note + " · ריאל משמאל, יריבה מימין</div>" +
+      "<button class='xa-btn' type='button' style='cursor:default'>📜 ציר זמן של המשחק</button></div>";
+  }
   function renderLive(force) {
     var el = slot("xaLive", document.getElementById("liveMatchWidget"), document.getElementById("playersBar")); if (!el) return;
     el.className = "xa-live";
     var ms = liveMatches();
-    var html = ms.map(function (m) {
+    var html = ((typeof liveDemoOn !== "undefined" && liveDemoOn) ? demoStripHTML() : "") + ms.map(function (m) {
       if (evCache[m.id] === undefined && !timelineFailures.has(m.id)) loadEvents(m);
       var actual = normalizeScoreStr(currentData["actual_" + m.id]);
       var chips = chipsHTML(m,actual);
